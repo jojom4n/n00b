@@ -1,8 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "defs.h" // for constexpr "white" and "black"
-
 class Player
 {
 	bool checkmated;

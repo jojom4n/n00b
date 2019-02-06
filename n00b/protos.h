@@ -4,9 +4,11 @@
 #include <string>
 #include "defs.h"
 
-// from commands.cpp
+// commands.cpp
 void read_commands();
-Options resolve_buffer(const std::string const& buffer);
+Options resolve_input(const std::string const &input);
+
+// game.cpp
 void new_game();
 
 #endif

@@ -9,18 +9,18 @@
 
 void read_commands() 
 {
-	std::string buffer;
+	std::string input;
 	
 	do 
 	{
 		std::cout << ">>>> ";
-		std::cin >> buffer;
+		std::cin >> input;
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // take only first word
 
-		 // transform the buffer in lowercase prior to examine it
-		std::transform(buffer.begin(), buffer.end(), buffer.begin(), ::tolower);
+		 // transform the input in lowercase prior to examine it
+		std::transform(input.begin(), input.end(), input.begin(), ::tolower);
 
-		switch (resolve_buffer(buffer)) {
+		switch (resolve_input(input)) {
 		case quit:
 			break;
 		case help:
@@ -43,22 +43,22 @@ void read_commands()
 			break;
 		}
 
-	} while (!(buffer == "quit") && !(buffer == "q"));
+	} while (!(input == "quit") && !(input == "q"));
 }
 
-Options resolve_buffer(const std::string const& buffer)
+Options resolve_input(const std::string const &input)
 {
-	if (buffer == "quit" || buffer == "q")
+	if (input == "quit" || input == "q")
 		return quit;
-	else if (buffer == "help" || buffer == "h" || buffer == "?")
+	else if (input == "help" || input == "h" || input == "?")
 		return help;
-	else if (buffer == "fen" || buffer == "f")
+	else if (input == "fen" || input == "f")
 		return fen;
-	else if (buffer == "play" || buffer == "n")
+	else if (input == "play" || input == "n")
 		return play;
-	else if (buffer == "sysinfo" || buffer == "s")
+	else if (input == "sysinfo" || input == "s")
 		return sysinfo;
-	else if (buffer == "display" || buffer == "p")
+	else if (input == "display" || input == "p")
 		return display;
 	else
 		return invalid;

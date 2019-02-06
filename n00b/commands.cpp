@@ -13,7 +13,7 @@ void read_commands()
 	
 	do 
 	{
-		std::cout << ">>>> ";
+		std::cout << "> ";
 		std::cin >> input;
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // take only first word
 

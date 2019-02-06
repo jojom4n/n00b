@@ -8,9 +8,9 @@ typedef uint64_t Bitboard;
 
 enum Piece {king, queen, rooks, knights, bishops, pawns};
 
-enum Color {white, black, both};
+enum Color {white, black};
 
-enum Castle { castle_kingside, castle_queenside, castle_both }; // for castling - see Player.h
+enum Castle { castle_kingside, castle_queenside, castle_both }; // for castling - see Board.h
 
 enum Square
 {

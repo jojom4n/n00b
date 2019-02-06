@@ -22,6 +22,13 @@ void Board::set_piece(Color const &a, Piece const &b, Square const &c)
 	update_bitboards(a);
 }
 
+void Board::set_piece(Color const &a, Piece const &b, Square const &from, Square const &to)
+{
+	bb[a][b] ^= 1ULL << from;
+	bb[a][b] |= 1ULL << to;
+	update_bitboards(a);
+}
+
 void Board::set_newgame()
 {
 	// white pieces
@@ -69,9 +76,4 @@ void Board::update_bitboards(Color const &a)
 			black_pieces = black_pieces | bb[black][i];
 
 	all_pieces = white_pieces | black_pieces;
-}
-
-void Board::init(std::string const &fen) const
-{
-	// TODO - Fetch position from FEN
 }

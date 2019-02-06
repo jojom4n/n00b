@@ -38,7 +38,7 @@ void read_commands()
 			std::cout << "Sorry, unavailable command.\n" << std::endl;
 			break;
 		}
-	} while (buffer != "quit" && buffer != "q");
+	} while (!(buffer == "quit") && !(buffer == "q"));
 }
 
 Options resolve_buffer(const std::string const& buffer) {

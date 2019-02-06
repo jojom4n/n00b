@@ -2,20 +2,24 @@
 #define BOARD_H
 
 #include <stdint.h>
+#include "defs.h"
 
 class Board
 {
-	// let's define the bitboards...
-	typedef uint64_t Bitboard;
-	
-	// ...and let's create those bitboards;
 	Bitboard bb[2][6];
-	Bitboard White_Pieces = 0, Black_Pieces = 0, All_Pieces = 0;
+	Bitboard White_Pieces = 0ULL, Black_Pieces = 0ULL, All_Pieces = 0ULL;
 	
 public:
 	Board();
 	~Board();
+	
 	void init(std::string const& fen) const; // TODO - Fetch position from FEN
+	
+	Bitboard get_piece(unsigned short const& x, unsigned short const& y) const
+		{return bb[x][y];}
+
+	Bitboard get_position() const { return All_Pieces; }
+	Bitboard get_position(bool const& b) const;
 };
 
 #endif

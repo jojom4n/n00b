@@ -7,6 +7,6 @@
 // from commands.cpp
 void read_commands();
 Options resolve_buffer(const std::string const& buffer);
-void sys_info();
+void new_game();
 
 #endif

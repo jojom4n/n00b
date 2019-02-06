@@ -14,7 +14,7 @@ Board::~Board()
 			bb[i][z] = 0;
 }
 
-void Board::init(const std::string fen)
+void Board::init(std::string const& fen) const
 {
 	// TODO - Fetch position from FEN
 }

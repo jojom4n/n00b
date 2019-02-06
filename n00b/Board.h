@@ -15,7 +15,7 @@ class Board
 public:
 	Board();
 	~Board();
-	void init(const std::string fen); // TODO - Fetch position from FEN
+	void init(std::string const& fen) const; // TODO - Fetch position from FEN
 };
 
 #endif

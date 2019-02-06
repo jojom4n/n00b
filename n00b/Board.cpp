@@ -9,8 +9,8 @@ Board::Board()
 Board::~Board()
 {
 	// we initialize main bitboard
-	for (unsigned short i = 0; i < 1; i++)
-		for (unsigned short z = 0; z < 5; z++)
+	for (unsigned short i = 0; i < 2; i++)
+		for (unsigned short z = 0; z < 6; z++)
 			bb[i][z] = 0;
 }
 

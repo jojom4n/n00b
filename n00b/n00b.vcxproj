@@ -151,13 +151,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="board.h" />
-    <ClInclude Include="commands.h" />
+    <ClInclude Include="Board.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="protos.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="board.cpp" />
+    <ClCompile Include="Board.cpp" />
     <ClCompile Include="commands.cpp" />
     <ClCompile Include="n00b.cpp" />
     <ClCompile Include="pch.cpp">

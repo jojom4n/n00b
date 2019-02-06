@@ -10,11 +10,12 @@ class Board
 	
 	// ...and let's create those bitboards;
 	Bitboard bb[2][6];
+	Bitboard White_Pieces = 0, Black_Pieces = 0, All_Pieces = 0;
 	
 public:
 	Board();
 	~Board();
-	void init();
+	void init(const std::string fen); // TODO - Fetch position from FEN
 };
 
 #endif

@@ -7,24 +7,24 @@
     <ClCompile Include="n00b.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="board.cpp">
+    <ClCompile Include="commands.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="commands.cpp">
+    <ClCompile Include="Board.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="board.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="defs.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="commands.h">
+    <ClInclude Include="protos.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Board.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

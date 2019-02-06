@@ -33,17 +33,9 @@ void Board::set_newgame()
 	set_piece(white, knights, G1);
 	set_piece(white, bishops, C1);
 	set_piece(white, bishops, F1);
-	set_piece(white, pawns, A2);
-	set_piece(white, pawns, B2);
-	set_piece(white, pawns, C2);
-	set_piece(white, pawns, D2);
-	set_piece(white, pawns, E2);
-	set_piece(white, pawns, F2);
-	set_piece(white, pawns, G2);
-	set_piece(white, pawns, H2);
 	
-	/*for (short int i = A2; i <= H2; i++)
-		set_piece(white, pawns, Square(i));*/
+	for (short int i = A2; i <= H2; i++)
+		set_piece(white, pawns, Square(i));
 
 	//black pieces
 	set_piece(black, king, E8);

@@ -45,7 +45,7 @@ void read_commands()
 	} while (!(input == "quit") && !(input == "q"));
 }
 
-Option resolve_input(const std::string const &input)
+Option resolve_input(std::string const &input)
 {
 	if (input == "quit" || input == "q")
 		return quit;

@@ -6,13 +6,13 @@
 // definitions for bitboard "bb" (see Board.h)
 typedef uint64_t Bitboard;
 
-enum Piece {king, queen, rooks, knights, bishops, pawns};
+enum Piece : short int {king, queen, rooks, knights, bishops, pawns};
 
-enum Color {white, black};
+enum Color : bool {white, black};
 
-enum Castle { castle_kingside, castle_queenside, castle_both }; // for castling - see Board.h
+enum Castle : short int { castle_kingside, castle_queenside, castle_both };
 
-enum Square : int
+enum Square : short int
 {
 	A1, B1, C1, D1, E1, F1, G1, H1,
 	A2, B2, C2, D2, E2, F2, G2, H2,
@@ -24,9 +24,9 @@ enum Square : int
 	A8, B8, C8, D8, E8, F8, G8, H8
 };
 
-enum Option { quit, help, fen, play, sysinfo, display, invalid };
+enum Option : short int { quit, help, fen, play, sysinfo, display, invalid };
 
-enum File { file_A, file_B, file_C, file_D, file_E, file_F, file_G, file_H};
+enum File : short int { file_A, file_B, file_C, file_D, file_E, file_F, file_G, file_H};
 
-enum Rank {rank_1, rank_2, rank_3, rank_4, rank_5, rank_6, rank_7, rank_8};
+enum Rank : short int{rank_1, rank_2, rank_3, rank_4, rank_5, rank_6, rank_7, rank_8};
 #endif

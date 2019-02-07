@@ -6,19 +6,20 @@
 #include "protos.h"
 
 void new_game()
-{
+{	
 	Board *Chessboard = new Board();
 
 	Chessboard->set_newgame();
 
-	std::string input = "";
-
-	do 
+	while (!(input == "quit") && !(input == "q") && !(Chessboard->is_checkmate())) 
 	{
 		std::cout << "\n" << display_board(*Chessboard);
-		std::cout << "\nwhite > ";
-		std::cin >> input;
-	} while (!(input == "abort") && !(Chessboard->is_checkmated()));
 
-	std::cout << std::endl;
+		if (Chessboard->has_move() == white)
+			std::cout << "\nwhite";
+		else
+			std::cout << "\nblack";
+
+		read_commands();
+	}
 }

@@ -14,6 +14,8 @@ struct bb_coordinates
 	ushort y;
 };
 
+extern std::string input;
+
 enum Piece : ushort {king, queen, rooks, knights, bishops, pawns};
 
 enum Color : bool {white, black};
@@ -32,7 +34,7 @@ enum Square : ushort
 	A8, B8, C8, D8, E8, F8, G8, H8
 };
 
-enum Option : ushort { quit, help, fen, play, sysinfo, print, invalid };
+enum Option : ushort { quit, help, fen, play, invalid };
 
 enum File : ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
 

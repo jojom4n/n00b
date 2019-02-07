@@ -2,6 +2,8 @@
 #include <iostream>
 #include "protos.h"
 
+std::string input = " ";
+
 int main()
 {
 	std::cout << "Welcome to n00b v. 0.1 - An experimental chess engine project" << std::endl;

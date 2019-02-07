@@ -7,9 +7,7 @@
 #include "protos.h"
 
 void read_commands() 
-{
-	std::string input;
-	
+{	
 	do 
 	{
 		std::cout << "> ";
@@ -31,12 +29,6 @@ void read_commands()
 		case play:
 			new_game();
 			break;
-		case sysinfo:
-			std::cout << "Sorry, function not implemented yet.\n" << std::endl;
-			break;
-		case print:
-			std::cout << "Sorry, function not implemented yet.\n" << std::endl;
-			break;
 		default:
 			std::cout << "Sorry, unavailable command.\n" << std::endl;
 			break;
@@ -55,10 +47,6 @@ Option resolve_input(std::string const &input)
 		return fen;
 	else if (input == "play" || input == "n")
 		return play;
-	else if (input == "sysinfo" || input == "s")
-		return sysinfo;
-	else if (input == "print" || input == "p")
-		return print;
 	else
 		return invalid;
 }

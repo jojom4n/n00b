@@ -3,7 +3,7 @@
 #include "Board.h"
 #include "protos.h"
 
-const std::string display(Board const &board)
+const std::string display_board(Board const &board)
 {
 	std::string output = "+---+---+---+---+---+---+---+---+\n";
 
@@ -34,10 +34,10 @@ const std::string display(Board const &board)
 															// ushort is always >= 0
 	{
 		
-		for (unsigned short int file = FILE_A; file <= FILE_H; file++) {
+		for (ushort file = FILE_A; file <= FILE_H; file++) {
 
 			Square check_square = Square(rank * rank + ((rank * i) + file));
-
+			
 			if (board.get_square(check_square)) // square not empty
 			{
 				output += "| ";
@@ -48,11 +48,15 @@ const std::string display(Board const &board)
 			else
 				output += "|   ";
 		}
-
-			output += "|\n+---+---+---+---+---+---+---+---+\n";
-			i++;
+		
+		output += "| ";
+		output += rank + 49;
+		output += "\n+---+---+---+---+---+---+---+---+\n";
+		i++;
 	}
-
+	
+	output += "  A   B   C   D   E   F   G   H\n";
+	
 	return output;
 }
 

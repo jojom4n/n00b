@@ -15,7 +15,7 @@ void new_game()
 
 	do 
 	{
-		std::cout << "\n" << display(*Chessboard);
+		std::cout << "\n" << display_board(*Chessboard);
 		std::cout << "\nwhite > ";
 		std::cin >> input;
 	} while (!(input == "abort") && !(Chessboard->is_checkmated()));

@@ -13,7 +13,7 @@ Option resolve_input(std::string const &input);
 void new_game();
 
 //display.cpp
-const std::string display(Board const &board);
+const std::string display_board(Board const &board);
 const char print_piece(bb_coordinates const &coordinates);
 
 #endif

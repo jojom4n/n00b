@@ -2,7 +2,6 @@
 #include <iostream>
 #include <string>
 #include <algorithm> // for std::transform in read_commands()
-#include <Windows.h>
 #include <limits> // for using limits in cin.ignore() - see code below
 #undef max // for using "max()" identifier in cin.ignore - see code below
 #include "protos.h"
@@ -46,7 +45,7 @@ void read_commands()
 	} while (!(input == "quit") && !(input == "q"));
 }
 
-Options resolve_input(const std::string const &input)
+Option resolve_input(const std::string const &input)
 {
 	if (input == "quit" || input == "q")
 		return quit;

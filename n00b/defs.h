@@ -24,5 +24,9 @@ enum Square
 	A8, B8, C8, D8, E8, F8, G8, H8
 };
 
-enum Options { quit, help, fen, play, sysinfo, display, invalid };
+enum Option { quit, help, fen, play, sysinfo, display, invalid };
+
+enum File { file_A, file_B, file_C, file_D, file_E, file_F, file_G, file_H};
+
+enum Rank {rank_1, rank_2, rank_3, rank_4, rank_5, rank_6, rank_7, rank_8};
 #endif

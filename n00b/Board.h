@@ -16,29 +16,27 @@ public:
 	Board();
 	~Board();
 	
-	Bitboard get_piece_table(Color const &a, Piece const &b) const
-		{return bb[a][b];}
-
-	void set_piece(Color const &a, Piece const &b, Square const &c);
-	void set_piece(Color const &a, Piece const&b, Square const &from, Square const &to);
-
 	void set_newgame();
 
 	bool has_move() const { return move; }
-	void set_move(bool const& b) { move = b; }
-
-	Castle has_castling() const { return castling; }
-	void has_castling(Castle const &i) { castling = i; }
-
-	Bitboard get_position() const { return all_pieces; }
-	Bitboard get_position(Color const &a) const;
+	void has_move(bool const& b) { move = b; }
 
 	bool is_checkmated() const { return checkmated; }
 	void is_checkmated(bool const &b) { checkmated = b; }
 
-	void update_bitboards(Color const &a);
+	Castle has_castling() const { return castling; }
+	void has_castling(Castle const &i) { castling = i; }
+
+	void set_piece(Color const &a, Piece const &b, Square const &c);
+	
+	Bitboard get_position() const { return all_pieces; }
+	Bitboard get_position(Color const &a) const;
+	Bitboard get_position(Color const &a, Piece const &b) const
+		{ return bb[a][b]; }
 
 	Bitboard get_square(Square const& a) const { return all_pieces & (1ULL << a); }
+	
+	void update_bitboards(Color const &a);
 };
 
 #endif

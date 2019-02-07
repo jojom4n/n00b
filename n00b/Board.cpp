@@ -16,19 +16,6 @@ Board::~Board()
 	
 }
 
-void Board::set_piece(Color const &a, Piece const &b, Square const &c)
-{
-	bb[a][b] |= 1ULL << c;
-	update_bitboards(a);
-}
-
-void Board::set_piece(Color const &a, Piece const &b, Square const &from, Square const &to)
-{
-	bb[a][b] ^= 1ULL << from;
-	bb[a][b] |= 1ULL << to;
-	update_bitboards(a);
-}
-
 void Board::set_newgame()
 {
 	// white pieces
@@ -56,6 +43,12 @@ void Board::set_newgame()
 
 	for (short int i = A7; i <= H7; i++)
 		set_piece(black, pawns, Square(i));
+}
+
+void Board::set_piece(Color const &a, Piece const &b, Square const &c)
+{
+	bb[a][b] |= 1ULL << c;
+	update_bitboards(a);
 }
 
 Bitboard Board::get_position(Color const &a) const 

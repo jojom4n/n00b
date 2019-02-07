@@ -6,7 +6,7 @@
 
 // commands.cpp
 void read_commands();
-Options resolve_input(const std::string const &input);
+Option resolve_input(const std::string const &input);
 
 // game.cpp
 void new_game();

@@ -14,9 +14,6 @@ void new_game()
 	std::cout << "\nPosizione completa\n" 
 		<< std::bitset<64>(Chessboard->get_position()) << std::endl << std::endl;
 
-	Chessboard->set_piece(white, pawns, E2, E4);
-	Chessboard->set_piece(black, pawns, E7, E5);
-
 	std::cout << std::bitset<64>(Chessboard->get_position()) << std::endl; //end testing
 
 	std::string input;

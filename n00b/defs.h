@@ -3,16 +3,24 @@
 
 #include <stdint.h>
 
+typedef unsigned short int ushort;
+
 // definitions for bitboard "bb" (see Board.h)
 typedef uint64_t Bitboard;
 
-enum Piece : short int {king, queen, rooks, knights, bishops, pawns};
+struct bb_coordinates
+{
+	ushort x;
+	ushort y;
+};
+
+enum Piece : ushort {king, queen, rooks, knights, bishops, pawns};
 
 enum Color : bool {white, black};
 
-enum Castle : short int { castle_kingside, castle_queenside, castle_both };
+enum Castle : ushort { castle_kingside, castle_queenside, castle_both };
 
-enum Square : short int
+enum Square : ushort
 {
 	A1, B1, C1, D1, E1, F1, G1, H1,
 	A2, B2, C2, D2, E2, F2, G2, H2,
@@ -24,9 +32,10 @@ enum Square : short int
 	A8, B8, C8, D8, E8, F8, G8, H8
 };
 
-enum Option : short int { quit, help, fen, play, sysinfo, display, invalid };
+enum Option : ushort { quit, help, fen, play, sysinfo, print, invalid };
 
-enum File : short int { file_A, file_B, file_C, file_D, file_E, file_F, file_G, file_H};
+enum File : ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
 
-enum Rank : short int{rank_1, rank_2, rank_3, rank_4, rank_5, rank_6, rank_7, rank_8};
+enum Rank : ushort{ RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};
+
 #endif

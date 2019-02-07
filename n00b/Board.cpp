@@ -2,13 +2,14 @@
 #include <iostream>
 #include "Board.h"
 #include "defs.h"
+#include "protos.h"
 
 Board::Board()
 {
 	// we initialize main bitboard
-	for (unsigned short i = 0; i < 2; i++)
-		for (unsigned short z = 0; z < 6; z++)
-			bb[i][z] = 0ULL;
+	for (ushort x = 0; x < 2; x++)
+		for (ushort y = 0; y < 6; y++)
+			bb[x][y] = 0ULL;
 }
 
 Board::~Board()
@@ -28,7 +29,7 @@ void Board::set_newgame()
 	set_piece(white, bishops, C1);
 	set_piece(white, bishops, F1);
 	
-	for (short int i = A2; i <= H2; i++)
+	for (ushort i = A2; i <= H2; i++)
 		set_piece(white, pawns, Square(i));
 
 	//black pieces
@@ -41,7 +42,7 @@ void Board::set_newgame()
 	set_piece(black, bishops, C8);
 	set_piece(black, bishops, F8);
 
-	for (short int i = A7; i <= H7; i++)
+	for (ushort i = A7; i <= H7; i++)
 		set_piece(black, pawns, Square(i));
 }
 
@@ -51,7 +52,7 @@ void Board::set_piece(Color const &color, Piece const &piece_table, Square const
 	update_bitboards(color);
 }
 
-Bitboard Board::get_position(Color const &color) const 
+const Bitboard Board::get_position(Color const &color)
 {
 	if (color == white)
 		return white_pieces;
@@ -59,13 +60,29 @@ Bitboard Board::get_position(Color const &color) const
 		return black_pieces;
 }
 
+const bb_coordinates Board::identify_piece(Square const &square) const
+{
+	Bitboard compare = 0ULL; // create an empty bitboard for comparison...
+
+	compare |= 1ULL << square; // ...and set (1) the single bit only from the square argument
+
+	// let us ANDing the 'compare' bitboard with the main bitboards until we find the one
+	// containing the same bit we set in 'compare'
+
+	for (ushort x = 0; x < 2; x++)
+		for (ushort y = 0; y < 6; y++)
+			if (bb[x][y] & compare)	{
+				bb_coordinates coords = { x, y };
+				return coords; }
+}
+
 void Board::update_bitboards(Color const &color)
 {
 	if (color == white)
-		for (unsigned short i = 0; i < 6; i++)
+		for (ushort i = 0; i < 6; i++)
 			white_pieces = white_pieces | bb[white][i];
 	else if (color == black)
-		for (unsigned short i = 0; i < 6; i++)
+		for (ushort i = 0; i < 6; i++)
 			black_pieces = black_pieces | bb[black][i];
 
 	all_pieces = white_pieces | black_pieces;

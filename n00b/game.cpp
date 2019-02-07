@@ -3,6 +3,7 @@
 #include <bitset>
 #include "Board.h"
 #include "defs.h"
+#include "protos.h"
 
 void new_game()
 {
@@ -10,16 +11,11 @@ void new_game()
 
 	Chessboard->set_newgame();
 
-	//For testing purposes only
-	std::cout << "\nPosizione completa\n" 
-		<< std::bitset<64>(Chessboard->get_position()) << std::endl << std::endl;
-
-	std::cout << std::bitset<64>(Chessboard->get_position()) << std::endl; //end testing
-
-	std::string input;
+	std::string input = "";
 
 	do 
 	{
+		std::cout << "\n" << display(*Chessboard);
 		std::cout << "\nwhite > ";
 		std::cin >> input;
 	} while (!(input == "abort") && !(Chessboard->is_checkmated()));

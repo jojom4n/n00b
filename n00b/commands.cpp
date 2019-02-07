@@ -34,7 +34,7 @@ void read_commands()
 		case sysinfo:
 			std::cout << "Sorry, function not implemented yet.\n" << std::endl;
 			break;
-		case display:
+		case print:
 			std::cout << "Sorry, function not implemented yet.\n" << std::endl;
 			break;
 		default:
@@ -57,8 +57,8 @@ Option resolve_input(std::string const &input)
 		return play;
 	else if (input == "sysinfo" || input == "s")
 		return sysinfo;
-	else if (input == "display" || input == "p")
-		return display;
+	else if (input == "print" || input == "p")
+		return print;
 	else
 		return invalid;
 }

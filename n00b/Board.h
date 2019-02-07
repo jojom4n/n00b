@@ -25,18 +25,18 @@ public:
 	void is_checkmated(bool const &b) { checkmated = b; }
 
 	Castle has_castling() const { return castling; }
-	void has_castling(Castle const &i) { castling = i; }
+	void has_castling(Castle const &castle) { castling = castle; }
 
-	void set_piece(Color const &a, Piece const &b, Square const &c);
+	void set_piece(Color const &color, Piece const &piece_table, Square const &square);
 	
 	Bitboard get_position() const { return all_pieces; }
-	Bitboard get_position(Color const &a) const;
-	Bitboard get_position(Color const &a, Piece const &b) const
-		{ return bb[a][b]; }
+	Bitboard get_position(Color const &color) const;
+	Bitboard get_position(Color const &color, Piece const &piece_table) const
+		{ return bb[color][piece_table]; }
 
-	Bitboard get_square(Square const& a) const { return all_pieces & (1ULL << a); }
+	Bitboard get_square(Square const& square) const { return all_pieces & (1ULL << square); }
 	
-	void update_bitboards(Color const &a);
+	void update_bitboards(Color const &color);
 };
 
 #endif

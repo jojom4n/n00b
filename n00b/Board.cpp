@@ -45,26 +45,26 @@ void Board::set_newgame()
 		set_piece(black, pawns, Square(i));
 }
 
-void Board::set_piece(Color const &a, Piece const &b, Square const &c)
+void Board::set_piece(Color const &color, Piece const &piece_table, Square const &square)
 {
-	bb[a][b] |= 1ULL << c;
-	update_bitboards(a);
+	bb[color][piece_table] |= 1ULL << square;
+	update_bitboards(color);
 }
 
-Bitboard Board::get_position(Color const &a) const 
+Bitboard Board::get_position(Color const &color) const 
 {
-	if (a == white)
+	if (color == white)
 		return white_pieces;
-	else if (a == black)
+	else if (color == black)
 		return black_pieces;
 }
 
-void Board::update_bitboards(Color const &a)
+void Board::update_bitboards(Color const &color)
 {
-	if (a == white)
+	if (color == white)
 		for (unsigned short i = 0; i < 6; i++)
 			white_pieces = white_pieces | bb[white][i];
-	else if (a == black)
+	else if (color == black)
 		for (unsigned short i = 0; i < 6; i++)
 			black_pieces = black_pieces | bb[black][i];
 

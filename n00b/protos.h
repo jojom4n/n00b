@@ -10,6 +10,6 @@ void new_game();
 
 //display.cpp
 const std::string display_board(Board const &board);
-const char print_piece(bb_coordinates const &coordinates);
+const char print_piece(bb_index const &coordinates);
 
 #endif

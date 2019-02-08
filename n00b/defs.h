@@ -3,14 +3,14 @@
 
 #include <stdint.h>
 
+#define C64(constantU64) constantU64##ULL
+
 typedef unsigned short int ushort;
 
 // definitions for bitboard "bb" (see Board.h)
 typedef uint64_t Bitboard;
 
-#define C64(constantU64) constantU64##ULL
-
-struct bb_coordinates
+struct bb_index
 {
 	ushort x;
 	ushort y;
@@ -22,9 +22,9 @@ const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
 const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
 const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
 
-enum Piece : ushort {king, queen, rooks, knights, bishops, pawns};
+enum Piece : ushort { king, queen, rooks, knights, bishops, pawns, no_piece };
 
-enum Color : bool {white, black};
+enum Color : ushort { white, black, no_color };
 
 enum Square : ushort
 {
@@ -35,7 +35,8 @@ enum Square : ushort
 	A5, B5, C5, D5, E5, F5, G5, H5,
 	A6, B6, C6, D6, E6, F6, G6, H6,
 	A7, B7, C7, D7, E7, F7, G7, H7,
-	A8, B8, C8, D8, E8, F8, G8, H8
+	A8, B8, C8, D8, E8, F8, G8, H8,
+	NONE
 };
 
 enum File : ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};

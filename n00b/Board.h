@@ -2,6 +2,8 @@
 #define BOARD_H
 
 #include <stdint.h>
+#include <vector>
+#include <assert.h>
 #include "defs.h"
 
 class Board
@@ -10,16 +12,16 @@ class Board
 	Bitboard white_pieces = C64(0), black_pieces = C64(0), all_pieces = C64(0);
 	bool move = white; // who has the move
 	bool checkmate = false; // is the player checkmated?
-	
+
 	struct Castle {
 		Color player;
-		enum side {castle_kingside, castle_queenside, castle_both, castle_none};
+		enum side { castle_kingside, castle_queenside, castle_both, castle_none };
 	} castling;
 
 public:
 	Board();
 	~Board();
-	
+
 	void set_newgame();
 
 	constexpr bool has_move() const { return move; }
@@ -32,25 +34,47 @@ public:
 	void has_castling(Castle const &castle) { castling = castle; }
 
 	void set_piece(Color const &color, Piece const &piece_table, Square const &square);
-	
+
 	constexpr Bitboard get_position() const { return all_pieces; }
-	
-	const Bitboard get_position(Color const &color) const 
-		{ (color == white) ? white_pieces : black_pieces; }
-	
+
+	const Bitboard get_position(Color const &color) const
+	{
+		return (color == white) ? white_pieces : black_pieces;
+	}
+
 	constexpr Bitboard get_position(Color const &color, Piece const &piece_table) const
-		{ return bb[color][piece_table]; }
+	{
+		return bb[color][piece_table];
+	}
 
-	constexpr Bitboard is_square_occupied(Square const &square) const 
-		{ return all_pieces & (C64(1) << square); }
-	
-	const bb_coordinates identify_piece(Square const &square) const;
+	constexpr Bitboard is_square_occupied(Square const &square) const
+	{
+		return all_pieces & (C64(1) << square);
+	}
 
-	const ushort popcount() const;
-	const ushort popcount(Color const &color) const;
+	const bb_index identify_piece(Square const &square) const;
+
+	const ushort popcount(Color const &color = no_color) const;
 	const ushort popcount(Color const &color, Piece const &piece) const;
-	
-	void update_bitboards(Color const &color);
-};
 
+	const std::vector<Square> get_square(Color const &color, Piece const &piece) const;
+
+	void update_bitboards(Color const &color);
+
+	//now the BitScanForward and BitScanReverse by hardware
+	#if defined(__GNUC__)  // GCC, Clang, ICC
+		const Square bitscan_fwd(Bitboard const &b) const;
+		const Square bitscan_rvs(Bitboard const &b) const;
+	#elif defined(_MSC_VER)  // MSVC
+		#ifdef _WIN64  // MSVC, WIN64
+			const Square bitscan_fwd(Bitboard const &b) const;
+			const Square bitscan_rvs(Bitboard const &b) const;
+		#else  // MSVC, WIN32
+			const Square bitscan_fwd(Bitboard const &b) const;
+			const Square bitscan_rvs(Bitboard const &b) const;
+		#endif
+	#else  // Compiler is neither GCC nor MSVC compatible
+		#error "Compiler not supported."
+	#endif
+};
 #endif

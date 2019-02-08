@@ -60,7 +60,7 @@ const std::string display_board(Board const &board)
 	return output;
 }
 
-const char print_piece (bb_coordinates const &coordinates)
+const char print_piece (bb_index const &coordinates)
 {
 	switch (coordinates.y)
 	{
@@ -104,6 +104,9 @@ const char print_piece (bb_coordinates const &coordinates)
 			return 'P';
 		else
 			return 'p';
+		break;
+	default:
+		return NULL; // some error occurred
 		break;
 	}
 }

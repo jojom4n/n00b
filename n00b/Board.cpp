@@ -7,9 +7,9 @@
 Board::Board()
 {
 	// we initialize main bitboard
-	for (ushort x = 0; x < 2; x++)
-		for (ushort y = 0; y < 6; y++)
-			bb[x][y] = C64(0);
+	for (auto &row : bb)
+		for (auto& elem : row)
+			elem = C64(0);
 }
 
 Board::~Board()
@@ -52,7 +52,7 @@ void Board::set_piece(Color const &color, Piece const &piece_table, Square const
 	update_bitboards(color);
 }
 
-const bb_coordinates Board::identify_piece(Square const &square) const
+const bb_index Board::identify_piece(Square const &square) const
 {
 	Bitboard compare = C64(0); // create an empty bitboard for comparison...
 
@@ -63,25 +63,26 @@ const bb_coordinates Board::identify_piece(Square const &square) const
 
 	for (ushort x = 0; x < 2; x++)
 		for (ushort y = 0; y < 6; y++)
-			if (bb[x][y] & compare)	{
-				bb_coordinates coords = { x, y };
-				return coords; }
+			if (bb[x][y] & compare) {
+				bb_index coords = { x, y };
+				return coords;
+			}
+
+	return { NULL,NULL }; // some error occurred
 }
 
-const ushort Board::popcount() const // see https://www.chessprogramming.org/Population_Count
-{
-	Bitboard count = all_pieces;
-	count = count - ((count >> 1) & k1); 
-	count = (count & k2) + ((count >> 2)  & k2);
-	count = (count + (count >> 4)) & k4;
-	count = (count * kf) >> 56; 
-	return (ushort)count;
-}
-
+// see https://www.chessprogramming.org/Population_Count
 const ushort Board::popcount(Color const &color) const 
 {
-	Bitboard count = C64(0);
-	(color == white) ? count = white_pieces : count = black_pieces;
+	Bitboard count;
+
+	if (color == white)
+		count = white_pieces;
+	else if (color == black)
+		count = black_pieces;
+	else 
+		count = all_pieces;
+	
 	count = count - ((count >> 1) & k1);
 	count = (count & k2) + ((count >> 2)  & k2);
 	count = (count + (count >> 4)) & k4;
@@ -99,6 +100,15 @@ const ushort Board::popcount(Color const &color, Piece const &piece) const
 	return (ushort)count;
 }
 
+
+// TODO: First we must implement a bitscan_forward function at least
+const std::vector<Square> Board::get_square(Color const &color, Piece const &piece) const
+{
+	std::vector<Square> squares;
+	Bitboard count = bb[color][piece];
+	return squares;
+}
+
 void Board::update_bitboards(Color const &color)
 {
 	if (color == white)
@@ -110,3 +120,78 @@ void Board::update_bitboards(Color const &color)
 
 	all_pieces = white_pieces | black_pieces;
 }
+
+//now the BitScanForward and BitScanReverse by hardware
+#if defined(__GNUC__)  // GCC, Clang, ICC
+
+	const Square Board::bitscan_fwd(Bitboard const &b) const 
+	{
+		assert(b);
+		return Square(__builtin_ctzll(b));
+	}
+
+	const Square Board::bitscan_rvs(Bitboard const &b) const 
+	{
+		assert(b);
+		return Square(63 ^ __builtin_clzll(b));
+	}
+
+#elif defined(_MSC_VER)  // MSVC
+
+	#ifdef _WIN64  // MSVC, WIN64
+
+		const Square Board::bitscan_fwd(Bitboard const &b) const 
+		{
+			assert(b);
+			unsigned long index;
+			_BitScanForward64(&index, b);
+			return (Square)index;
+		}
+
+		const Square Board::bitscan_rvs(Bitboard const &b) const 
+		{
+			assert(b);
+			unsigned long index;
+			_BitScanReverse64(&index, b);
+			return (Square)index;
+		}
+
+	#else  // MSVC, WIN32
+
+		const Square Board::bitscan_fwd(Bitboard const &b) const 
+		{
+			assert(b);
+			unsigned long index;
+
+			if (b & 0xffffffff) {
+				_BitScanForward(&index, int32_t(b));
+				return Square(index);
+			}
+			else {
+				_BitScanForward(&index, int32_t(b >> 32));
+				return Square(index + 32);
+			}
+		}
+
+		const Square Board::bitscan_rvs(Bitboard const &b) 
+		{
+			assert(b);
+			unsigned long index;
+
+			if (b >> 32) {
+				_BitScanReverse(&index, int32_t(b >> 32));
+				return Square(index + 32);
+			}
+			else {
+				_BitScanReverse(&index, int32_t(b));
+				return Square(index);
+			}
+		}
+
+	#endif
+
+#else  // Compiler is neither GCC nor MSVC compatible
+
+	#error "Compiler not supported."
+
+#endif

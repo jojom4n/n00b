@@ -10,7 +10,11 @@ class Board
 	Bitboard white_pieces = 0ULL, black_pieces = 0ULL, all_pieces = 0ULL;
 	bool move = white; // who has the move
 	bool checkmate = false; // is the player checkmated?
-	Castle castling = castle_both; // can the player castle?
+	
+	struct Castle {
+		Color player;
+		enum side {castle_kingside, castle_queenside, castle_both, castle_none};
+	} castling;
 
 public:
 	Board();

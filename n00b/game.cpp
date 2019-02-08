@@ -11,15 +11,14 @@ void new_game()
 
 	Chessboard->set_newgame();
 
-	while (!(input == "quit") && !(input == "q") && !(Chessboard->is_checkmate())) 
+	for (;;)
 	{
-		std::cout << "\n" << display_board(*Chessboard);
-
+		std::string input;
 		if (Chessboard->has_move() == white)
 			std::cout << "\nwhite";
 		else
 			std::cout << "\nblack";
 
-		read_commands();
+		std::cin >> input;
 	}
 }

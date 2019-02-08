@@ -39,6 +39,8 @@ enum Square : ushort
 	NONE
 };
 
+extern const std::string squares_to_string[65];
+
 enum File : ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H};
 
 enum Rank : ushort{ RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8};

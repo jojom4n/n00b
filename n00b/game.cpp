@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <iostream>
 #include <bitset>
+#include <vector>
 #include "Board.h"
 #include "defs.h"
 #include "protos.h"
@@ -28,7 +29,29 @@ void new_game()
 	std::cout << "\n\nTotal number of pieces on board: " << Chessboard->popcount();
 
 	std::cout << "\n\n" << display_board(*Chessboard) << std::endl;
+
+	std::cout << "\n\nWhite King is on square: ";
+	for (auto &squares : Chessboard->get_square(white, king))
+		std::cout << squares_to_string[squares] << " ";
 	
+	std::cout << "\n\nWhite pawns are on square: ";
+	for (auto &squares : Chessboard->get_square(white, pawns))
+		std::cout << squares_to_string[squares] << " ";
+
+	std::cout << "\n\nBlack rooks are on square: ";
+	for (auto &squares : Chessboard->get_square(black, rooks))
+		std::cout << squares_to_string[squares] << " ";
+
+	std::cout << "\n\nBlack bishops are on square: ";
+	for (auto &squares : Chessboard->get_square(black, bishops))
+		std::cout << squares_to_string[squares] << " ";
+
+	std::cout << "\n\nWhite knights are on square: ";
+	for (auto &squares : Chessboard->get_square(white, knights))
+		std::cout << squares_to_string[squares] << " ";
+
+	std::cout << std::endl;
+
 	for (;;)
 	{
 		std::string input;

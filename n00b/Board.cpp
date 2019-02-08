@@ -102,10 +102,14 @@ const ushort Board::popcount(Color const &color, Piece const &piece) const
 
 
 // TODO: First we must implement a bitscan_forward function at least
-const std::vector<Square> Board::get_square(Color const &color, Piece const &piece) const
+const std::vector<Square> Board::get_square(Color const &color, Piece const &piece)
 {
 	std::vector<Square> squares;
 	Bitboard count = bb[color][piece];
+	
+	while (count)
+		{ squares.push_back(bitscan_reset(count)); }
+	
 	return squares;
 }
 
@@ -173,7 +177,7 @@ void Board::update_bitboards(Color const &color)
 			}
 		}
 
-		const Square Board::bitscan_rvs(Bitboard const &b) 
+		const Square Board::bitscan_rvs(Bitboard const &b) const
 		{
 			assert(b);
 			unsigned long index;
@@ -195,3 +199,10 @@ void Board::update_bitboards(Color const &color)
 	#error "Compiler not supported."
 
 #endif
+
+const Square Board::bitscan_reset(Bitboard &b)
+{
+	Square index = bitscan_fwd(b);
+	b &= b - 1; // reset bit outside
+	return index;
+}

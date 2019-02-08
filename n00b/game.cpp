@@ -11,13 +11,31 @@ void new_game()
 
 	Chessboard->set_newgame();
 
+	std::cout << "\nNumber of white pawns: " << Chessboard->popcount(white, pawns);
+	std::cout << "\nNumber of black pawns: " << Chessboard->popcount(black, pawns);
+	std::cout << "\n\nNumber of white rooks: " << Chessboard->popcount(white, rooks);
+	std::cout << "\nNumber of black rooks: " << Chessboard->popcount(black, rooks);
+	std::cout << "\n\nNumber of white bishops: " << Chessboard->popcount(white, bishops);
+	std::cout << "\nNumber of black bishops: " << Chessboard->popcount(black, bishops);
+	std::cout << "\n\nNumber of white knights: " << Chessboard->popcount(white, knights);
+	std::cout << "\nNumber of black knights: " << Chessboard->popcount(black, knights);
+	std::cout << "\n\nNumber of white kings: " << Chessboard->popcount(white, king);
+	std::cout << "\nNumber of black kings: " << Chessboard->popcount(black, king);
+	std::cout << "\n\nNumber of white queens: " << Chessboard->popcount(white, queen);
+	std::cout << "\nNumber of black queens: " << Chessboard->popcount(black, queen);
+	std::cout << "\n\nNumber of white pieces on board: " << Chessboard->popcount(white);
+	std::cout << "\nNumber of black pieces on board: " << Chessboard->popcount(black);
+	std::cout << "\n\nTotal number of pieces on board: " << Chessboard->popcount();
+
+	std::cout << "\n\n" << display_board(*Chessboard) << std::endl;
+	
 	for (;;)
 	{
 		std::string input;
 		if (Chessboard->has_move() == white)
-			std::cout << "\nwhite";
+			std::cout << "\nwhite>> ";
 		else
-			std::cout << "\nblack";
+			std::cout << "\nblack>> ";
 
 		std::cin >> input;
 	}

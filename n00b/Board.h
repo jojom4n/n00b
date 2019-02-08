@@ -7,7 +7,7 @@
 class Board
 {
 	Bitboard bb[2][6];
-	Bitboard white_pieces = 0ULL, black_pieces = 0ULL, all_pieces = 0ULL;
+	Bitboard white_pieces = C64(0), black_pieces = C64(0), all_pieces = C64(0);
 	bool move = white; // who has the move
 	bool checkmate = false; // is the player checkmated?
 	
@@ -34,13 +34,22 @@ public:
 	void set_piece(Color const &color, Piece const &piece_table, Square const &square);
 	
 	constexpr Bitboard get_position() const { return all_pieces; }
-	const Bitboard get_position(Color const &color);
+	
+	const Bitboard get_position(Color const &color) const 
+		{ (color == white) ? white_pieces : black_pieces; }
+	
 	constexpr Bitboard get_position(Color const &color, Piece const &piece_table) const
 		{ return bb[color][piece_table]; }
 
-	constexpr Bitboard get_square(Square const &square) const { return all_pieces & (1ULL << square); }
+	constexpr Bitboard is_square_occupied(Square const &square) const 
+		{ return all_pieces & (C64(1) << square); }
+	
 	const bb_coordinates identify_piece(Square const &square) const;
 
+	const ushort popcount() const;
+	const ushort popcount(Color const &color) const;
+	const ushort popcount(Color const &color, Piece const &piece) const;
+	
 	void update_bitboards(Color const &color);
 };
 

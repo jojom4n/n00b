@@ -9,7 +9,7 @@ Board::Board()
 	// we initialize main bitboard
 	for (ushort x = 0; x < 2; x++)
 		for (ushort y = 0; y < 6; y++)
-			bb[x][y] = 0ULL;
+			bb[x][y] = C64(0);
 }
 
 Board::~Board()
@@ -48,23 +48,15 @@ void Board::set_newgame()
 
 void Board::set_piece(Color const &color, Piece const &piece_table, Square const &square)
 {
-	bb[color][piece_table] |= 1ULL << square;
+	bb[color][piece_table] |= C64(1) << square;
 	update_bitboards(color);
-}
-
-const Bitboard Board::get_position(Color const &color)
-{
-	if (color == white)
-		return white_pieces;
-	else if (color == black)
-		return black_pieces;
 }
 
 const bb_coordinates Board::identify_piece(Square const &square) const
 {
-	Bitboard compare = 0ULL; // create an empty bitboard for comparison...
+	Bitboard compare = C64(0); // create an empty bitboard for comparison...
 
-	compare |= 1ULL << square; // ...and set (1) the single bit only from the square argument
+	compare |= C64(1) << square; // ...and set (1) the single bit only from the square argument
 
 	// let us ANDing the 'compare' bitboard with the main bitboards until we find the one
 	// containing the same bit we set in 'compare'
@@ -74,6 +66,37 @@ const bb_coordinates Board::identify_piece(Square const &square) const
 			if (bb[x][y] & compare)	{
 				bb_coordinates coords = { x, y };
 				return coords; }
+}
+
+const ushort Board::popcount() const // see https://www.chessprogramming.org/Population_Count
+{
+	Bitboard count = all_pieces;
+	count = count - ((count >> 1) & k1); 
+	count = (count & k2) + ((count >> 2)  & k2);
+	count = (count + (count >> 4)) & k4;
+	count = (count * kf) >> 56; 
+	return (ushort)count;
+}
+
+const ushort Board::popcount(Color const &color) const 
+{
+	Bitboard count = C64(0);
+	(color == white) ? count = white_pieces : count = black_pieces;
+	count = count - ((count >> 1) & k1);
+	count = (count & k2) + ((count >> 2)  & k2);
+	count = (count + (count >> 4)) & k4;
+	count = (count * kf) >> 56;
+	return (ushort)count;
+}
+
+const ushort Board::popcount(Color const &color, Piece const &piece) const
+{
+	Bitboard count = bb[color][piece];
+	count = count - ((count >> 1) & k1);
+	count = (count & k2) + ((count >> 2)  & k2);
+	count = (count + (count >> 4)) & k4;
+	count = (count * kf) >> 56;
+	return (ushort)count;
 }
 
 void Board::update_bitboards(Color const &color)

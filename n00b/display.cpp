@@ -38,7 +38,7 @@ const std::string display_board(Board const &board)
 
 			Square check_square = Square(rank * rank + ((rank * i) + file));
 			
-			if (board.get_square(check_square)) // square not empty
+			if (board.is_square_occupied(check_square)) // square not empty
 			{
 				output += "| ";
 				output += print_piece(board.identify_piece(check_square));

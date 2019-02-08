@@ -8,11 +8,19 @@ typedef unsigned short int ushort;
 // definitions for bitboard "bb" (see Board.h)
 typedef uint64_t Bitboard;
 
+#define C64(constantU64) constantU64##ULL
+
 struct bb_coordinates
 {
 	ushort x;
 	ushort y;
 };
+
+// for popcount() function in Board class - see https://www.chessprogramming.org/Population_Count
+const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
+const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
+const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
+const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
 
 enum Piece : ushort {king, queen, rooks, knights, bishops, pawns};
 

@@ -9,7 +9,6 @@
 void new_game()
 {	
 	Board *Chessboard = new Board();
-
 	Chessboard->set_newgame();
 
 	std::cout << "\nNumber of white pawns: " << Chessboard->popcount(white, pawns);

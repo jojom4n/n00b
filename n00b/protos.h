@@ -5,6 +5,9 @@
 #include "defs.h"
 #include "Board.h"
 
+// tables.cpp
+void init_masks();
+
 // game.cpp
 void new_game();
 

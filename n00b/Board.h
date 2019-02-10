@@ -8,7 +8,7 @@
 
 class Board
 {
-	Bitboard bb[2][6];
+	Bitboard bb[2][6] = {};
 	Bitboard white_pieces = C64(0), black_pieces = C64(0), all_pieces = C64(0);
 	bool move = white; // who has the move
 	bool checkmate = false; // is the player checkmated?

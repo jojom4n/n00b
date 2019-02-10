@@ -6,10 +6,11 @@
 
 Board::Board()
 {
-	// we initialize main bitboard
+	/* It SHOULD now work at initizialization time in Board.h. TEST!
 	for (auto &row : bb)
 		for (auto& elem : row)
 			elem = C64(0);
+	 */
 }
 
 Board::~Board()

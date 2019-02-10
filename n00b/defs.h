@@ -46,8 +46,7 @@ enum File : ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FIL
 
 enum Rank : ushort{ RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER};
 
-extern Bitboard rank_mask[RANK_NUMBER];
+extern Bitboard rank_mask[RANK_NUMBER], file_mask[FILE_NUMBER];
 
-extern Bitboard file_mask[FILE_NUMBER];
-
+extern Bitboard north_attack[SQ_NUMBER], south_attack[SQ_NUMBER], east_attack[SQ_NUMBER], west_attack[SQ_NUMBER];
 #endif

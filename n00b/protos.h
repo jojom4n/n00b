@@ -6,7 +6,10 @@
 #include "Board.h"
 
 // tables.cpp
-void init_masks();
+void init_tables();
+void create_file_mask();
+void create_rank_mask();
+void create_attacks_from();
 
 // game.cpp
 void new_game();

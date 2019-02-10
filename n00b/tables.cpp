@@ -4,16 +4,45 @@
 #include "defs.h"
 #include "protos.h"
 
-Bitboard file_mask[FILE_NUMBER] = { C64(0) };
-Bitboard rank_mask[RANK_NUMBER] = { C64(0) };
-Bitboard north_attack[SQ_NUMBER] = { C64(0) }, south_attack[SQ_NUMBER] = { C64(0) },
-	east_attack[SQ_NUMBER] = { C64(0) }, west_attack[SQ_NUMBER] = { C64(0) };
+Bitboard file_mask[FILE_NUMBER] {};
+Bitboard rank_mask[RANK_NUMBER] {};
+Bitboard rook_mask[SQ_NUMBER] {};
+Bitboard north_attack[SQ_NUMBER] {}, south_attack[SQ_NUMBER] {},
+	east_attack[SQ_NUMBER] {}, west_attack[SQ_NUMBER] {};
+
+const Bitboard rook_table[SQ_NUMBER][1 << ROOK_INDEX_BITS]{};
 
 void init_tables()
 {
 	create_file_mask();
 	create_rank_mask();
 	create_attacks_from();
+	create_rook_mask();
+	create_bishop_mask();
+}
+
+void create_rook_mask()
+{
+	// we don't want to modify real file and rank masks, so we copy them in new Bitboards
+	Bitboard temp_N[SQ_NUMBER]{}, temp_S[SQ_NUMBER]{}, temp_E[SQ_NUMBER]{}, temp_W[SQ_NUMBER]{};
+
+	std::copy(&north_attack[0], &north_attack[SQ_NUMBER], temp_N);
+	std::copy(&south_attack[0], &south_attack[SQ_NUMBER], temp_S);
+	std::copy(&east_attack[0], &east_attack[SQ_NUMBER], temp_E);
+	std::copy(&west_attack[0], &west_attack[SQ_NUMBER], temp_W);
+	
+	for (ushort square_index = A1; square_index <= H8; square_index++) {
+		if (square_index <= H7) temp_N[square_index] ^= C64(1) << bitscan_rvs(temp_N[square_index]);
+		if (square_index >= A2) temp_S[square_index] ^= C64(1) << bitscan_fwd(temp_S[square_index]);
+		if (FILE_INDEX != FILE_H) temp_E[square_index] ^= C64(1) << bitscan_rvs(temp_E[square_index]);
+		if (FILE_INDEX != FILE_A) temp_W[square_index] ^= C64(1) << bitscan_fwd(temp_W[square_index]);
+		rook_mask[square_index] = temp_N[square_index] | temp_S[square_index] | temp_E[square_index] | temp_W[square_index];
+	}
+}
+
+void create_bishop_mask()
+{
+	
 }
 
 void create_file_mask()
@@ -66,7 +95,4 @@ void create_attacks_from()
 			/* Shifting appropriate rank_mask n times, where n is (8 - file index).
 			Since shifting will create clipping, we AND the result of the shift with the same rank_mask again, to reset clipped '1' */
 			west_attack[square_index] = rank_mask[RANK_INDEX] >> (1 * (8 - FILE_INDEX)) & rank_mask[RANK_INDEX];
-	
-	std::bitset<64>x(west_attack[D6]);
-	std::cout << x << std::endl;
 }

@@ -157,9 +157,11 @@
     <ClInclude Include="protos.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bitscan.cpp" />
     <ClCompile Include="Board.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="magic.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

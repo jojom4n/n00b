@@ -11,6 +11,8 @@ void new_game()
 	Board *Chessboard = new Board();
 	Chessboard->set_newgame();
 
+	std::cout << std::endl << display_board(*Chessboard) << std::endl;
+
 	std::cout << "\nNumber of white pawns: " << Chessboard->popcount(white, pawns);
 	std::cout << "\nNumber of black pawns: " << Chessboard->popcount(black, pawns);
 	std::cout << "\n\nNumber of white rooks: " << Chessboard->popcount(white, rooks);
@@ -26,8 +28,6 @@ void new_game()
 	std::cout << "\n\nNumber of white pieces on board: " << Chessboard->popcount(white);
 	std::cout << "\nNumber of black pieces on board: " << Chessboard->popcount(black);
 	std::cout << "\n\nTotal number of pieces on board: " << Chessboard->popcount();
-
-	std::cout << "\n\n" << display_board(*Chessboard) << std::endl;
 
 	std::cout << "\n\nWhite King is on square: ";
 	for (auto &squares : Chessboard->get_square(white, king))
@@ -48,6 +48,9 @@ void new_game()
 	std::cout << "\n\nWhite knights are on square: ";
 	for (auto &squares : Chessboard->get_square(white, knights))
 		std::cout << squares_to_string[squares] << " ";
+	
+	std::bitset<64>x(rook_mask[C3]);
+	std::cout << "\n\nAttack bitboard for Rook on C3: " << x << std::endl;
 
 	std::cout << std::endl;
 

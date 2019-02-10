@@ -60,23 +60,5 @@ public:
 	const std::vector<Square> get_square(Color const &color, Piece const &piece);
 
 	void update_bitboards(Color const &color);
-
-	//now the BitScanForward and BitScanReverse by hardware
-	#if defined(__GNUC__)  // GCC, Clang, ICC
-		const Square bitscan_fwd(Bitboard const &b) const;
-		const Square bitscan_rvs(Bitboard const &b) const;
-	#elif defined(_MSC_VER)  // MSVC
-		#ifdef _WIN64  // MSVC, WIN64
-			const Square bitscan_fwd(Bitboard const &b) const;
-			const Square bitscan_rvs(Bitboard const &b) const;
-		#else  // MSVC, WIN32
-			const Square bitscan_fwd(Bitboard const &b) const;
-			const Square bitscan_rvs(Bitboard const &b) const;
-		#endif
-	#else  // Compiler is neither GCC nor MSVC compatible
-		#error "Compiler not supported."
-	#endif
-
-	const Square bitscan_reset(Bitboard &b);
 };
 #endif

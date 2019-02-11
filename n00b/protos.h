@@ -14,7 +14,9 @@ void create_attacks_from();
 
 // magic.cpp
 const Bitboard rook_attack(Square const &square, Bitboard blockers);
-const Bitboard gen_blockerboard(int index, Bitboard const &blockermask);
+const Bitboard gen_blockerboard(int index, ushort bits, Bitboard b);
+const Bitboard gen_r_attks(ushort square, Bitboard b);
+void init_rook();
 
 // game.cpp
 void new_game();

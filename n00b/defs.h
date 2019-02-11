@@ -5,8 +5,8 @@
 #include <string>
 
 #define C64(constantU64) constantU64##ULL
-#define FILE_INDEX (square_index % 8)
-#define RANK_INDEX (square_index / 8)
+#define FILE_INDEX (square % 8)
+#define RANK_INDEX (square / 8)
 
 typedef unsigned short int ushort;
 

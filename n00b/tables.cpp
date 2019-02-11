@@ -16,8 +16,6 @@ void init_tables()
 	create_rank_mask();
 	create_attacks_from();
 	create_rook_mask();
-	create_rook_magic();
-	create_bishop_mask();
 }
 
 void create_rook_mask()
@@ -37,11 +35,6 @@ void create_rook_mask()
 		if (FILE_INDEX != FILE_A) temp_W[square_index] ^= C64(1) << bitscan_fwd(temp_W[square_index]);
 		rook_mask[square_index] = temp_N[square_index] | temp_S[square_index] | temp_E[square_index] | temp_W[square_index];
 	}
-}
-
-void create_bishop_mask()
-{
-	
 }
 
 void create_file_mask()

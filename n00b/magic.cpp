@@ -2,7 +2,7 @@
 #include "defs.h"
 #include "protos.h"
 
-const Bitboard rook_magic[SQ_NUMBER] =
+const uint64_t rook_magic[SQ_NUMBER] =
 {
 	C64(0x0080001020400080), C64(0x0040001000200040), C64(0x0080081000200080), C64(0x0080040800100080),
 	C64(0x0080020400080080), C64(0x0080010200040080), C64(0x0080008001000200), C64(0x0080002040800100),
@@ -27,11 +27,6 @@ Bitboard rook_table[SQ_NUMBER][1 << ROOK_INDEX_BITS]{};
 const Bitboard rook_attack (Square const &square, Bitboard blockers)
 {
 	return rook_table[square][((blockers&rook_mask[square]) * rook_magic[square]) >> (SQ_NUMBER - ROOK_INDEX_BITS)];
-}
-
-void create_rook_magic()
-{	
-
 }
 
 const Bitboard gen_blockerboard(int index, Bitboard const &blockermask)

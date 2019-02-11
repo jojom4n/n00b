@@ -10,7 +10,6 @@
 
 typedef unsigned short int ushort;
 
-// definitions for bitboard
 typedef uint64_t Bitboard;
 
 struct bb_index
@@ -23,7 +22,7 @@ struct bb_index
 constexpr ushort ROOK_INDEX_BITS = 12;
 constexpr ushort BISHOP_INDEX_BITS = 9;
 
-// for popcount() function in Board class - see https://www.chessprogramming.org/Population_Count
+// for popcount() functions - see https://www.chessprogramming.org/Population_Count
 const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
 const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
 const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
@@ -52,10 +51,9 @@ enum File : const ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_
 
 enum Rank : const ushort{ RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER};
 
-extern Bitboard rank_mask[RANK_NUMBER], file_mask[FILE_NUMBER], rook_mask[SQ_NUMBER], bishop_mask[SQ_NUMBER];
+extern Bitboard rank_mask[RANK_NUMBER], file_mask[FILE_NUMBER], rook_mask[SQ_NUMBER];
 extern Bitboard north_attack[SQ_NUMBER], south_attack[SQ_NUMBER], east_attack[SQ_NUMBER], west_attack[SQ_NUMBER];
-extern const Bitboard rook_magic[SQ_NUMBER];
-extern const Bitboard bishop_magic[SQ_NUMBER];
+extern const uint64_t rook_magic[SQ_NUMBER];
 extern Bitboard rook_table[SQ_NUMBER][1 << ROOK_INDEX_BITS];
 
 #endif

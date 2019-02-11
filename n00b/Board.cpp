@@ -98,13 +98,13 @@ const ushort Board::popcount(Color const &color, Piece const &piece) const
 }
 
 
-const std::vector<ushort> Board::get_square(Color const &color, Piece const &piece)
+const std::vector<Square> Board::get_square(Color const &color, Piece const &piece)
 {
-	std::vector<ushort> squares;
+	std::vector<Square> squares;
 	Bitboard count = bb[color][piece];
 	
 	while (count)
-		{ squares.push_back(bitscan_reset(count)); }
+		{ squares.push_back(Square(bitscan_reset(count))); }
 	
 	return squares;
 }

@@ -57,7 +57,7 @@ public:
 	const ushort popcount(Color const &color = no_color) const;
 	const ushort popcount(Color const &color, Piece const &piece) const;
 
-	const std::vector<Square> get_square(Color const &color, Piece const &piece);
+	const std::vector<ushort> get_square(Color const &color, Piece const &piece);
 
 	void update_bitboards(Color const &color);
 };

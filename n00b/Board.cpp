@@ -6,11 +6,7 @@
 
 Board::Board()
 {
-	/* It SHOULD now work at initizialization time in Board.h. TEST!
-	for (auto &row : bb)
-		for (auto& elem : row)
-			elem = C64(0);
-	 */
+
 }
 
 Board::~Board()
@@ -102,10 +98,9 @@ const ushort Board::popcount(Color const &color, Piece const &piece) const
 }
 
 
-// TODO: First we must implement a bitscan_forward function at least
-const std::vector<Square> Board::get_square(Color const &color, Piece const &piece)
+const std::vector<ushort> Board::get_square(Color const &color, Piece const &piece)
 {
-	std::vector<Square> squares;
+	std::vector<ushort> squares;
 	Bitboard count = bb[color][piece];
 	
 	while (count)

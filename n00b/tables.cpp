@@ -10,14 +10,13 @@ Bitboard rook_mask[SQ_NUMBER] {};
 Bitboard north_attack[SQ_NUMBER] {}, south_attack[SQ_NUMBER] {},
 	east_attack[SQ_NUMBER] {}, west_attack[SQ_NUMBER] {};
 
-const Bitboard rook_table[SQ_NUMBER][1 << ROOK_INDEX_BITS]{};
-
 void init_tables()
 {
 	create_file_mask();
 	create_rank_mask();
 	create_attacks_from();
 	create_rook_mask();
+	create_rook_magic();
 	create_bishop_mask();
 }
 

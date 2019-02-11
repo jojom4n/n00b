@@ -49,8 +49,10 @@ void new_game()
 	for (auto &squares : Chessboard->get_square(white, knights))
 		std::cout << squares_to_string[squares] << " ";
 	
-	std::bitset<64>x(rook_mask[C3]);
-	std::cout << "\n\nAttack bitboard for Rook on C3: " << x << std::endl;
+	Bitboard occupancy = 0x2200400a00;
+	
+	std::bitset<64>x(rook_attack(E3,occupancy));
+	std::cout << "\n\nAttack bitboard for Rook on E3: " << x << std::endl;
 
 	std::cout << std::endl;
 

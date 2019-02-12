@@ -50,41 +50,31 @@ void lineAttacks()
 	}
 
 	// Diagonal mask
-	uint64_t noea = C64(0x8040201008040201); // diagonal from A1 to H8
+	uint64_t baseDiagonal = C64(0x8040201008040201); // diagonal from A1 to H8
 	
 	/* calculate and store diagonals from A1 to H1.
-	We use a mask to remove all excessive bits coming from noea << 1 */
-	for (ushort f = FILE_A; f <= FILE_H; f++, noea = (noea << 1) & C64(0x80c0e0f0f8fcfe))
-		Masks.diagonal[7 - f] = noea;
+	We use a mask to remove all excessive bits coming from baseDiagonal << 1 */
+	for (ushort f = FILE_A; f <= FILE_H; f++, baseDiagonal = (baseDiagonal << 1) & C64(0x80c0e0f0f8fcfe))
+		Masks.diagonal[7 - f] = baseDiagonal;
 	
-	noea = C64(0x4020100804020100); // reset noea to diagonal from A2 to H7
+	baseDiagonal = C64(0x4020100804020100); // reset baseDiagonal to diagonal from A2 to H7
 
-	for (ushort r = RANK_2; r <= RANK_8; r++, noea = (noea >> 1) & C64(0x7f3f1f0f07030100))
-		Masks.diagonal[7 + r] = noea;
-
-	int i = 0;
-	for (auto& elem : Masks.diagonal) {
-		std::cout << "Diagonal " << i << " is " << elem << std::endl;
-		i++;
-	}
+	for (ushort r = RANK_2; r <= RANK_8; r++, baseDiagonal = (baseDiagonal >> 1) & C64(0x7f3f1f0f07030100))
+		Masks.diagonal[7 + r] = baseDiagonal;
 	
 
-	/* for (int f = FILE_A; f <= FILE_H; f++, noea = (noea << 1) & NOT_FILE_A)
+	// Anti-diagonal mask
+	uint64_t baseAntiDiagonal = C64(0x102040810204080); // antidiagonal from A8 to H1
 
-	
-	for (int f = FILE_A; f <= FILE_H; f++, noea = (noea << 1) & NOT_FILE_A) 
-	{
-		// if (noea != 0) bitscan_reset(noea, true);
-		// uint64_t ne = noea;
-		// if (ne != 0) bitscan_reset(ne, true);
+	/* calculate and store anti-diagonals from A8 to H8.
+	We use a mask to remove all excessive bits coming from baseAntiDiagonal << 1 */
+	for (ushort f = FILE_A; f <= FILE_H; f++, baseAntiDiagonal = (baseAntiDiagonal << 1) & C64(0xfefcf8f0e0c08000))
+		Masks.antiDiagonal[(RANK_8 + f)] = baseAntiDiagonal;
 
-		for (int r = 0; r < 8 * 8; r += 8, noea <<=8) {
-			Masks.diagonal[7 + r - f] = noea;
-			// if (ne != 0) bitscan_reset(ne, true);
-			}
+	baseAntiDiagonal = C64(0x1020408102040); // reset baseDiagonal to diagonal from A7 to H2
 
-	}
-	*/
+	for (short r = RANK_7; r >= RANK_1; r--, baseAntiDiagonal = (baseAntiDiagonal >> 1) & C64(0x103070f1f3f7f))
+		Masks.antiDiagonal[r] = baseAntiDiagonal;
 }
 
 void rayAttacksNoEdge() // no edge

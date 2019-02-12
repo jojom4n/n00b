@@ -75,16 +75,16 @@ const ushort SHIFT_ROOK[64] = {
 };
 
 extern struct Mask Masks;
-std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rook_table;
+struct AttackTables Attacks;
 
-const Bitboard rook_attack (Square const &square, Bitboard const &blockers)
+const Bitboard getRookAttacks (Square const &square, Bitboard const &blockers)
 {
-	return rook_table[square][((blockers & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
+	return Attacks.rook[square][((blockers & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
 }
 
 void rookMagic()
 {
-	rook_table.fill({});
+	Attacks.rook.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
@@ -96,7 +96,7 @@ void rookMagic()
 			blockerboard[i] = gen_blockerboard(i, bits, Masks.rook[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
 			uint64_t index = ((blockerboard[i] & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
-			rook_table[square][ushort(index)] = tmp_rook;
+			Attacks.rook[square][ushort(index)] = tmp_rook;
 		}
 	}
 }

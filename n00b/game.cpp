@@ -15,7 +15,7 @@ void newGame()
 	std::cout << std::endl << display_board(*Chessboard) << std::endl;
 	
 	// TEST MAGIC
-	std::bitset<64>x(rook_attack(F6,Chessboard->getAllBlockers()));
+	std::bitset<64>x(getRookAttacks(F6,Chessboard->getAllBlockers()));
 	std::cout << "\n\nMagic bitboard for Rook on F6: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST

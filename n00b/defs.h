@@ -36,13 +36,17 @@ enum File : const ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_
 
 enum Rank : const ushort { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER };
 
-enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
+enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, RAYS_NUMBER};
 
 // OTHER TYPES
 struct coords { ushort x; ushort y; };
 
 // see magic.cpp
 constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
+
+constexpr uint64_t A1H8_DIAG = C64(0x8040201008040201);
+constexpr ushort DIAG_NUMBER = 15;
+constexpr uint64_t NOT_FILE_A = 0xfefefefefefefefe;
 
 // for popcount() functions - see https://www.chessprogramming.org/Population_Count
 const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
@@ -53,8 +57,10 @@ const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
 struct Mask {
 	std::array<Bitboard, FILE_NUMBER> file;
 	std::array<Bitboard, RANK_NUMBER> rank;
+	std::array<Bitboard, DIAG_NUMBER> diagonal;
+	std::array<Bitboard, DIAG_NUMBER> antiDiagonal;
 	std::array<Bitboard, SQ_NUMBER> rook;
-	std::array<std::array<Bitboard,SQ_NUMBER>, 8>rays;
+	std::array<std::array<Bitboard,SQ_NUMBER>, RAYS_NUMBER>raysNoEdge;
 };
 
 struct AttackTables {

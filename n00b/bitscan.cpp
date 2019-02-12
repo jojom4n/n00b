@@ -76,10 +76,20 @@ const Square bitscan_rvs(Bitboard const &b)
 
 #endif
 
-const Square bitscan_reset(Bitboard &b)
+const Square bitscan_reset(Bitboard &b, bool reverse)
 {
-	Square index = bitscan_fwd(b);
-	b &= b - 1; // reset bit outside
+	Square index{};
+
+	if (reverse == true) {
+		index = bitscan_rvs(b);
+		// b &= ~(1 << (64 - 1));
+		b &= ~(C64(1) << index);
+	}
+	else {
+		index = bitscan_fwd(b);
+		b &= b - 1; // reset bit outside
+	}
+
 	return index;
 }
 

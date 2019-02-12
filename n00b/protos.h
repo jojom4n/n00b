@@ -10,7 +10,7 @@
 void initAttacks();
 void generateRookMask(struct Mask Masks);
 void lineAttacks();
-void rayAttacks();
+void rayAttacksNoEdge();
 
 // magic.cpp
 const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers);
@@ -43,6 +43,6 @@ const Square bitscan_rvs(Bitboard const &b);
 
 const ushort popcount(Bitboard const &b);
 
-const Square bitscan_reset(Bitboard &b);
+const Square bitscan_reset(Bitboard &b, bool reverse = 0);
 
 #endif

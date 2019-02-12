@@ -15,14 +15,14 @@ void newGame()
 	std::cout << std::endl << display_board(*Chessboard) << std::endl;
 	
 	// TEST MAGIC
-	std::bitset<64>x(rook_attack(A1,Chessboard->getOpponentBlockers()));
-	std::cout << "\n\nMagic bitboard for Rook on A1: " << x << std::endl;
+	std::bitset<64>x(rook_attack(F6,Chessboard->getAllBlockers()));
+	std::cout << "\n\nMagic bitboard for Rook on F6: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
 	// TEST MAGIC
-	std::bitset<64>y(Masks.rook[B2]);
-	std::cout << "\n\nMask bitboard for Rook on B2: " << y << std::endl;
+	std::bitset<64>y(Masks.rook[G5]);
+	std::cout << "\n\nMask bitboard for Rook on G5: " << y << std::endl;
 	std::cout << std::endl;
 	//END TEST
 

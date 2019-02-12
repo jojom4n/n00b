@@ -7,20 +7,26 @@ struct Mask Masks;
 
 void initAttacks()
 {
+	// initialize the std::array arrays in Masks struct
+	Masks.file.fill({});
+	Masks.rank.fill({});
+	Masks.rays.fill({});
+	Masks.rook.fill({});
+	
 	lineAttacks();
 	rayAttacks();
 	generateRookMask(Masks);
 	rookMagic();
 }
 
-void generateRookMask(struct Mask Masks) //BUUUUUUGGGG!!!!
+void generateRookMask(struct Mask m)
 {
 	for (ushort square = A1; square <= H8; square++) {
-		if (square <= H7) Masks.rays[NORTH][square] ^= C64(1) << bitscan_rvs(Masks.rays[NORTH][square]);
-		if (square >= A2) Masks.rays[SOUTH][square] ^= C64(1) << bitscan_fwd(Masks.rays[SOUTH][square]);
-		if (FILE_INDEX != FILE_H) Masks.rays[EAST][square] ^= C64(1) << bitscan_rvs(Masks.rays[EAST][square]);
-		if (FILE_INDEX != FILE_A) Masks.rays[WEST][square] ^= C64(1) << bitscan_fwd(Masks.rays[WEST][square]);
-		Masks.rook[square] = Masks.rays[NORTH][square] | Masks.rays[SOUTH][square] | Masks.rays[EAST][square] | Masks.rays[WEST][square];
+		if (square <= H7) m.rays[NORTH][square] ^= C64(1) << bitscan_rvs(m.rays[NORTH][square]);
+		if (square >= A2) m.rays[SOUTH][square] ^= C64(1) << bitscan_fwd(m.rays[SOUTH][square]);
+		if (FILE_INDEX != FILE_H) m.rays[EAST][square] ^= C64(1) << bitscan_rvs(m.rays[EAST][square]);
+		if (FILE_INDEX != FILE_A) m.rays[WEST][square] ^= C64(1) << bitscan_fwd(m.rays[WEST][square]);
+		Masks.rook[square] = m.rays[NORTH][square] | m.rays[SOUTH][square] | m.rays[EAST][square] | m.rays[WEST][square];
 	}
 }
 

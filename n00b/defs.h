@@ -52,14 +52,15 @@ const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
 const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
 const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
 
-extern Bitboard rook_table[SQ_NUMBER][1 << ROOK_INDEX_BITS];
+extern std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rook_table;
 
 struct Mask {
-	Bitboard file[FILE_NUMBER]{}, rank[RANK_NUMBER]{};
-	Bitboard rook[SQ_NUMBER]{};
-	std::array<std::array<Bitboard,8>, SQ_NUMBER>rays{};
+	std::array<Bitboard, FILE_NUMBER> file;
+	std::array<Bitboard, RANK_NUMBER> rank;
+	std::array<Bitboard, SQ_NUMBER> rook;
+	std::array<std::array<Bitboard,SQ_NUMBER>, 8>rays;
 };
 
-extern const std::string squares_to_string[65];
+extern const std::array<std::string, 65> squares_to_string;
 
 #endif

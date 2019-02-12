@@ -6,7 +6,7 @@
 
 Board::Board()
 {
-
+	board_.fill({});
 }
 
 Board::~Board()

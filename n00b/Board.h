@@ -4,12 +4,13 @@
 
 #include <stdint.h>
 #include <vector>
+#include <array>
 #include <assert.h>
 #include "defs.h"
 
 class Board
 {
-	Bitboard board_[2][6] = {};
+	std::array<std::array<Bitboard, 6>, 2> board_;
 	Bitboard whitePieces_ = C64(0), blackPieces_ = C64(0), allPieces_ = C64(0);
 	bool move_ = WHITE; // who has the move?
 	bool checkmate_ = false; // is the player checkmated?

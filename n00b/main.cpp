@@ -2,13 +2,11 @@
 #include <iostream>
 #include "protos.h"
 
-std::string input = " ";
-
 int main()
 {
-	init_tables();
-	std::cout << "Welcome to n00b v. 0.1 - An experimental chess engine project" << std::endl;
+	initAttacks();
+	std::cout << "Welcome to n00b v. 0.01 - An experimental chess engine project" << std::endl;
 	std::cout << "Copyright (c) 2019 Binary Pollution" << std::endl;
-	new_game();
+	newGame();
 	return 0;
 }

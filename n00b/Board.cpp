@@ -14,71 +14,65 @@ Board::~Board()
 	
 }
 
-void Board::set_newgame()
+void Board::setNew()
 {
 	// white pieces
-	set_piece(white, king, E1);
-	set_piece(white, queen, D1);
-	set_piece(white, rooks, A1);
-	set_piece(white, rooks, H1);
-	set_piece(white, knights, B1);
-	set_piece(white, knights, G1);
-	set_piece(white, bishops, C1);
-	set_piece(white, bishops, F1);
+	putPiece(WHITE, KING, E1);
+	putPiece(WHITE, QUEEN, D1);
+	putPiece(WHITE, ROOKS, A1);
+	putPiece(WHITE, ROOKS, H1);
+	putPiece(WHITE, KNIGHTS, B1);
+	putPiece(WHITE, KNIGHTS, G1);
+	putPiece(WHITE, BISHOPS, C1);
+	putPiece(WHITE, BISHOPS, F1);
 	
 	for (ushort i = A2; i <= H2; i++)
-		set_piece(white, pawns, Square(i));
+		putPiece(WHITE, PAWNS, Square(i));
 
 	//black pieces
-	set_piece(black, king, E8);
-	set_piece(black, queen, D8);
-	set_piece(black, rooks, A8);
-	set_piece(black, rooks, H8);
-	set_piece(black, knights, B8);
-	set_piece(black, knights, G8);
-	set_piece(black, bishops, C8);
-	set_piece(black, bishops, F8);
+	putPiece(BLACK, KING, E8);
+	putPiece(BLACK, QUEEN, D8);
+	putPiece(BLACK, ROOKS, A8);
+	putPiece(BLACK, ROOKS, H8);
+	putPiece(BLACK, KNIGHTS, B8);
+	putPiece(BLACK, KNIGHTS, G8);
+	putPiece(BLACK, BISHOPS, C8);
+	putPiece(BLACK, BISHOPS, F8);
 
 	for (ushort i = A7; i <= H7; i++)
-		set_piece(black, pawns, Square(i));
+		putPiece(BLACK, PAWNS, Square(i));
 }
 
-void Board::set_piece(Color const &color, Piece const &piece_table, Square const &square)
+void Board::putPiece(Color const &color, Piece const &piece, Square const &square)
 {
-	bb[color][piece_table] |= C64(1) << square;
-	update_bitboards(color);
+	board_[color][piece] |= C64(1) << square;
+	update(color);
 }
 
-const bb_index Board::identify_piece(Square const &square) const
+const coords Board::idPiece(Square const &square) const
 {
-	Bitboard compare = C64(0); // create an empty bitboard for comparison...
-
-	compare |= C64(1) << square; // ...and set (1) the single bit only from the square argument
-
-	// let us ANDing the 'compare' bitboard with the main bitboards until we find the one
-	// containing the same bit we set in 'compare'
+	/* let us AND the bit set in the square (1ULL << square) with the main bitboards,
+	until we find the one containing that bit */
 
 	for (ushort x = 0; x < 2; x++)
 		for (ushort y = 0; y < 6; y++)
-			if (bb[x][y] & compare) {
-				bb_index coords = { x, y };
-				return coords;
-			}
-
-	return { NULL,NULL }; // some error occurred
+			if (board_[x][y] & (C64(1) << square))
+				return coords{ x,y };
+	
+	return { NULL, NULL };  // some error occurred
 }
 
 // see https://www.chessprogramming.org/Population_Count
-const ushort Board::popcount(Color const &color) const 
+const ushort Board::count(Color const &color) const 
 {
-	Bitboard count;
+	uint64_t count;
 
-	if (color == white)
-		count = white_pieces;
-	else if (color == black)
-		count = black_pieces;
+	if (color == WHITE)
+		count = whitePieces_;
+	else if (color == BLACK)
+		count = blackPieces_;
 	else 
-		count = all_pieces;
+		count = allPieces_;
 	
 	count = count - ((count >> 1) & k1);
 	count = (count & k2) + ((count >> 2)  & k2);
@@ -87,9 +81,9 @@ const ushort Board::popcount(Color const &color) const
 	return (ushort)count;
 }
 
-const ushort Board::popcount(Color const &color, Piece const &piece) const
+const ushort Board::countPieceType(Color const &color, Piece const &piece) const
 {
-	Bitboard count = bb[color][piece];
+	Bitboard count = board_[color][piece];
 	count = count - ((count >> 1) & k1);
 	count = (count & k2) + ((count >> 2)  & k2);
 	count = (count + (count >> 4)) & k4;
@@ -98,25 +92,25 @@ const ushort Board::popcount(Color const &color, Piece const &piece) const
 }
 
 
-const std::vector<Square> Board::get_square(Color const &color, Piece const &piece)
+const std::vector<Square> Board::getPieceOnSquare(Color const &color, Piece const &piece) const
 {
-	std::vector<Square> squares;
-	Bitboard count = bb[color][piece];
+	std::vector<Square> square;
+	Bitboard count = board_[color][piece];
 	
 	while (count)
-		{ squares.push_back(Square(bitscan_reset(count))); }
+		{ square.push_back(Square(bitscan_reset(count))); }
 	
-	return squares;
+	return square;
 }
 
-void Board::update_bitboards(Color const &color)
+void Board::update(Color const &color)
 {
-	if (color == white)
+	if (color == WHITE)
 		for (ushort i = 0; i < 6; i++)
-			white_pieces = white_pieces | bb[white][i];
-	else if (color == black)
+			whitePieces_ = whitePieces_ | board_[WHITE][i];
+	else if (color == BLACK)
 		for (ushort i = 0; i < 6; i++)
-			black_pieces = black_pieces | bb[black][i];
+			blackPieces_ = blackPieces_ | board_[BLACK][i];
 
-	all_pieces = white_pieces | black_pieces;
+	allPieces_ = whitePieces_ | blackPieces_;
 }

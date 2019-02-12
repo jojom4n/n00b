@@ -1,3 +1,4 @@
+#pragma once
 #ifndef BOARD_H
 #define BOARD_H
 
@@ -8,46 +9,55 @@
 
 class Board
 {
-	Bitboard bb[2][6] = {};
-	Bitboard white_pieces = C64(0), black_pieces = C64(0), all_pieces = C64(0);
-	bool move = white; // who has the move?
-	bool checkmate = false; // is the player checkmated?
+	Bitboard board_[2][6] = {};
+	Bitboard whitePieces_ = C64(0), blackPieces_ = C64(0), allPieces_ = C64(0);
+	bool move_ = WHITE; // who has the move?
+	bool checkmate_ = false; // is the player checkmated?
 
 	struct Castle {
 		Color player;
-		enum side { castle_kingside, castle_queenside, castle_both, castle_none };
-	} castling;
+		enum side : const ushort { KINGSIDE, QUEENSIDE, BOTH, NONE };
+	} castling_;
+	
+	void update(Color const &color);
 
 public:
 	Board();
 	~Board();
 
-	void set_newgame();
+	void setNew();
 
-	constexpr bool has_move() const { return move; }
-	void has_move(bool const& b) { move = b; }
+	constexpr bool getMove() const { return move_; }
+	void setMove(bool const& b) { move_ = b; }
 
-	constexpr bool is_checkmate() const { return checkmate; }
-	void is_checkmate(bool const &b) { checkmate = b; }
+	constexpr bool getCheckmate() const { return checkmate_; }
+	void setCheckmate(bool const &b) { checkmate_ = b; }
 
-	constexpr Castle has_castling() const { return castling; }
-	void has_castling(Castle const &castle) { castling = castle; }
+	constexpr Castle getCastle() const { return castling_; }
+	void setCastle(Castle const &castle) { castling_ = castle; }
 
-	void set_piece(Color const &color, Piece const &piece_table, Square const &square);
+	void putPiece(Color const &color, Piece const &piece, Square const &square);
 
-	constexpr Bitboard get_position() const { return all_pieces; }
-	constexpr Bitboard get_position(Color const &color) const { return (color == white) ? white_pieces : black_pieces; }
-	constexpr Bitboard get_position(Color const &color, Piece const &piece_table) const { return bb[color][piece_table]; }
+	constexpr Bitboard getPosition() const { return allPieces_; }
+	constexpr Bitboard getPosition(Color const &color) const { return (color == WHITE) ? whitePieces_ : blackPieces_; }
+	
+	constexpr Bitboard getPieces(Color const &color, Piece const &piece) const { return board_[color][piece]; }
 
-	constexpr Bitboard is_square_occupied(Square const &square) const { return all_pieces & (C64(1) << square); }
+	constexpr Bitboard getOpponentBlockers() const
+		{ return (move_ == WHITE) ? blackPieces_ : whitePieces_; }
+	constexpr Bitboard getPlayerBlockers() const
+		{ return (move_ == WHITE) ? whitePieces_ : blackPieces_; }
+	constexpr Bitboard getAllBlockers() const
+		{ return allPieces_;	}
+	
+	constexpr bool occupiedSquare(Square const &square) const { return (allPieces_ & (C64(1) << square)) ? true : false; }
 
-	const bb_index identify_piece(Square const &square) const;
+	const coords idPiece(Square const &square) const;
 
-	const ushort popcount(Color const &color = no_color) const;
-	const ushort popcount(Color const &color, Piece const &piece) const;
+	const ushort count(Color const &color = NO_COLOR) const;
+	const ushort countPieceType(Color const &color, Piece const &piece) const;
 
-	const std::vector<Square> get_square(Color const &color, Piece const &piece);
-
-	void update_bitboards(Color const &color);
+	const std::vector<Square> getPieceOnSquare(Color const &color, Piece const &piece) const;
 };
+
 #endif

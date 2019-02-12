@@ -2,28 +2,6 @@
 #include "defs.h"
 #include "protos.h"
 
-// FROM CRAFTY!
-/* const uint64_t rook_magic[SQ_NUMBER] = 
-{
-	C64(0x0080001020400080), C64(0x0040001000200040), C64(0x0080081000200080), C64(0x0080040800100080),
-	C64(0x0080020400080080), C64(0x0080010200040080), C64(0x0080008001000200), C64(0x0080002040800100),
-	C64(0x0000800020400080), C64(0x0000400020005000), C64(0x0000801000200080), C64(0x0000800800100080),
-	C64(0x0000800400080080), C64(0x0000800200040080), C64(0x0000800100020080), C64(0x0000800040800100),
-	C64(0x0000208000400080), C64(0x0000404000201000), C64(0x0000808010002000), C64(0x0000808008001000),
-	C64(0x0000808004000800), C64(0x0000808002000400), C64(0x0000010100020004), C64(0x0000020000408104),
-	C64(0x0000208080004000), C64(0x0000200040005000), C64(0x0000100080200080), C64(0x0000080080100080),
-	C64(0x0000040080080080), C64(0x0000020080040080), C64(0x0000010080800200), C64(0x0000800080004100),
-	C64(0x0000204000800080), C64(0x0000200040401000), C64(0x0000100080802000), C64(0x0000080080801000),
-	C64(0x0000040080800800), C64(0x0000020080800400), C64(0x0000020001010004), C64(0x0000800040800100),
-	C64(0x0000204000808000), C64(0x0000200040008080), C64(0x0000100020008080), C64(0x0000080010008080),
-	C64(0x0000040008008080), C64(0x0000020004008080), C64(0x0000010002008080), C64(0x0000004081020004),
-	C64(0x0000204000800080), C64(0x0000200040008080), C64(0x0000100020008080), C64(0x0000080010008080),
-	C64(0x0000040008008080), C64(0x0000020004008080), C64(0x0000800100020080), C64(0x0000800041000080),
-	C64(0x00FFFCDDFCED714A), C64(0x007FFCDDFCED714A), C64(0x003FFFCDFFD88096), C64(0x0000040810002101),
-	C64(0x0001000204080011), C64(0x0001000204000801), C64(0x0001000082000401), C64(0x0001FFFAABFAD1A2)
-}; */
-
-
 const Bitboard MAGIC_BISHOP[64] = {
 	0x010a0a1023020080L, 0x0050100083024000L, 0x8826083200800802L,
 	0x0102408100002400L, 0x0414242008000000L, 0x0414242008000000L,
@@ -96,26 +74,24 @@ const ushort SHIFT_ROOK[64] = {
 	52, 53, 53, 53, 53, 53, 53, 52,
 };
 
-
-
+extern struct Mask Masks;
 Bitboard rook_table[SQ_NUMBER][1 << ROOK_INDEX_BITS]{};
 
-const Bitboard rook_attack (Square const &square, Bitboard blockers)
+const Bitboard rook_attack (Square const &square, Bitboard const &blockers)
 {
-	return rook_table[square][((blockers&rook_mask[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
+	return rook_table[square][((blockers & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
 }
 
-void init_rook()
+void rookMagic()
 {
 	for (ushort square = A1; square <= H8; square++) {
-
 		Bitboard blockerboard[1 << ROOK_INDEX_BITS]{}, tmp_rook;
-		ushort bits = popcount(rook_mask[square]);
+		ushort bits = popcount(Masks.rook[square]);
 
-		for (int i = 0; i < ( 1 << bits); i++) {
-			blockerboard[i] = gen_blockerboard(i, bits, rook_mask[square]);
+		for (int i = 0; i < (1 << bits); i++) {
+			blockerboard[i] = gen_blockerboard(i, bits, Masks.rook[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
-			int index = ((blockerboard[i] & rook_mask[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
+			int index = ((blockerboard[i] & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
 			rook_table[square][index] = tmp_rook;
 		}
 	}

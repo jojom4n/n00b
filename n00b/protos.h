@@ -1,3 +1,4 @@
+#pragma once
 #ifndef PROTOS_H
 #define PROTOS_H
 
@@ -5,25 +6,24 @@
 #include "defs.h"
 #include "Board.h"
 
-// tables.cpp
-void init_tables();
-void create_rook_mask();
-void create_file_mask();
-void create_rank_mask();
-void create_attacks_from();
+// attack.cpp
+void initAttacks();
+void generateRookMask(struct Mask Masks);
+void lineAttacks();
+void rayAttacks();
 
 // magic.cpp
-const Bitboard rook_attack(Square const &square, Bitboard blockers);
+const Bitboard rook_attack(Square const &square, Bitboard const &blockers);
 const Bitboard gen_blockerboard(int index, ushort bits, Bitboard b);
 const Bitboard gen_r_attks(ushort square, Bitboard b);
-void init_rook();
+void rookMagic();
 
 // game.cpp
-void new_game();
+void newGame();
 
 //display.cpp
 const std::string display_board(Board const &board);
-const char print_piece(bb_index const &coordinates);
+const char printPiece(coords const &coordinates);
 
 // bitscan.cpp
 #if defined(__GNUC__)  // GCC, Clang, ICC

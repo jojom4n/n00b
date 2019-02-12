@@ -1,8 +1,10 @@
+#pragma once
 #ifndef DEFS_H
 #define DEFS_H
 
 #include <stdint.h>
 #include <string>
+#include <array>
 
 #define C64(constantU64) constantU64##ULL
 #define FILE_INDEX (square % 8)
@@ -12,25 +14,10 @@ typedef unsigned short int ushort;
 
 typedef uint64_t Bitboard;
 
-struct bb_index
-{
-	ushort x;
-	ushort y;
-};
+// ENUMS
+enum Piece : const ushort { KING, QUEEN, ROOKS, KNIGHTS, BISHOPS, PAWNS, NO_PIECE };
 
-// see magic.cpp
-constexpr ushort ROOK_INDEX_BITS = 12;
-constexpr ushort BISHOP_INDEX_BITS = 9;
-
-// for popcount() functions - see https://www.chessprogramming.org/Population_Count
-const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
-const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
-const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
-const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
-
-enum Piece : const ushort { king, queen, rooks, knights, bishops, pawns, no_piece };
-
-enum Color : const ushort { black, white, no_color };
+enum Color : const ushort { BLACK, WHITE, NO_COLOR };
 
 enum Square : const ushort
 {
@@ -45,15 +32,34 @@ enum Square : const ushort
 	SQ_NUMBER, SQ_EMPTY
 };
 
-extern const std::string squares_to_string[65];
+enum File : const ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER };
 
-enum File : const ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER};
+enum Rank : const ushort { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER };
 
-enum Rank : const ushort{ RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER};
+enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST};
 
-extern Bitboard rank_mask[RANK_NUMBER], file_mask[FILE_NUMBER], rook_mask[SQ_NUMBER];
-extern Bitboard north_attack[SQ_NUMBER], south_attack[SQ_NUMBER], east_attack[SQ_NUMBER], west_attack[SQ_NUMBER];
-extern const uint64_t rook_magic[SQ_NUMBER];
+// OTHER TYPES
+struct coords { ushort x; ushort y; };
+
+extern struct Magic Rook, Bishop;
+
+// see magic.cpp
+constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
+
+// for popcount() functions - see https://www.chessprogramming.org/Population_Count
+const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
+const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
+const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
+const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
+
 extern Bitboard rook_table[SQ_NUMBER][1 << ROOK_INDEX_BITS];
+
+struct Mask {
+	Bitboard file[FILE_NUMBER]{}, rank[RANK_NUMBER]{};
+	Bitboard rook[SQ_NUMBER]{};
+	std::array<std::array<Bitboard,8>, SQ_NUMBER>rays{};
+};
+
+extern const std::string squares_to_string[65];
 
 #endif

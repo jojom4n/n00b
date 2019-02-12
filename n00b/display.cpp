@@ -24,7 +24,7 @@ const std::string display_board(Board const &board)
 
 	/* Need to explain what we are going to do in the following for...loop.
 
-		We will reverse scan the all_pieces bitboard rank by rank, that is, from 8th rank 
+		We will reverse scan the allPieces_ bitboard rank by rank, that is, from 8th rank 
 		to 1st one. For each rank,	we will scan from file A to file H and we will print 
 		an "X" for every piece we will find in the bitboard.
 
@@ -37,11 +37,7 @@ const std::string display_board(Board const &board)
 		SquareToScan = (rank ^ 2) + [(rank * i) + file]
 
 		where 'i' is the index we have declared just before the for...loop statement, going to be
-		incremented by 1 for every rank we will go through.
-
-		I know that the above formula is far from being elegant or efficient, but it works.
-		Anyway, I could not find a better formula somewhere.
-		*/
+		incremented by 1 for every rank we will go through	*/
 
 	for (short int rank = RANK_8; rank >= RANK_1; rank--)	// cannot use ushort: by definition
 															// ushort is always >= 0
@@ -49,12 +45,12 @@ const std::string display_board(Board const &board)
 		
 		for (ushort file = FILE_A; file <= FILE_H; file++) {
 
-			Square check_square = Square(rank * rank + ((rank * i) + file));
+			Square square = Square(rank * rank + ((rank * i) + file));
 			
-			if (board.is_square_occupied(check_square)) // square not empty
+			if (board.occupiedSquare(square)) // square not empty
 			{
 				output += "| ";
-				output += print_piece(board.identify_piece(check_square));
+				output += printPiece(board.idPiece(square));
 				output += " ";
 			}
 			
@@ -73,50 +69,27 @@ const std::string display_board(Board const &board)
 	return output;
 }
 
-const char print_piece (bb_index const &coordinates)
+const char printPiece (coords const &coordinates)
 {
 	switch (coordinates.y)
 	{
-	case king:
-		if (coordinates.x == white)
-			return 'K';
-		else
-			return 'k';
+	case KING:
+		return (coordinates.x == WHITE) ? 'K' : 'k';
 		break;
-	
-	case queen:
-		if (coordinates.x == white)
-			return 'Q';
-		else
-			return 'q';
+	case QUEEN:
+		return (coordinates.x == WHITE) ? 'Q' : 'q';
 		break;
-
-	case rooks:
-		if (coordinates.x == white)
-			return 'R';
-		else
-			return 'r';
+	case ROOKS:
+		return (coordinates.x == WHITE) ? 'R' : 'r';
 		break;
-
-	case knights:
-		if (coordinates.x == white)
-			return 'N';
-		else
-			return 'n';
+	case KNIGHTS:
+		return (coordinates.x == WHITE) ? 'N' : 'n';
 		break;
-
-	case bishops:
-		if (coordinates.x == white)
-			return 'B';
-		else
-			return 'b';
+	case BISHOPS:
+		return (coordinates.x == WHITE) ? 'B' : 'b';
 		break;
-
-	case pawns:
-		if (coordinates.x == white)
-			return 'P';
-		else
-			return 'p';
+	case PAWNS:
+		return (coordinates.x == WHITE) ? 'P' : 'p';
 		break;
 	default:
 		return NULL; // some error occurred

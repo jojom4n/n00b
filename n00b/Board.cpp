@@ -9,10 +9,12 @@ Board::Board()
 	board_.fill({});
 }
 
+
 Board::~Board()
 {
 	
 }
+
 
 void Board::setNew()
 {
@@ -43,11 +45,13 @@ void Board::setNew()
 		putPiece(BLACK, PAWNS, Square(i));
 }
 
+
 void Board::putPiece(Color const &color, Piece const &piece, Square const &square)
 {
 	board_[color][piece] |= C64(1) << square;
 	update(color);
 }
+
 
 const coords Board::idPiece(Square const &square) const
 {
@@ -61,6 +65,7 @@ const coords Board::idPiece(Square const &square) const
 	
 	return { NULL, NULL };  // some error occurred
 }
+
 
 // see https://www.chessprogramming.org/Population_Count
 const ushort Board::count(Color const &color) const 
@@ -80,6 +85,7 @@ const ushort Board::count(Color const &color) const
 	count = (count * kf) >> 56;
 	return (ushort)count;
 }
+
 
 const ushort Board::countPieceType(Color const &color, Piece const &piece) const
 {
@@ -102,6 +108,7 @@ const std::vector<Square> Board::getPieceOnSquare(Color const &color, Piece cons
 	
 	return square;
 }
+
 
 void Board::update(Color const &color)
 {

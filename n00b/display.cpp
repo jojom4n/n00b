@@ -16,6 +16,7 @@ const std::array<std::string, 65> squares_to_string =
 	"NONE"
 };
 
+
 const std::string display_board(Board const &board)
 {
 	std::string output = "+---+---+---+---+---+---+---+---+\n";
@@ -39,7 +40,7 @@ const std::string display_board(Board const &board)
 		where 'i' is the index we have declared just before the for...loop statement, going to be
 		incremented by 1 for every rank we will go through	*/
 
-	for (short int rank = RANK_8; rank >= RANK_1; rank--)	// cannot use ushort: by definition
+	for (short rank = RANK_8; rank >= RANK_1; rank--)	// cannot use ushort: by definition
 															// ushort is always >= 0
 	{
 		
@@ -68,6 +69,7 @@ const std::string display_board(Board const &board)
 	
 	return output;
 }
+
 
 const char printPiece (coords const &coordinates)
 {

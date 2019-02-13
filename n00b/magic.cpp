@@ -2,31 +2,6 @@
 #include "defs.h"
 #include "protos.h"
 
-const Bitboard MAGIC_BISHOP[64] = {
-	0x010a0a1023020080L, 0x0050100083024000L, 0x8826083200800802L,
-	0x0102408100002400L, 0x0414242008000000L, 0x0414242008000000L,
-	0x0804230108200880L, 0x0088840101012000L, 0x0400420202041100L,
-	0x0400420202041100L, 0x1100300082084211L, 0x0000124081000000L,
-	0x0405040308000411L, 0x01000110089c1008L, 0x0030108805101224L,
-	0x0010808041101000L, 0x2410002102020800L, 0x0010202004098180L,
-	0x1104000808001010L, 0x274802008a044000L, 0x1400884400a00000L,
-	0x0082000048260804L, 0x4004840500882043L, 0x0081001040680440L,
-	0x4282180040080888L, 0x0044200002080108L, 0x2404c80a04002400L,
-	0x2020808028020002L, 0x0129010050304000L, 0x0008020108430092L,
-	0x005600450c884800L, 0x005600450c884800L, 0x001004501c200301L,
-	0xa408025880100100L, 0x1042080300060a00L, 0x4100a00801110050L,
-	0x11240100c40c0040L, 0x24a0281141188040L, 0x08100c4081030880L,
-	0x020c310201002088L, 0x006401884600c280L, 0x1204028210809888L,
-	0x8000a01402005002L, 0x041d8a021a000400L, 0x041d8a021a000400L,
-	0x000201a102004102L, 0x0408010842041282L, 0x000201a102004102L,
-	0x0804230108200880L, 0x0804230108200880L, 0x8001010402090010L,
-	0x0008000042020080L, 0x4200012002440000L, 0x80084010228880a0L,
-	0x4244049014052040L, 0x0050100083024000L, 0x0088840101012000L,
-	0x0010808041101000L, 0x1090c00110511001L, 0x2124000208420208L,
-	0x0800102118030400L, 0x0010202120024080L, 0x00024a4208221410L,
-	0x010a0a1023020080L
-};
-
 const Bitboard MAGIC_ROOK[64] = {
 	0x0080004000608010L, 0x2240100040012002L, 0x008008a000841000L,
 	0x0100204900500004L, 0x020008200200100cL, 0x40800c0080020003L,
@@ -52,15 +27,29 @@ const Bitboard MAGIC_ROOK[64] = {
 	0x800a208440230402L
 };
 
-const ushort SHIFT_BISHOP[64] = {
-	58, 59, 59, 59, 59, 59, 59, 58,
-	59, 59, 59, 59, 59, 59, 59, 59,
-	59, 59, 57, 57, 57, 57, 59, 59,
-	59, 59, 57, 55, 55, 57, 59, 59,
-	59, 59, 57, 55, 55, 57, 59, 59,
-	59, 59, 57, 57, 57, 57, 59, 59,
-	59, 59, 59, 59, 59, 59, 59, 59,
-	58, 59, 59, 59, 59, 59, 59, 58
+const Bitboard MAGIC_BISHOP[64] = {
+	0x010a0a1023020080L, 0x0050100083024000L, 0x8826083200800802L,
+	0x0102408100002400L, 0x0414242008000000L, 0x0414242008000000L,
+	0x0804230108200880L, 0x0088840101012000L, 0x0400420202041100L,
+	0x0400420202041100L, 0x1100300082084211L, 0x0000124081000000L,
+	0x0405040308000411L, 0x01000110089c1008L, 0x0030108805101224L,
+	0x0010808041101000L, 0x2410002102020800L, 0x0010202004098180L,
+	0x1104000808001010L, 0x274802008a044000L, 0x1400884400a00000L,
+	0x0082000048260804L, 0x4004840500882043L, 0x0081001040680440L,
+	0x4282180040080888L, 0x0044200002080108L, 0x2404c80a04002400L,
+	0x2020808028020002L, 0x0129010050304000L, 0x0008020108430092L,
+	0x005600450c884800L, 0x005600450c884800L, 0x001004501c200301L,
+	0xa408025880100100L, 0x1042080300060a00L, 0x4100a00801110050L,
+	0x11240100c40c0040L, 0x24a0281141188040L, 0x08100c4081030880L,
+	0x020c310201002088L, 0x006401884600c280L, 0x1204028210809888L,
+	0x8000a01402005002L, 0x041d8a021a000400L, 0x041d8a021a000400L,
+	0x000201a102004102L, 0x0408010842041282L, 0x000201a102004102L,
+	0x0804230108200880L, 0x0804230108200880L, 0x8001010402090010L,
+	0x0008000042020080L, 0x4200012002440000L, 0x80084010228880a0L,
+	0x4244049014052040L, 0x0050100083024000L, 0x0088840101012000L,
+	0x0010808041101000L, 0x1090c00110511001L, 0x2124000208420208L,
+	0x0800102118030400L, 0x0010202120024080L, 0x00024a4208221410L,
+	0x010a0a1023020080L
 };
 
 const ushort SHIFT_ROOK[64] = {
@@ -74,13 +63,30 @@ const ushort SHIFT_ROOK[64] = {
 	52, 53, 53, 53, 53, 53, 53, 52,
 };
 
+const ushort SHIFT_BISHOP[64] = {
+	58, 59, 59, 59, 59, 59, 59, 58,
+	59, 59, 59, 59, 59, 59, 59, 59,
+	59, 59, 57, 57, 57, 57, 59, 59,
+	59, 59, 57, 55, 55, 57, 59, 59,
+	59, 59, 57, 55, 55, 57, 59, 59,
+	59, 59, 57, 57, 57, 57, 59, 59,
+	59, 59, 59, 59, 59, 59, 59, 59,
+	58, 59, 59, 59, 59, 59, 59, 58
+};
+
+
 extern struct Mask Masks;
 struct AttackTables Attacks;
 
 const Bitboard getRookAttacks (Square const &square, Bitboard const &blockers)
-{
-	return Attacks.rook[square][((blockers & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
-}
+	{ return Attacks.rook[square]
+		[((blockers & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]]; }
+
+
+const Bitboard getBishopAttacks(Square const & square, Bitboard const & blockers)
+	{ return Attacks.bishop[square]
+		[((blockers & Masks.bishop[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]]; }
+
 
 void rookMagic()
 {
@@ -89,52 +95,117 @@ void rookMagic()
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
-		Bitboard tmp_rook;
+		Bitboard tmp_rook = C64(0);
 		ushort bits = popcount(Masks.rook[square]);
 
-		for (int i = 0; i < (1 << bits); i++) {
+		for (ushort i = 0; i < (1 << bits); i++) {
 			blockerboard[i] = gen_blockerboard(i, bits, Masks.rook[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
-			uint64_t index = ((blockerboard[i] & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
+			
+			uint64_t index = ((blockerboard[i] & Masks.rook[square]) 
+				* MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
+			
 			Attacks.rook[square][ushort(index)] = tmp_rook;
 		}
 	}
 }
 
-const Bitboard gen_blockerboard(int index, ushort bits, Bitboard b)
+
+void bishopMagic()
 {
-	int i, j;
-	Bitboard result = 0ULL;
-	for (i = 0; i < bits; i++) {
-		j = bitscan_reset(b);
-		if (index & (1 << i)) result |= (1ULL << j);
+	Attacks.bishop.fill({});
+
+	for (ushort square = A1; square <= H8; square++) {
+		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
+		blockerboard.fill({});
+		Bitboard tmp_bishop = C64(0);
+		ushort bits = popcount(Masks.bishop[square]);
+
+		for (ushort i = 0; i < (1 << bits); i++) {
+			blockerboard[i] = gen_blockerboard(i, bits, Masks.bishop[square]);
+			tmp_bishop = gen_b_attks(square, blockerboard[i]);
+
+			uint64_t index = ((blockerboard[i] & Masks.bishop[square]) 
+				* MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square];
+
+			Attacks.bishop[square][ushort(index)] = tmp_bishop;
+		}
 	}
+}
+
+
+const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboard b)
+{
+	Bitboard result = C64(0);
+
+	for (ushort i = 0, j = 0; i < bits; i++) {
+		j = bitscan_reset(b);
+		if (index & (1 << i)) result |= (C64(1) << j);
+	}
+
 	return result;
 }
 
-const Bitboard gen_r_attks(ushort square, Bitboard blockerboard){
-	Bitboard result = 0ULL;
-	int rank, file;
-	
-	for (rank = RANK_INDEX + 1; rank <= 7; rank++) {
-		result |= (1ULL << (FILE_INDEX + rank * 8));
-		if (blockerboard & (1ULL << (FILE_INDEX + rank * 8))) break;
+
+const Bitboard gen_r_attks(ushort const &square, Bitboard const &blockerboard)
+{
+	Bitboard result = C64(0);
+
+	for (ushort rank = RANK_INDEX + 1; rank <= 7; rank++) {
+		result |= C64(1) << (FILE_INDEX + rank * 8);
+		if (blockerboard & (C64(1) << (FILE_INDEX + rank * 8))) break;
+	}
+
+	for (short rank = RANK_INDEX - 1; rank >= 0; rank--) {
+		result |= C64(1) << (FILE_INDEX + rank * 8);
+		if (blockerboard & (C64(1) << (FILE_INDEX + rank * 8))) break;
+	}
+
+	for (ushort file = FILE_INDEX + 1; file <= 7; file++) {
+		result |= C64(1) << (file + RANK_INDEX * 8);
+		if (blockerboard & (C64(1) << (file + RANK_INDEX * 8))) break;
+	}
+
+	for (short file = FILE_INDEX - 1; file >= 0; file--) {
+		result |= C64(1) << (file + RANK_INDEX * 8);
+		if (blockerboard & (C64(1) << (file + RANK_INDEX * 8))) break;
 	}
 	
-	for (rank = RANK_INDEX - 1; rank >= 0; rank--) {
-		result |= (1ULL << (FILE_INDEX + rank * 8));
-		if (blockerboard & (1ULL << (FILE_INDEX + rank * 8))) break;
+	return result;
+}
+
+
+const Bitboard gen_b_attks(ushort const &square, Bitboard const &blockerboard)
+{
+	Bitboard result = C64(0);
+
+	for (short rank = RANK_INDEX + 1, file = FILE_INDEX + 1;
+		rank <= RANK_8 && file <= FILE_H; rank++, file++)
+	{
+		result |= C64(1) << (file + rank * 8);
+		if (blockerboard & (C64(1) << (file + rank * 8))) break;
 	}
-	
-	for (file = FILE_INDEX + 1; file <= 7; file++) {
-		result |= (1ULL << (file + RANK_INDEX * 8));
-		if (blockerboard & (1ULL << (file + RANK_INDEX * 8))) break;
+
+	for (short rank = RANK_INDEX + 1, file = FILE_INDEX - 1;
+		rank <= RANK_8 && file >= FILE_A; rank++, file--)
+	{
+		result |= C64(1) << (file + rank * 8);
+		if (blockerboard & (C64(1) << (file + rank * 8))) break;
 	}
-	
-	for (file = FILE_INDEX - 1; file >= 0; file--) {
-		result |= (1ULL << (file + RANK_INDEX * 8));
-		if (blockerboard & (1ULL << (file + RANK_INDEX * 8))) break;
+
+	for (short rank = RANK_INDEX - 1, file = FILE_INDEX + 1;
+		rank >= RANK_1 && file <= FILE_H; rank--, file++)
+	{
+		result |= C64(1) << (file + rank * 8);
+		if (blockerboard & (C64(1) << (file + rank * 8))) break;
 	}
-	
+
+	for (short rank = RANK_INDEX - 1, file = FILE_INDEX - 1;
+		rank >= RANK_1 && file >= FILE_A; rank--, file--)
+	{
+		result |= C64(1) << (file + rank * 8);
+		if (blockerboard & (C64(1) << (file + rank * 8))) break;
+	}
+
 	return result;
 }

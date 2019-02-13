@@ -15,9 +15,12 @@ void raysNoEdge();
 
 // magic.cpp
 const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers);
-const Bitboard gen_blockerboard(int index, ushort bits, Bitboard b);
-const Bitboard gen_r_attks(ushort square, Bitboard b);
+const Bitboard getBishopAttacks(Square const &square, Bitboard const &blockers);
+const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboard b);
+const Bitboard gen_r_attks(ushort const &square, Bitboard const &blockerboard);
+const Bitboard gen_b_attks(ushort const &square, Bitboard const &blockerboard);
 void rookMagic();
+void bishopMagic();
 
 // game.cpp
 void newGame();
@@ -43,7 +46,6 @@ const Square bitscan_rvs(Bitboard const &b);
 #endif
 
 const ushort popcount(Bitboard const &b);
-
 const Square bitscan_reset(Bitboard &b, bool reverse = 0);
 
 #endif

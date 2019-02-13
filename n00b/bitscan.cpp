@@ -10,6 +10,7 @@ const Square bitscan_fwd(Bitboard const &b)
 	return Square(__builtin_ctzll(b));
 }
 
+
 const Square Board::bitscan_rvs(Bitboard const &b) const
 {
 	assert(b);
@@ -27,6 +28,7 @@ const Square bitscan_fwd(Bitboard const &b)
 	_BitScanForward64(&index, b);
 	return (Square)index;
 }
+
 
 const Square bitscan_rvs(Bitboard const &b)
 {
@@ -53,6 +55,7 @@ const Square bitscan_fwd(Bitboard const &b)
 	}
 }
 
+
 const Square bitscan_rvs(Bitboard const &b)
 {
 	assert(b);
@@ -76,6 +79,7 @@ const Square bitscan_rvs(Bitboard const &b)
 
 #endif
 
+
 const Square bitscan_reset(Bitboard &b, bool reverse)
 {
 	Square index{};
@@ -91,6 +95,7 @@ const Square bitscan_reset(Bitboard &b, bool reverse)
 
 	return index;
 }
+
 
 const ushort popcount(Bitboard const &b) {
 	Bitboard count = b;

@@ -15,16 +15,24 @@ void newGame()
 	std::cout << std::endl << display_board(*Chessboard) << std::endl;
 	
 	// TEST MAGIC
-	std::bitset<64>x(getRookAttacks(F6,Chessboard->getAllBlockers()));
+	uint64_t x= getRookAttacks(F6,Chessboard->getAllBlockers());
 	std::cout << "\n\nMagic bitboard for Rook on F6: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
 	// TEST MAGIC
-	std::bitset<64>y(Masks.rook[G5]);
-	std::cout << "\n\nMask bitboard for Rook on G5: " << y << std::endl;
+	std::cout << "\n\nMask bitboard for Rook on G5: " << Masks.rook[G5] << std::endl;
 	std::cout << std::endl;
 	//END TEST
+
+	// TEST MAGIC
+	x = getBishopAttacks(D3, Chessboard->getAllBlockers());
+	std::cout << "\n\nMagic bitboard for Bishop on D3: " << x << std::endl;
+	std::cout << std::endl;
+	//END TEST
+
+	std::cout << "\n\nMask bitboard for Bishop on E4: " << Masks.bishop[E4] << std::endl;
+
 
 	for (;;)
 	{

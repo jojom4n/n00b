@@ -20,7 +20,9 @@ void initAttacks()
 	raysNoEdge();
 	generateSlidingPieceMask(Masks);
 	rookMagic();
+	bishopMagic();
 }
+
 
 void generateSlidingPieceMask(struct Mask m)
 {
@@ -33,6 +35,7 @@ void generateSlidingPieceMask(struct Mask m)
 			| m.raysNoEdge[SOUTH_WEST][square] | m.raysNoEdge[SOUTH_EAST][square];
 	}
 }
+
 
 void lineAttacks()
 {
@@ -81,6 +84,7 @@ void lineAttacks()
 		Masks.antiDiagonal[r] = baseAntiDiagonal;
 }
 
+
 void raysAttacks()
 {
 	// N ray
@@ -110,7 +114,7 @@ void raysAttacks()
 	// NW ray
 	uint64_t baseDiagonalNW = C64(0x102040810204000);
 
-	for (int f = FILE_H; f >= FILE_A; f--, baseDiagonalNW = (baseDiagonalNW >> 1) & NOT_FILE_H) {
+	for (short f = FILE_H; f >= FILE_A; f--, baseDiagonalNW = (baseDiagonalNW >> 1) & NOT_FILE_H) {
 		uint64_t copyDiagonal = baseDiagonalNW;
 
 		for (ushort r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
@@ -132,10 +136,10 @@ void raysAttacks()
 	// SW ray
 	uint64_t baseDiagonalSW = C64(0x40201008040201);
 
-	for (int f = FILE_H; f >= FILE_A; f--, baseDiagonalSW = (baseDiagonalSW >> 1) & NOT_FILE_H) {
+	for (short f = FILE_H; f >= FILE_A; f--, baseDiagonalSW = (baseDiagonalSW >> 1) & NOT_FILE_H) {
 		uint64_t copyDiagonal = baseDiagonalSW;
 
-		for (int r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
+		for (short r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
 			Masks.rays[SOUTH_WEST][(8 * r) + f] = copyDiagonal;
 	}
 	
@@ -146,10 +150,11 @@ void raysAttacks()
 	for (ushort f = FILE_A; f <= FILE_H; f++, baseDiagonalSE = (baseDiagonalSE << 1) & NOT_FILE_A) {
 		uint64_t copyDiagonal = baseDiagonalSE;
 
-		for (int r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
+		for (short r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
 			Masks.rays[SOUTH_EAST][(8 * r) + f] = copyDiagonal;
 	}
 }
+
 
 void raysNoEdge() 
 {

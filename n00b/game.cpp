@@ -15,9 +15,11 @@ void newGame()
 	Chessboard->setNew();
 	std::cout << std::endl << display_board(*Chessboard) << std::endl;
 	
+	Bitboard occupancy = 0xffff000000000000;
+	
 	// TEST MAGIC
-	U64 x = getRookAttacks(F6,Chessboard->getAllBlockers());
-	std::cout << "\n\nMagic bitboard for Rook on F6: " << x << std::endl;
+	uint64_t x = getRookAttacks(D8, occupancy);
+	std::cout << "\n\nMagic bitboard for Rook on D8: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
@@ -27,8 +29,8 @@ void newGame()
 	//END TEST
 
 	// TEST MAGIC
-	x = getBishopAttacks(D3, Chessboard->getAllBlockers());
-	std::cout << "\n\nMagic bitboard for Bishop on D3: " << x << std::endl;
+	x = getBishopAttacks(H8, occupancy);
+	std::cout << "\n\nMagic bitboard for Bishop on G7: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 

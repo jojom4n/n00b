@@ -8,8 +8,8 @@
 
 // attack.cpp
 void initAttacks();
-void SlidingMaskEx(struct Mask Masks);
-void lineAttacks();
+void SlidingMaskEx();
+void linesAttacks();
 void raysAttacks();
 void raysEx();
 void kingMask();

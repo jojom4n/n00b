@@ -79,6 +79,8 @@ extern struct AttackTable Attacks;
 
 void rookMagic()
 {
+	Attacks.rookMagic.fill({});
+
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
@@ -89,7 +91,7 @@ void rookMagic()
 			blockerboard[i] = gen_blockerboard(i, bits, Masks.linesEx[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
 			
-			U64 index = ((blockerboard[i] & Masks.linesEx[square]) 
+			uint64_t index = ((blockerboard[i] & Masks.linesEx[square]) 
 				* MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
 			
 			Attacks.rookMagic[square][ushort(index)] = tmp_rook;
@@ -100,6 +102,8 @@ void rookMagic()
 
 void bishopMagic()
 {
+	Attacks.bishopMagic.fill({});
+
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
@@ -110,7 +114,7 @@ void bishopMagic()
 			blockerboard[i] = gen_blockerboard(i, bits, Masks.diagonalsEx[square]);
 			tmp_bishop = gen_b_attks(square, blockerboard[i]);
 
-			U64 index = ((blockerboard[i] & Masks.diagonalsEx[square]) 
+			uint64_t index = ((blockerboard[i] & Masks.diagonalsEx[square]) 
 				* MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square];
 
 			Attacks.bishopMagic[square][ushort(index)] = tmp_bishop;

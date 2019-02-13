@@ -6,13 +6,13 @@
 #include <string>
 #include <array>
 
-#define C64(constantU64) constantU64##ULL
+#define C64(constantuint64_t) constantuint64_t##ULL
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
 
 typedef unsigned short int ushort;
 
-typedef unsigned long long Bitboard, U64;
+typedef uint64_t Bitboard;
 
 // ENUMS
 enum Piece : const ushort { KING, QUEEN, ROOKS, KNIGHTS, BISHOPS, PAWNS, NO_PIECE };
@@ -45,11 +45,12 @@ struct coords { ushort x; ushort y; };
 // see magic.cpp
 constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
 
-constexpr U64 A1H8_DIAG = C64(0x8040201008040201);
+constexpr uint64_t A1H8_DIAG = C64(0x8040201008040201);
 constexpr ushort DIAG_NUMBER = 15;
-constexpr U64 NOT_FILE_A = 0xfefefefefefefefe;
-constexpr U64 NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
-constexpr U64 NO_EDGES = 0x7e7e7e7e7e7e00;
+
+constexpr uint64_t NOT_FILE_A = 0xfefefefefefefefe;
+constexpr uint64_t NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
+
 
 // for popcount() functions - see https://www.chessprogramming.org/Population_Count
 const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */

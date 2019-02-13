@@ -14,21 +14,23 @@ void initAttacks()
 	Masks.raysNoEdge.fill({});
 	Masks.rook.fill({});
 	
+	// generate attacks and masks
 	lineAttacks();
 	raysAttacks();
 	raysNoEdge();
-	generateRookMask(Masks);
+	generateSlidingPieceMask(Masks);
 	rookMagic();
 }
 
-void generateRookMask(struct Mask m)
+void generateSlidingPieceMask(struct Mask m)
 {
 	for (ushort square = A1; square <= H8; square++) {
-		/* if (square <= H7) m.raysNoEdge[NORTH][square] ^= C64(1) << bitscan_rvs(m.raysNoEdge[NORTH][square]);
-		if (square >= A2) m.raysNoEdge[SOUTH][square] ^= C64(1) << bitscan_fwd(m.raysNoEdge[SOUTH][square]);
-		if (FILE_INDEX != FILE_H) m.raysNoEdge[EAST][square] ^= C64(1) << bitscan_rvs(m.raysNoEdge[EAST][square]);
-		if (FILE_INDEX != FILE_A) m.raysNoEdge[WEST][square] ^= C64(1) << bitscan_fwd(m.raysNoEdge[WEST][square]); */
-		Masks.rook[square] = m.raysNoEdge[NORTH][square] | m.raysNoEdge[SOUTH][square] | m.raysNoEdge[EAST][square] | m.raysNoEdge[WEST][square];
+		
+		Masks.rook[square] = m.raysNoEdge[NORTH][square] | m.raysNoEdge[SOUTH][square] 
+			| m.raysNoEdge[WEST][square] | m.raysNoEdge[EAST][square];
+		
+		Masks.bishop[square] = m.raysNoEdge[NORTH_WEST][square] | m.raysNoEdge[NORTH_EAST][square] 
+			| m.raysNoEdge[SOUTH_WEST][square] | m.raysNoEdge[SOUTH_EAST][square];
 	}
 }
 
@@ -86,40 +88,80 @@ void raysAttacks()
 	for (ushort square = A1; square <= H8; square++, baseN <<= 1)
 		Masks.rays[NORTH][square] = baseN;
 	
+
 	// S ray
 	uint64_t baseS = C64(0x0080808080808080);
 	for (short square = H8; square >= A1; square--, baseS >>= 1)
 		Masks.rays[SOUTH][square] = baseS;
+
 
 	// W ray
 	uint64_t baseW = C64(0x7f00000000000000);
 	for (short square = H8; square >= A1; square--, baseW >>= 1)
 		Masks.rays[WEST][square] = baseW & Masks.rank[RANK_INDEX];
 
+
 	// E ray
 	uint64_t baseE = C64(0xfe);
 	for (ushort square = A1; square <= H8; square++, baseE <<=1)
 		Masks.rays[EAST][square] = baseE & Masks.rank[RANK_INDEX];
 	
-	// NE ray
-	uint64_t baseDiagonal = C64(0x8040201008040200);
 
-	for (int f = FILE_A; f <= FILE_H; f++, baseDiagonal = (baseDiagonal << 1) & NOT_FILE_A)	{
-		uint64_t copyDiagonal = baseDiagonal;
+	// NW ray
+	uint64_t baseDiagonalNW = C64(0x102040810204000);
+
+	for (int f = FILE_H; f >= FILE_A; f--, baseDiagonalNW = (baseDiagonalNW >> 1) & NOT_FILE_H) {
+		uint64_t copyDiagonal = baseDiagonalNW;
+
+		for (ushort r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
+			Masks.rays[NORTH_WEST][r + f] = copyDiagonal;
+	}
+	
+
+	// NE ray
+	uint64_t baseDiagonalNE = C64(0x8040201008040200);
+
+	for (ushort f = FILE_A; f <= FILE_H; f++, baseDiagonalNE = (baseDiagonalNE << 1) & NOT_FILE_A) {
+		uint64_t copyDiagonal = baseDiagonalNE;
 		
-		for (int r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
-			Masks.raysNoEdge[NORTH_EAST][r + f] = copyDiagonal;
+		for (ushort r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
+			Masks.rays[NORTH_EAST][r + f] = copyDiagonal;
+	}
+
+
+	// SW ray
+	uint64_t baseDiagonalSW = C64(0x40201008040201);
+
+	for (int f = FILE_H; f >= FILE_A; f--, baseDiagonalSW = (baseDiagonalSW >> 1) & NOT_FILE_H) {
+		uint64_t copyDiagonal = baseDiagonalSW;
+
+		for (int r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
+			Masks.rays[SOUTH_WEST][(8 * r) + f] = copyDiagonal;
+	}
+	
+
+	// SE ray
+	uint64_t baseDiagonalSE = C64(0x2040810204080);
+
+	for (ushort f = FILE_A; f <= FILE_H; f++, baseDiagonalSE = (baseDiagonalSE << 1) & NOT_FILE_A) {
+		uint64_t copyDiagonal = baseDiagonalSE;
+
+		for (int r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
+			Masks.rays[SOUTH_EAST][(8 * r) + f] = copyDiagonal;
 	}
 }
 
 void raysNoEdge() 
 {
-	// use NO_EDGE mask to extract No Edge Masks from simple masks
+	// use NO_EDGE mask to extract No Edge Masks from simple rays
 	for (ushort square = A1; square <= H8; square++) {
 		Masks.raysNoEdge[NORTH][square] = Masks.rays[NORTH][square] & NO_EDGES;
 		Masks.raysNoEdge[SOUTH][square] = Masks.rays[SOUTH][square] & NO_EDGES;
 		Masks.raysNoEdge[WEST][square] = Masks.rays[WEST][square] & NO_EDGES;
 		Masks.raysNoEdge[EAST][square] = Masks.rays[EAST][square] & NO_EDGES;
+		Masks.raysNoEdge[NORTH_WEST][square] = Masks.rays[NORTH_WEST][square] & NO_EDGES;
 		Masks.raysNoEdge[NORTH_EAST][square] = Masks.rays[NORTH_EAST][square] & NO_EDGES;
+		Masks.raysNoEdge[SOUTH_WEST][square] = Masks.rays[SOUTH_WEST][square] & NO_EDGES;
+		Masks.raysNoEdge[SOUTH_EAST][square] = Masks.rays[SOUTH_EAST][square] & NO_EDGES;
 	}
 }

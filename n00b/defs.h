@@ -47,6 +47,7 @@ constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
 constexpr uint64_t A1H8_DIAG = C64(0x8040201008040201);
 constexpr ushort DIAG_NUMBER = 15;
 constexpr uint64_t NOT_FILE_A = 0xfefefefefefefefe;
+constexpr uint64_t NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
 constexpr uint64_t NO_EDGES = 0x7e7e7e7e7e7e00;
 
 // for popcount() functions - see https://www.chessprogramming.org/Population_Count
@@ -61,6 +62,7 @@ struct Mask {
 	std::array<Bitboard, DIAG_NUMBER> diagonal;
 	std::array<Bitboard, DIAG_NUMBER> antiDiagonal;
 	std::array<Bitboard, SQ_NUMBER> rook;
+	std::array<Bitboard, SQ_NUMBER> bishop;
 	std::array<std::array<Bitboard, SQ_NUMBER>, RAYS_NUMBER>rays;
 	std::array<std::array<Bitboard,SQ_NUMBER>, RAYS_NUMBER>raysNoEdge;
 };

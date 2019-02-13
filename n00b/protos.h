@@ -8,7 +8,7 @@
 
 // attack.cpp
 void initAttacks();
-void generateRookMask(struct Mask Masks);
+void generateSlidingPieceMask(struct Mask Masks);
 void lineAttacks();
 void raysAttacks();
 void raysNoEdge();

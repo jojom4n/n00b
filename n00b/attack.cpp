@@ -15,7 +15,8 @@ void initAttacks()
 	Masks.rook.fill({});
 	
 	lineAttacks();
-	rayAttacksNoEdge();
+	raysAttacks();
+	raysNoEdge();
 	generateRookMask(Masks);
 	rookMagic();
 }
@@ -23,10 +24,10 @@ void initAttacks()
 void generateRookMask(struct Mask m)
 {
 	for (ushort square = A1; square <= H8; square++) {
-		if (square <= H7) m.raysNoEdge[NORTH][square] ^= C64(1) << bitscan_rvs(m.raysNoEdge[NORTH][square]);
+		/* if (square <= H7) m.raysNoEdge[NORTH][square] ^= C64(1) << bitscan_rvs(m.raysNoEdge[NORTH][square]);
 		if (square >= A2) m.raysNoEdge[SOUTH][square] ^= C64(1) << bitscan_fwd(m.raysNoEdge[SOUTH][square]);
 		if (FILE_INDEX != FILE_H) m.raysNoEdge[EAST][square] ^= C64(1) << bitscan_rvs(m.raysNoEdge[EAST][square]);
-		if (FILE_INDEX != FILE_A) m.raysNoEdge[WEST][square] ^= C64(1) << bitscan_fwd(m.raysNoEdge[WEST][square]);
+		if (FILE_INDEX != FILE_A) m.raysNoEdge[WEST][square] ^= C64(1) << bitscan_fwd(m.raysNoEdge[WEST][square]); */
 		Masks.rook[square] = m.raysNoEdge[NORTH][square] | m.raysNoEdge[SOUTH][square] | m.raysNoEdge[EAST][square] | m.raysNoEdge[WEST][square];
 	}
 }
@@ -48,6 +49,7 @@ void lineAttacks()
 			square += 1;
 		}
 	}
+
 
 	// Diagonal mask
 	uint64_t baseDiagonal = C64(0x8040201008040201); // diagonal from A1 to H8
@@ -77,29 +79,47 @@ void lineAttacks()
 		Masks.antiDiagonal[r] = baseAntiDiagonal;
 }
 
-void rayAttacksNoEdge() // no edge
+void raysAttacks()
 {
-	// N attack. We don't precalculate rank 8 because there is no north from there
-	for (ushort square = A1; square <= H7; square++)
-		// we will shift up the rank mask by (rank index + 1) - +1 needed because rank index starts from 0
-		Masks.raysNoEdge[NORTH][square] = Masks.file[FILE_INDEX] << (8 * (RANK_INDEX + 1));
+	// N ray
+	uint64_t baseN = C64(0x0101010101010100);
+	for (ushort square = A1; square <= H8; square++, baseN <<= 1)
+		Masks.rays[NORTH][square] = baseN;
+	
+	// S ray
+	uint64_t baseS = C64(0x0080808080808080);
+	for (short square = H8; square >= A1; square--, baseS >>= 1)
+		Masks.rays[SOUTH][square] = baseS;
 
-	// S attack. We don't precalculate rank 1 because there is no south from there
-	for (ushort square = A2; square <= H8; square++)
-		// we will shift towards down the rank mask by (8 - rank index)
-		Masks.raysNoEdge[SOUTH][square] = Masks.file[FILE_INDEX] >> (8 * (8 - RANK_INDEX));
+	// W ray
+	uint64_t baseW = C64(0x7f00000000000000);
+	for (short square = H8; square >= A1; square--, baseW >>= 1)
+		Masks.rays[WEST][square] = baseW & Masks.rank[RANK_INDEX];
 
-	// E attack. We don't precalculate file H because there is no east from there
-	for (ushort square = A1; square <= H8; square++)
-		if (FILE_INDEX != FILE_H)
-			/* Shifting appropriate rankMask n times, where n is the file index (+1 because file index starts from 0).
-			Since shifting will create clipping, we AND the result of the shift with the same rankMask again, to reset clipped '1' */
-			Masks.raysNoEdge[EAST][square] = Masks.rank[RANK_INDEX] << (1 * (FILE_INDEX + 1)) & Masks.rank[RANK_INDEX];
+	// E ray
+	uint64_t baseE = C64(0xfe);
+	for (ushort square = A1; square <= H8; square++, baseE <<=1)
+		Masks.rays[EAST][square] = baseE & Masks.rank[RANK_INDEX];
+	
+	// NE ray
+	uint64_t baseDiagonal = C64(0x8040201008040200);
 
-	// W attack. We don't precalculate file A because there is no west from there
-	for (ushort square = A1; square <= H8; square++)
-		if (FILE_INDEX != FILE_A)
-			/* Shifting appropriate rankMask n times, where n is (8 - file index).
-			Since shifting will create clipping, we AND the result of the shift with the same rankMask again, to reset clipped '1' */
-			Masks.raysNoEdge[WEST][square] = Masks.rank[RANK_INDEX] >> (1 * (8 - FILE_INDEX)) & Masks.rank[RANK_INDEX];
+	for (int f = FILE_A; f <= FILE_H; f++, baseDiagonal = (baseDiagonal << 1) & NOT_FILE_A)	{
+		uint64_t copyDiagonal = baseDiagonal;
+		
+		for (int r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
+			Masks.raysNoEdge[NORTH_EAST][r + f] = copyDiagonal;
+	}
+}
+
+void raysNoEdge() 
+{
+	// use NO_EDGE mask to extract No Edge Masks from simple masks
+	for (ushort square = A1; square <= H8; square++) {
+		Masks.raysNoEdge[NORTH][square] = Masks.rays[NORTH][square] & NO_EDGES;
+		Masks.raysNoEdge[SOUTH][square] = Masks.rays[SOUTH][square] & NO_EDGES;
+		Masks.raysNoEdge[WEST][square] = Masks.rays[WEST][square] & NO_EDGES;
+		Masks.raysNoEdge[EAST][square] = Masks.rays[EAST][square] & NO_EDGES;
+		Masks.raysNoEdge[NORTH_EAST][square] = Masks.rays[NORTH_EAST][square] & NO_EDGES;
+	}
 }

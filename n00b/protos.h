@@ -10,7 +10,8 @@
 void initAttacks();
 void generateRookMask(struct Mask Masks);
 void lineAttacks();
-void rayAttacksNoEdge();
+void raysAttacks();
+void raysNoEdge();
 
 // magic.cpp
 const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers);

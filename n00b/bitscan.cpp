@@ -82,7 +82,6 @@ const Square bitscan_reset(Bitboard &b, bool reverse)
 
 	if (reverse == true) {
 		index = bitscan_rvs(b);
-		// b &= ~(1 << (64 - 1));
 		b &= ~(C64(1) << index);
 	}
 	else {

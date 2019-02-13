@@ -8,14 +8,15 @@
 
 // attack.cpp
 void initAttacks();
-void generateSlidingPieceMask(struct Mask Masks);
+void SlidingMaskEx(struct Mask Masks);
 void lineAttacks();
 void raysAttacks();
-void raysNoEdge();
-
-// magic.cpp
+void raysEx();
+void kingMask();
 const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers);
 const Bitboard getBishopAttacks(Square const &square, Bitboard const &blockers);
+
+// magic.cpp
 const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboard b);
 const Bitboard gen_r_attks(ushort const &square, Bitboard const &blockerboard);
 const Bitboard gen_b_attks(ushort const &square, Bitboard const &blockerboard);

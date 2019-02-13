@@ -70,7 +70,7 @@ const coords Board::idPiece(Square const &square) const
 // see https://www.chessprogramming.org/Population_Count
 const ushort Board::count(Color const &color) const 
 {
-	uint64_t count;
+	U64 count;
 
 	if (color == WHITE)
 		count = whitePieces_;

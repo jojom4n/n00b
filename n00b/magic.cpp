@@ -74,38 +74,25 @@ const ushort SHIFT_BISHOP[64] = {
 	58, 59, 59, 59, 59, 59, 59, 58
 };
 
-
 extern struct Mask Masks;
-struct AttackTables Attacks;
-
-const Bitboard getRookAttacks (Square const &square, Bitboard const &blockers)
-	{ return Attacks.rook[square]
-		[((blockers & Masks.rook[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]]; }
-
-
-const Bitboard getBishopAttacks(Square const & square, Bitboard const & blockers)
-	{ return Attacks.bishop[square]
-		[((blockers & Masks.bishop[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]]; }
-
+extern struct AttackTable Attacks;
 
 void rookMagic()
 {
-	Attacks.rook.fill({});
-
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_rook = C64(0);
-		ushort bits = popcount(Masks.rook[square]);
+		ushort bits = popcount(Masks.linesEx[square]);
 
 		for (ushort i = 0; i < (1 << bits); i++) {
-			blockerboard[i] = gen_blockerboard(i, bits, Masks.rook[square]);
+			blockerboard[i] = gen_blockerboard(i, bits, Masks.linesEx[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
 			
-			uint64_t index = ((blockerboard[i] & Masks.rook[square]) 
+			U64 index = ((blockerboard[i] & Masks.linesEx[square]) 
 				* MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
 			
-			Attacks.rook[square][ushort(index)] = tmp_rook;
+			Attacks.rookMagic[square][ushort(index)] = tmp_rook;
 		}
 	}
 }
@@ -113,22 +100,20 @@ void rookMagic()
 
 void bishopMagic()
 {
-	Attacks.bishop.fill({});
-
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_bishop = C64(0);
-		ushort bits = popcount(Masks.bishop[square]);
+		ushort bits = popcount(Masks.diagonalsEx[square]);
 
 		for (ushort i = 0; i < (1 << bits); i++) {
-			blockerboard[i] = gen_blockerboard(i, bits, Masks.bishop[square]);
+			blockerboard[i] = gen_blockerboard(i, bits, Masks.diagonalsEx[square]);
 			tmp_bishop = gen_b_attks(square, blockerboard[i]);
 
-			uint64_t index = ((blockerboard[i] & Masks.bishop[square]) 
+			U64 index = ((blockerboard[i] & Masks.diagonalsEx[square]) 
 				* MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square];
 
-			Attacks.bishop[square][ushort(index)] = tmp_bishop;
+			Attacks.bishopMagic[square][ushort(index)] = tmp_bishop;
 		}
 	}
 }

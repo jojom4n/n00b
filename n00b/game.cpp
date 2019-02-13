@@ -7,6 +7,7 @@
 
 std::string input = " ";
 extern struct Mask Masks;
+extern struct AttackTable Attacks;
 
 void newGame()
 {	
@@ -15,13 +16,13 @@ void newGame()
 	std::cout << std::endl << display_board(*Chessboard) << std::endl;
 	
 	// TEST MAGIC
-	uint64_t x= getRookAttacks(F6,Chessboard->getAllBlockers());
+	U64 x = getRookAttacks(F6,Chessboard->getAllBlockers());
 	std::cout << "\n\nMagic bitboard for Rook on F6: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
 	// TEST MAGIC
-	std::cout << "\n\nMask bitboard for Rook on G5: " << Masks.rook[G5] << std::endl;
+	std::cout << "\n\nMask bitboard for Rook on G5: " << Masks.linesEx[G5] << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
@@ -31,7 +32,9 @@ void newGame()
 	std::cout << std::endl;
 	//END TEST
 
-	std::cout << "\n\nMask bitboard for Bishop on E4: " << Masks.bishop[E4] << std::endl;
+	std::cout << "\n\nMask bitboard for Bishop on E4: " << Masks.diagonalsEx[E4] << std::endl;
+
+	std::cout << sizeof(Masks.diagonal);
 
 
 	for (;;)

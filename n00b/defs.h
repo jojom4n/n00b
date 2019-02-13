@@ -12,7 +12,7 @@
 
 typedef unsigned short int ushort;
 
-typedef uint64_t Bitboard;
+typedef unsigned long long Bitboard, U64;
 
 // ENUMS
 enum Piece : const ushort { KING, QUEEN, ROOKS, KNIGHTS, BISHOPS, PAWNS, NO_PIECE };
@@ -45,11 +45,11 @@ struct coords { ushort x; ushort y; };
 // see magic.cpp
 constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
 
-constexpr uint64_t A1H8_DIAG = C64(0x8040201008040201);
+constexpr U64 A1H8_DIAG = C64(0x8040201008040201);
 constexpr ushort DIAG_NUMBER = 15;
-constexpr uint64_t NOT_FILE_A = 0xfefefefefefefefe;
-constexpr uint64_t NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
-constexpr uint64_t NO_EDGES = 0x7e7e7e7e7e7e00;
+constexpr U64 NOT_FILE_A = 0xfefefefefefefefe;
+constexpr U64 NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
+constexpr U64 NO_EDGES = 0x7e7e7e7e7e7e00;
 
 // for popcount() functions - see https://www.chessprogramming.org/Population_Count
 const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
@@ -62,17 +62,22 @@ struct Mask {
 	std::array<Bitboard, RANK_NUMBER> rank;
 	std::array<Bitboard, DIAG_NUMBER> diagonal;
 	std::array<Bitboard, DIAG_NUMBER> antiDiagonal;
-	std::array<Bitboard, SQ_NUMBER> rook;
-	std::array<Bitboard, SQ_NUMBER> bishop;
+	std::array<Bitboard, SQ_NUMBER> linesEx;
+	std::array<Bitboard, SQ_NUMBER> diagonalsEx;
 	std::array<std::array<Bitboard, SQ_NUMBER>, RAYS_NUMBER>rays;
-	std::array<std::array<Bitboard,SQ_NUMBER>, RAYS_NUMBER>raysNoEdge;
+	std::array<std::array<Bitboard,SQ_NUMBER>, RAYS_NUMBER>raysEx;
 };
 
-struct AttackTables {
-	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rook;
-	std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishop;
+struct AttackTable {
+	std::array<Bitboard, SQ_NUMBER> king;
+	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
+	std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishopMagic;
 };
 
 extern const std::array<std::string, 65> squares_to_string;
+extern const Bitboard MAGIC_ROOK[64];
+extern const Bitboard MAGIC_BISHOP[64];
+extern const ushort SHIFT_ROOK[64];
+extern const ushort SHIFT_BISHOP[64];
 
 #endif

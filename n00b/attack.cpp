@@ -222,7 +222,7 @@ const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers)
 }
 
 
-const Bitboard getBishopAttacks(Square const & square, Bitboard const & blockers)
+const Bitboard getBishopAttacks(Square const &square, Bitboard const &blockers)
 {
 	return Attacks.bishopMagic[square]
 		[((blockers & Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];

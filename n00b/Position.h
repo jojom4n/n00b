@@ -15,7 +15,8 @@ class Position
 	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
 	std::list<Bitboard> enPassantSquare{};
 	bool turn_ = WHITE; // who has the move?
-	ushort moveNumber_ = 1; // number of half-move. Default to 1
+	ushort moveNumber_ = 1; // number of moves. Default to 1
+	ushort halfMove_ = 0; // number of half-moves. Default to 0
 	bool checkmate_ = false; // is the player checkmated?
 	std::array<ushort, 2> castle_ {ALL, ALL}; // castling rights for each player. Default to all
 	std::array<ushort, 2> playerTime_ {600}; // time in seconds. Default to 10 mins
@@ -34,6 +35,9 @@ public:
 	constexpr ushort getMoveNumber() const { return moveNumber_; }
 	void setMoveNumber(ushort const &move) { moveNumber_ = move; }
 
+	constexpr ushort getHalfMove() const { return halfMove_; }
+	void setHalfMove(ushort const &half_move) { halfMove_ = half_move; }
+	
 	constexpr bool getCheckmate() const { return checkmate_; }
 	void setCheckmate(bool const &b) { checkmate_ = b; }
 

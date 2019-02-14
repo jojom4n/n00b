@@ -1,5 +1,6 @@
 #include "pch.h"
 #include <iostream>
+#include <string>
 #include "Position.h"
 #include "defs.h"
 #include "protos.h"
@@ -44,6 +45,20 @@ void newGame()
 		(Chessboard->getTurn() == WHITE) ? 
 			std::cout << "\nwhite>> " : std::cout << "\nblack>> ";
 
-		std::cin >> input;
+		std::getline(std::cin, input);
+
+		readCommand(input, *Chessboard);
+
+		std::cout << std::endl;
 	}
 }
+
+void readCommand(const std::string &input, Position &board)
+{
+	if (input.compare(0, 12, "fen position") == 0)
+		if (fenValidate(input))
+			fenApply(input, board);
+		else
+			std::cout << "Sorry, invalid FEN position.\n";
+}
+

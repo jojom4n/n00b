@@ -6,6 +6,8 @@
 
 Board::Board()
 {
+	white_.castle = BOTH;
+	black_.castle = BOTH;
 	board_.fill({});
 }
 

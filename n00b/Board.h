@@ -15,10 +15,9 @@ class Board
 	bool move_ = WHITE; // who has the move?
 	bool checkmate_ = false; // is the player checkmated?
 
-	struct Castle {
-		Color player;
-		enum side : const ushort { KINGSIDE, QUEENSIDE, BOTH, NONE };
-	} castling_;
+	struct Player {
+		ushort castle;
+	} white_, black_;
 	
 	void update(Color const &color);
 
@@ -34,8 +33,8 @@ public:
 	constexpr bool getCheckmate() const { return checkmate_; }
 	void setCheckmate(bool const &b) { checkmate_ = b; }
 
-	constexpr Castle getCastle() const { return castling_; }
-	void setCastle(Castle const &castle) { castling_ = castle; }
+	constexpr ushort getCastle() const { return (move_ == WHITE) ? white_.castle : black_.castle; }
+	void setCastle(Color const &color, ushort const &castle) { (color == WHITE) ? white_.castle = castle : black_.castle = castle; }
 
 	void putPiece(Color const &color, Piece const &piece, Square const &square);
 

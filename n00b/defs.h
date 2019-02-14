@@ -81,6 +81,10 @@ struct AttackTable {
 	std::array<Bitboard, SQ_NUMBER> knight;
 	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
 	std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishopMagic;
+	const Bitboard whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const;
+	const Bitboard blackPawn(Bitboard const &pawn, Bitboard const &occupancy) const;
+	const Bitboard rook(Square const &square, Bitboard const &blockers) const;
+	const Bitboard bishop(Square const &square, Bitboard const &blockers) const;
 };
 
 extern const std::array<std::string, 65> squares_to_string;

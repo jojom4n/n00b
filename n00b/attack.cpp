@@ -215,25 +215,25 @@ void knightMask()
 }
 
 
-const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers)
+const Bitboard AttackTable::rook(Square const &square, Bitboard const &blockers) const
 {
 	return Attacks.rookMagic[square]
 		[((blockers & Masks.linesEx[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
 }
 
 
-const Bitboard getBishopAttacks(Square const &square, Bitboard const &blockers)
+const Bitboard AttackTable::bishop(Square const &square, Bitboard const &blockers) const
 {
 	return Attacks.bishopMagic[square]
 		[((blockers & Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];
 }
 
-const Bitboard getWPawnAttacks(Bitboard const &pawn, Bitboard const &occupancy)
+const Bitboard AttackTable::whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const
 {
 	return (((pawn << 7) & NOT_FILE_H) | (pawn << 9) & NOT_FILE_A) & occupancy;
 }
 
-const Bitboard getBPawnAttacks(Bitboard const &pawn, Bitboard const &occupancy)
+const Bitboard AttackTable::blackPawn(Bitboard const &pawn, Bitboard const &occupancy) const
 {
 	return (((pawn >> 7) & NOT_FILE_H) | (pawn >> 9) & NOT_FILE_A) & occupancy;
 }

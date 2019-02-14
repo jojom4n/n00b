@@ -15,7 +15,7 @@ void newGame()
 	std::cout << std::endl << display_board(*Chessboard) << std::endl;
 	
 	// TEST MAGIC
-	uint64_t x = getRookAttacks(A1, Chessboard->getAllBlockers());
+	uint64_t x = Attacks.rook(A1, Chessboard->getAllBlockers());
 	std::cout << "\n\nMagic bitboard for Rook on A1: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
@@ -26,14 +26,14 @@ void newGame()
 	//END TEST
 
 	// TEST MAGIC
-	x = getBishopAttacks(F5, Chessboard->getAllBlockers());
+	x = Attacks.bishop(F5, Chessboard->getAllBlockers());
 	std::cout << "\n\nMagic bitboard for Bishop on F5: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
 	std::cout << "\n\nMask bitboard for Bishop on F6: " << Masks.diagonalsEx[F6] << std::endl;
 
-	std::cout << "\n\nWhite pawns attacks: " << getWPawnAttacks(Chessboard->getPieces(WHITE, PAWNS),
+	std::cout << "\n\nWhite pawns attacks: " << Attacks.whitePawn(Chessboard->getPieces(WHITE, PAWNS),
 		C64(0xfff700000020ffff)) << std::endl;
 
 	std::cout << std::endl << sizeof(Masks.diagonal);

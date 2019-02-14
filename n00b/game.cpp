@@ -33,12 +33,15 @@ void newGame()
 
 	std::cout << "\n\nMask bitboard for Bishop on F6: " << Masks.diagonalsEx[F6] << std::endl;
 
-	std::cout << sizeof(Masks.diagonal);
+	std::cout << "\n\nWhite pawns attacks: " << getWPawnAttacks(Chessboard->getPieces(WHITE, PAWNS),
+		C64(0xfff700000020ffff)) << std::endl;
+
+	std::cout << std::endl << sizeof(Masks.diagonal);
 
 
 	for (;;)
 	{
-		(Chessboard->getMove() == WHITE) ? 
+		(Chessboard->getTurn() == WHITE) ? 
 			std::cout << "\nwhite>> " : std::cout << "\nblack>> ";
 
 		std::cin >> input;

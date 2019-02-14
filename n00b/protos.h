@@ -16,6 +16,9 @@ void kingMask();
 void knightMask();
 const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers);
 const Bitboard getBishopAttacks(Square const &square, Bitboard const &blockers);
+const Bitboard getWPawnAttacks(Bitboard const &pawn, Bitboard const &occupancy);
+const Bitboard getBPawnAttacks(Bitboard const &pawn, Bitboard const &occupancy);
+
 
 // magic.cpp
 const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboard b);

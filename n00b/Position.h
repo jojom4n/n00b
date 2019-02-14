@@ -14,9 +14,10 @@ class Position
 	std::array<std::array<Bitboard, 6>, 2> board_;
 	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
 	std::list<Bitboard> enPassantSquare{};
-	bool move_ = WHITE; // who has the move?
+	bool turn_ = WHITE; // who has the move?
+	ushort moveNumber_ = 1; // number of half-move. Default to 1
 	bool checkmate_ = false; // is the player checkmated?
-	std::array<ushort, 2> castle_ {BOTH, BOTH};
+	std::array<ushort, 2> castle_ {ALL, ALL}; // castling rights for each player. Default to all
 	std::array<ushort, 2> playerTime_ {600}; // time in seconds. Default to 10 mins
 		
 	void update(Color const &color);
@@ -27,13 +28,16 @@ public:
 
 	void setNew();
 
-	constexpr bool getMove() const { return move_; }
-	void setMove(bool const& b) { move_ = b; }
+	constexpr bool getTurn() const { return turn_; }
+	void setTurn(bool const& b) { turn_ = b; }
+
+	constexpr ushort getMoveNumber() const { return moveNumber_; }
+	void setMoveNumber(ushort const &move) { moveNumber_ = move; }
 
 	constexpr bool getCheckmate() const { return checkmate_; }
 	void setCheckmate(bool const &b) { checkmate_ = b; }
 
-	constexpr ushort getCastle() const { return (move_ == WHITE) ? castle_[WHITE] : castle_[BLACK]; }
+	constexpr ushort getCastle() const { return (turn_ == WHITE) ? castle_[WHITE] : castle_[BLACK]; }
 	void setCastle(Color const &color, ushort const &castle) 
 		{ (color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle; }
 
@@ -50,9 +54,9 @@ public:
 	constexpr Bitboard getPieces(Color const &color, Piece const &piece) const { return board_[color][piece]; }
 
 	constexpr Bitboard getOpponentBlockers() const
-		{ return (move_ == WHITE) ? blackPieces_ : whitePieces_; }
+		{ return (turn_ == WHITE) ? blackPieces_ : whitePieces_; }
 	constexpr Bitboard getPlayerBlockers() const
-		{ return (move_ == WHITE) ? whitePieces_ : blackPieces_; }
+		{ return (turn_ == WHITE) ? whitePieces_ : blackPieces_; }
 	constexpr Bitboard getAllBlockers() const
 		{ return allPieces_;	}
 	

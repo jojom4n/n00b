@@ -32,7 +32,7 @@ enum Square : const ushort
 	SQ_NUMBER, SQ_EMPTY
 };
 
-enum Castle : const ushort { KINGSIDE, QUEENSIDE, BOTH, NONE };
+enum Castle : const ushort { KINGSIDE, QUEENSIDE, ALL, NONE };
 
 enum File : const ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER };
 
@@ -42,6 +42,7 @@ enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST
 
 enum RaysKnight : const ushort {NORTH_NORTH_WEST, NORTH_NORTH_EAST, NORTH_EAST_EAST, SOUTH__EAST_EAST, SOUTH_SOUTH_EAST,
 	SOUTH_SOUTH_WEST, SOUTH__WEST_WEST, NORTH_WEST_WEST, RAYS_KNIGHT_NUMBER};
+
 
 // OTHER TYPES
 struct coords { ushort x; ushort y; };

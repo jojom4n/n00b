@@ -227,3 +227,13 @@ const Bitboard getBishopAttacks(Square const & square, Bitboard const & blockers
 	return Attacks.bishopMagic[square]
 		[((blockers & Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];
 }
+
+const Bitboard getWPawnAttacks(Bitboard const &pawn, Bitboard const &occupancy)
+{
+	return (((pawn << 7) & NOT_FILE_H) | (pawn << 9) & NOT_FILE_A) & occupancy;
+}
+
+const Bitboard getBPawnAttacks(Bitboard const &pawn, Bitboard const &occupancy)
+{
+	return (((pawn >> 7) & NOT_FILE_H) | (pawn >> 9) & NOT_FILE_A) & occupancy;
+}

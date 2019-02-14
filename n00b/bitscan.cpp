@@ -11,7 +11,7 @@ const Square bitscan_fwd(Bitboard const &b)
 }
 
 
-const Square Board::bitscan_rvs(Bitboard const &b) const
+const Square bitscan_rvs(Bitboard const &b) const
 {
 	assert(b);
 	return Square(63 ^ __builtin_clzll(b));

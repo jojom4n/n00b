@@ -1,6 +1,6 @@
 #include "pch.h"
 #include <string>
-#include "Board.h"
+#include "Position.h"
 #include "protos.h"
 
 const std::array<std::string, 65> squares_to_string =
@@ -17,7 +17,7 @@ const std::array<std::string, 65> squares_to_string =
 };
 
 
-const std::string display_board(Board const &board)
+const std::string display_board(Position const &board)
 {
 	std::string output = "+---+---+---+---+---+---+---+---+\n";
 

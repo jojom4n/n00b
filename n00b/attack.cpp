@@ -65,7 +65,7 @@ void linesAttacks()
 	baseDiagonal = C64(0x4020100804020100); // reset baseDiagonal to diagonal from A2 to H7
 
 	for (ushort r = RANK_2; r <= RANK_8; r++, baseDiagonal = (baseDiagonal >> 1) & C64(0x7f3f1f0f07030100))
-		Masks.diagonal[C64(7) + r] = baseDiagonal;
+		Masks.diagonal[7 + r] = baseDiagonal;
 	
 	uint64_t baseAntiDiagonal = C64(0x102040810204080); // antidiagonal from A8 to H1
 

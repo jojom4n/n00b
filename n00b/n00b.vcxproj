@@ -151,14 +151,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Board.h" />
+    <ClInclude Include="Position.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="protos.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitscan.cpp" />
-    <ClCompile Include="Board.cpp" />
+    <ClCompile Include="Position.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="magic.cpp" />

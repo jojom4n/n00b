@@ -4,7 +4,7 @@
 
 #include <string>
 #include "defs.h"
-#include "Board.h"
+#include "Position.h"
 
 // attack.cpp
 void initAttacks();
@@ -28,7 +28,7 @@ void bishopMagic();
 void newGame();
 
 //display.cpp
-const std::string display_board(Board const &board);
+const std::string display_board(Position const &board);
 const char printPiece(coords const &coordinates);
 
 // bitscan.cpp

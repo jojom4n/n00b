@@ -1,24 +1,22 @@
 #include "pch.h"
 #include <iostream>
-#include "Board.h"
+#include "Position.h"
 #include "defs.h"
 #include "protos.h"
 
-Board::Board()
+Position::Position()
 {
-	white_.castle = BOTH;
-	black_.castle = BOTH;
 	board_.fill({});
 }
 
 
-Board::~Board()
+Position::~Position()
 {
 	
 }
 
 
-void Board::setNew()
+void Position::setNew()
 {
 	// white pieces
 	putPiece(WHITE, KING, E1);
@@ -48,14 +46,14 @@ void Board::setNew()
 }
 
 
-void Board::putPiece(Color const &color, Piece const &piece, Square const &square)
+void Position::putPiece(Color const &color, Piece const &piece, Square const &square)
 {
 	board_[color][piece] |= C64(1) << square;
 	update(color);
 }
 
 
-const coords Board::idPiece(Square const &square) const
+const coords Position::idPiece(Square const &square) const
 {
 	/* let us AND the bit set in the square (1ULL << square) with the main bitboards,
 	until we find the one containing that bit */
@@ -70,7 +68,7 @@ const coords Board::idPiece(Square const &square) const
 
 
 // see https://www.chessprogramming.org/Population_Count
-const ushort Board::count(Color const &color) const 
+const ushort Position::count(Color const &color) const 
 {
 	uint64_t count;
 
@@ -89,7 +87,7 @@ const ushort Board::count(Color const &color) const
 }
 
 
-const ushort Board::countPieceType(Color const &color, Piece const &piece) const
+const ushort Position::countPieceType(Color const &color, Piece const &piece) const
 {
 	Bitboard count = board_[color][piece];
 	count = count - ((count >> 1) & k1);
@@ -100,7 +98,7 @@ const ushort Board::countPieceType(Color const &color, Piece const &piece) const
 }
 
 
-const std::vector<Square> Board::getPieceOnSquare(Color const &color, Piece const &piece) const
+const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece const &piece) const
 {
 	std::vector<Square> square;
 	Bitboard count = board_[color][piece];
@@ -112,7 +110,7 @@ const std::vector<Square> Board::getPieceOnSquare(Color const &color, Piece cons
 }
 
 
-void Board::update(Color const &color)
+void Position::update(Color const &color)
 {
 	if (color == WHITE)
 		for (ushort i = 0; i < 6; i++)

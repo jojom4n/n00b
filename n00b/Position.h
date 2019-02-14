@@ -4,26 +4,26 @@
 
 #include <stdint.h>
 #include <vector>
+#include <list>
 #include <array>
 #include <assert.h>
 #include "defs.h"
 
-class Board
+class Position
 {
 	std::array<std::array<Bitboard, 6>, 2> board_;
-	Bitboard whitePieces_ = C64(0), blackPieces_ = C64(0), allPieces_ = C64(0);
+	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
+	std::list<Bitboard> enPassantSquare{};
 	bool move_ = WHITE; // who has the move?
 	bool checkmate_ = false; // is the player checkmated?
-
-	struct Player {
-		ushort castle;
-	} white_, black_;
-	
+	std::array<ushort, 2> castle_ {BOTH, BOTH};
+	std::array<ushort, 2> playerTime_ {600}; // time in seconds. Default to 10 mins
+		
 	void update(Color const &color);
 
 public:
-	Board();
-	~Board();
+	Position();
+	~Position();
 
 	void setNew();
 
@@ -33,9 +33,15 @@ public:
 	constexpr bool getCheckmate() const { return checkmate_; }
 	void setCheckmate(bool const &b) { checkmate_ = b; }
 
-	constexpr ushort getCastle() const { return (move_ == WHITE) ? white_.castle : black_.castle; }
-	void setCastle(Color const &color, ushort const &castle) { (color == WHITE) ? white_.castle = castle : black_.castle = castle; }
+	constexpr ushort getCastle() const { return (move_ == WHITE) ? castle_[WHITE] : castle_[BLACK]; }
+	void setCastle(Color const &color, ushort const &castle) 
+		{ (color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle; }
 
+	constexpr ushort getPlayerTime(Color const &color) const 
+		{ return (color == WHITE) ? playerTime_[WHITE] : playerTime_[BLACK]; }
+	void setPlayerTime(Color const &color, ushort time)
+		{ (color == WHITE) ? playerTime_[WHITE] = time : playerTime_[BLACK] = time;	}
+	
 	void putPiece(Color const &color, Piece const &piece, Square const &square);
 
 	constexpr Bitboard getPosition() const { return allPieces_; }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "Position.h"
 #include "defs.h"
 #include "protos.h"
@@ -46,19 +47,27 @@ void newGame()
 			std::cout << "\nwhite>> " : std::cout << "\nblack>> ";
 
 		std::getline(std::cin, input);
+		std::stringstream lineStream(input);
 
-		readCommand(input, *Chessboard);
+		readCommand(lineStream, *Chessboard);
 
 		std::cout << std::endl;
 	}
 }
 
-void readCommand(const std::string &input, Position &board)
+void readCommand(std::stringstream &inputStream, Position &board)
 {
-	if (input.compare(0, 12, "fen position") == 0)
-		if (fenValidate(input))
-			fenApply(input, board);
-		else
-			std::cout << "Sorry, invalid FEN position.\n";
+	// let us count the words in the line
+	ushort numWords = 0;
+	std::string input = " ";
+	while (inputStream >> input) ++numWords;
+
+	input = inputStream.str();
+	
+	if (input.compare(0, 12, "fen position") == 0 && numWords > 2) {
+		if (fenValidate(input)) fenParser(input, board);
+	}
+	else
+		std::cout << "Sorry, invalid FEN position.\n\n";
 }
 

@@ -24,11 +24,11 @@ void bishopMagic();
 
 // game.cpp
 void newGame();
-void readCommand(const std::string &input, Position &board);
+void readCommand(std::stringstream &inputStream, Position &board);
 
 // fen.cpp
 bool fenValidate(const std::string &fen);
-void fenApply(const std::string &fen, Position &board);
+void fenParser(const std::string &fen, Position &board);
 
 //display.cpp
 const std::string display_board(Position const &board);

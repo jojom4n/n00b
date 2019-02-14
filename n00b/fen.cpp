@@ -7,7 +7,7 @@ bool fenValidate(const std::string &fen)
 	return true;
 }
 
-void fenApply(const std::string &fen, Position &board)
+void fenParser(const std::string &fen, Position &board)
 {
 
 }

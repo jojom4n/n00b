@@ -12,8 +12,8 @@
 class Position
 {
 	std::array<std::array<Bitboard, 6>, 2> board_;
-	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
-	std::list<Bitboard> enPassantSquare{};
+	Bitboard whitePieces_ {}, blackPieces_ {}, allPieces_ {};
+	ushort enPassantSquare_ {};
 	bool turn_ = WHITE; // who has the move?
 	ushort moveNumber_ = 1; // number of moves. Default to 1
 	ushort halfMove_ = 0; // number of half-moves. Default to 0
@@ -32,6 +32,9 @@ public:
 	constexpr bool getTurn() const { return turn_; }
 	void setTurn(bool const& b) { turn_ = b; }
 
+	constexpr ushort getEnPassant() { return enPassantSquare_; }
+	void setEnPassant(const ushort &square) { enPassantSquare_ = square; }
+	
 	constexpr ushort getMoveNumber() const { return moveNumber_; }
 	void setMoveNumber(ushort const &move) { moveNumber_ = move; }
 

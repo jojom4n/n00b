@@ -13,6 +13,7 @@ void linesAttacks();
 void raysAttacks();
 void raysEx();
 void kingMask();
+void knightMask();
 const Bitboard getRookAttacks(Square const &square, Bitboard const &blockers);
 const Bitboard getBishopAttacks(Square const &square, Bitboard const &blockers);
 

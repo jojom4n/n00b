@@ -16,6 +16,7 @@ void initAttacks()
 	
 	// generate attacks
 	kingMask();
+	knightMask();
 	rookMagic();
 	bishopMagic();
 }
@@ -154,10 +155,17 @@ void raysEx()
 		if (FILE_INDEX != FILE_A) Masks.raysEx[WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[WEST][square]);
 		if (FILE_INDEX != FILE_H) Masks.raysEx[EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[EAST][square]);
 
-		if (Masks.raysEx[NORTH_WEST][square]) Masks.raysEx[NORTH_WEST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_WEST][square]);
-		if (Masks.raysEx[NORTH_EAST][square]) Masks.raysEx[NORTH_EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_EAST][square]);
-		if (Masks.raysEx[SOUTH_WEST][square]) Masks.raysEx[SOUTH_WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_WEST][square]);
-		if (Masks.raysEx[SOUTH_EAST][square]) Masks.raysEx[SOUTH_EAST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_EAST][square]);
+		if (Masks.raysEx[NORTH_WEST][square]) 
+			Masks.raysEx[NORTH_WEST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_WEST][square]);
+		
+		if (Masks.raysEx[NORTH_EAST][square]) 
+			Masks.raysEx[NORTH_EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_EAST][square]);
+		
+		if (Masks.raysEx[SOUTH_WEST][square]) 
+			Masks.raysEx[SOUTH_WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_WEST][square]);
+		
+		if (Masks.raysEx[SOUTH_EAST][square]) 
+			Masks.raysEx[SOUTH_EAST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_EAST][square]);
 	}
 }
 
@@ -181,6 +189,28 @@ void kingMask()
 
 		Attacks.king[square] = north | south | west | east | northWest | southWest
 			| northEast | southEast;
+	}
+}
+
+
+void knightMask()
+{
+	Attacks.knight.fill({});
+
+	for (ushort square = A1; square <= H8; square++) {
+		uint64_t knightPosition{ 0 }, nnw, nne, ne, se, sse, ssw, sw, nw;
+
+		knightPosition |= C64(1) << square;
+		nnw = (knightPosition & NOT_FILE_A) << 15;
+		nne = (knightPosition & NOT_FILE_H) << 17;
+		ne = (knightPosition & NOT_FILE_GH) << 10;
+		se = (knightPosition & NOT_FILE_GH) >> 6;
+		sse = (knightPosition & NOT_FILE_H) >> 15;
+		ssw = (knightPosition & NOT_FILE_A) >> 17;
+		sw = (knightPosition & NOT_FILE_AB) >> 10;
+		nw = (knightPosition & NOT_FILE_AB) << 6;
+
+		Attacks.knight[square] = nnw | nne | ne | se | sse | ssw | sw | nw;
 	}
 }
 

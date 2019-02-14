@@ -40,6 +40,8 @@ enum Rank : const ushort { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_
 
 enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, RAYS_NUMBER};
 
+enum RaysKnight : const ushort {NORTH_NORTH_WEST, NORTH_NORTH_EAST, NORTH_EAST_EAST, SOUTH__EAST_EAST, SOUTH_SOUTH_EAST,
+	SOUTH_SOUTH_WEST, SOUTH__WEST_WEST, NORTH_WEST_WEST, RAYS_KNIGHT_NUMBER};
 
 // OTHER TYPES
 struct coords { ushort x; ushort y; };
@@ -52,6 +54,8 @@ constexpr ushort DIAG_NUMBER = 15;
 
 constexpr uint64_t NOT_FILE_A = 0xfefefefefefefefe;
 constexpr uint64_t NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
+constexpr uint64_t NOT_FILE_AB = 0xfcfcfcfcfcfcfcfc;
+constexpr uint64_t NOT_FILE_GH = 0x3f3f3f3f3f3f3f3f;
 
 
 // for popcount() functions - see https://www.chessprogramming.org/Population_Count
@@ -73,6 +77,7 @@ struct Mask {
 
 struct AttackTable {
 	std::array<Bitboard, SQ_NUMBER> king;
+	std::array<Bitboard, SQ_NUMBER> knight;
 	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
 	std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishopMagic;
 };

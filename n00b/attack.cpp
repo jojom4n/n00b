@@ -17,7 +17,7 @@ void initAttacks()
 	// generate attacks
 	kingMask();
 	rookMagic();
-	// bishopMagic();
+	bishopMagic();
 }
 
 
@@ -111,17 +111,17 @@ void raysAttacks()
 		for (ushort r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
 			Masks.rays[NORTH_WEST][r + f] = copyDiagonal;
 	}
-	
+
 	// NE ray
 	uint64_t baseDiagonalNE = C64(0x8040201008040200);
 
 	for (ushort f = FILE_A; f <= FILE_H; f++, baseDiagonalNE = (baseDiagonalNE << 1) & NOT_FILE_A) {
 		uint64_t copyDiagonal = baseDiagonalNE;
-		
+
 		for (ushort r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
 			Masks.rays[NORTH_EAST][r + f] = copyDiagonal;
 	}
-
+	
 	// SW ray
 	uint64_t baseDiagonalSW = C64(0x40201008040201);
 
@@ -153,12 +153,12 @@ void raysEx()
 		if (square >= A2) Masks.raysEx[SOUTH][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH][square]);
 		if (FILE_INDEX != FILE_A) Masks.raysEx[WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[WEST][square]);
 		if (FILE_INDEX != FILE_H) Masks.raysEx[EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[EAST][square]);
-	}
 
-		/* Masks.raysEx[NORTH_WEST][square] = Masks.rays[NORTH_WEST][square] & NO_EDGE_WEST;
-		Masks.raysEx[NORTH_EAST][square] = Masks.rays[NORTH_EAST][square] & NO_EDGES;
-		Masks.raysEx[SOUTH_WEST][square] = Masks.rays[SOUTH_WEST][square] & NO_EDGES;
-		Masks.raysEx[SOUTH_EAST][square] = Masks.rays[SOUTH_EAST][square] & NO_EDGES; */
+		if (Masks.raysEx[NORTH_WEST][square]) Masks.raysEx[NORTH_WEST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_WEST][square]);
+		if (Masks.raysEx[NORTH_EAST][square]) Masks.raysEx[NORTH_EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_EAST][square]);
+		if (Masks.raysEx[SOUTH_WEST][square]) Masks.raysEx[SOUTH_WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_WEST][square]);
+		if (Masks.raysEx[SOUTH_EAST][square]) Masks.raysEx[SOUTH_EAST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_EAST][square]);
+	}
 }
 
 

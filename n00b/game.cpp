@@ -18,8 +18,8 @@ void newGame()
 	Bitboard occupancy = 0xffff000000000000;
 	
 	// TEST MAGIC
-	uint64_t x = getRookAttacks(D8, occupancy);
-	std::cout << "\n\nMagic bitboard for Rook on D8: " << x << std::endl;
+	uint64_t x = getRookAttacks(A1, occupancy);
+	std::cout << "\n\nMagic bitboard for Rook on A1: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
@@ -29,12 +29,12 @@ void newGame()
 	//END TEST
 
 	// TEST MAGIC
-	x = getBishopAttacks(H8, occupancy);
-	std::cout << "\n\nMagic bitboard for Bishop on G7: " << x << std::endl;
+	x = getBishopAttacks(F5, occupancy);
+	std::cout << "\n\nMagic bitboard for Bishop on F5: " << x << std::endl;
 	std::cout << std::endl;
 	//END TEST
 
-	std::cout << "\n\nMask bitboard for Bishop on E4: " << Masks.diagonalsEx[E4] << std::endl;
+	std::cout << "\n\nMask bitboard for Bishop on F6: " << Masks.diagonalsEx[F6] << std::endl;
 
 	std::cout << sizeof(Masks.diagonal);
 

@@ -3,17 +3,6 @@
 #include "Position.h"
 #include <sstream>
 
-std::map<std::string, Square> SquareMap = {
-	{ "a1",A1 }, { "b1",B1 }, { "c1",C1 }, { "d1",D1 }, { "e1",E1 }, { "f1",F1 }, { "g1",G1 }, { "h1",H1 },
-	{ "a2",A2 }, { "b2",B2 }, { "c2",C2 }, { "d2",D2 }, { "e2",E2 }, { "f2",F2 }, { "g2",G2 }, { "h2",H2 },
-	{ "a3",A3 }, { "b3",A3 }, { "c3",C3 }, { "d3",D3 }, { "e3",E3 }, { "f3",F3 }, { "g3",G3 }, { "h3",H3 },
-	{ "a4",A4 }, { "b4",B4 }, { "c4",C4 }, { "d4",D4 }, { "e4",E4 }, { "f4",F4 }, { "g4",G4 }, { "h4",H4 },
-	{ "a5",A5 }, { "b5",B5 }, { "c5",C5 }, { "d5",D5 }, { "e5",E5 }, { "f5",F5 }, { "g5",G5 }, { "h5",H5 },
-	{ "a6",A6 }, { "b6",B6 }, { "c6",C6 }, { "d6",D6 }, { "e6",E6 }, { "f6",F6 }, { "g6",G6 }, { "h6",H6 },
-	{ "a7",A7 }, { "b7",B7 }, { "c7",C7 }, { "d7",D7 }, { "e7",E7 }, { "f7",F7 }, { "g7",G7 }, { "h7",H7 },
-	{ "a8",A8 }, { "b8",B8 }, { "c8",C8 }, { "d8",D8 }, { "e8",E8 }, { "f8",F8 }, { "g8",G8 }, { "h8",H8 }
-};
-
 bool fenValidate(const std::stringstream &fen)
 {
 	return true;
@@ -138,10 +127,11 @@ void fenParser(std::stringstream &fen, Position &board)
 	board.setCastle(BLACK, castle_black);
 
 	// En passant square
-	if (buffer[5].length() > 1) { // is there an indication of en passant square in FEN?
-		std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower);
-		board.setEnPassant(SquareMap[buffer[5]]);
-	}
+	std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower); // lower-case the en-passant value, just in case
+	if (StringSquareMap.find(buffer[5]) != StringSquareMap.end()) // is there a valid value, corresponding to map?
+		board.setEnPassant(StringSquareMap[buffer[5]]);
+	else
+		board.setEnPassant(SQ_EMPTY);
 
 	board.setHalfMove(std::stoi(buffer[6], nullptr, 0)); // set half move
 

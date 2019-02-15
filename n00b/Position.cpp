@@ -45,6 +45,7 @@ void Position::setNew()
 		putPiece(BLACK, PAWNS, Square(i));
 }
 
+
 void Position::resetPosition()
 {
 	board_.fill({});

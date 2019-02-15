@@ -13,7 +13,7 @@ class Position
 {
 	std::array<std::array<Bitboard, 6>, 2> board_;
 	Bitboard whitePieces_ {}, blackPieces_ {}, allPieces_ {};
-	ushort enPassantSquare_ {};
+	ushort enPassantSquare_ {SQ_EMPTY};
 	bool turn_ = WHITE; // who has the move?
 	ushort moveNumber_ = 1; // number of moves. Default to 1
 	ushort halfMove_ = 0; // number of half-moves. Default to 0
@@ -34,7 +34,7 @@ public:
 	constexpr bool getTurn() const { return turn_; }
 	void setTurn(bool const& b) { turn_ = b; }
 
-	constexpr ushort getEnPassant() { return enPassantSquare_; }
+	constexpr ushort getEnPassant() const { return enPassantSquare_; }
 	void setEnPassant(const ushort &square) { enPassantSquare_ = square; }
 	
 	constexpr ushort getMoveNumber() const { return moveNumber_; }
@@ -46,7 +46,7 @@ public:
 	constexpr bool getCheckmate() const { return checkmate_; }
 	void setCheckmate(bool const &b) { checkmate_ = b; }
 
-	constexpr ushort getCastle() const { return (turn_ == WHITE) ? castle_[WHITE] : castle_[BLACK]; }
+	constexpr ushort getCastle(Color const &color) const { return castle_[color]; }
 	void setCastle(Color const &color, ushort const &castle) 
 		{ (color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle; }
 

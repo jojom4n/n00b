@@ -92,6 +92,7 @@ void display_board(Position const &board)
 	std::cout << "Castling rights: " << CastleMap[board.getCastle(WHITE)] << castleDisplayBlack << std::endl;
 	std::cout << "En-passant square: " << SquareStringMap[Square(board.getEnPassant())] << "\t";
 	std::cout << "Half-move: " << board.getHalfMove() << "\tMove number: " << board.getMoveNumber();
+	std::cout << std::endl;
 }
 
 

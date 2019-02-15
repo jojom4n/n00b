@@ -27,11 +27,11 @@ void newGame();
 void readCommand(std::stringstream &inputStream, Position &board);
 
 // fen.cpp
-bool fenValidate(const std::string &fen);
-void fenParser(const std::string &fen, Position &board);
+bool fenValidate(const std::stringstream &fen);
+void fenParser(std::stringstream &fen, Position &board);
 
 //display.cpp
-const std::string display_board(Position const &board);
+void display_board(Position const &board);
 const char printPiece(coords const &coordinates);
 
 // bitscan.cpp

@@ -29,6 +29,8 @@ public:
 
 	void setNew();
 
+	void resetPosition();
+	
 	constexpr bool getTurn() const { return turn_; }
 	void setTurn(bool const& b) { turn_ = b; }
 
@@ -56,9 +58,11 @@ public:
 	void putPiece(Color const &color, Piece const &piece, Square const &square);
 
 	constexpr Bitboard getPosition() const { return allPieces_; }
-	constexpr Bitboard getPosition(Color const &color) const { return (color == WHITE) ? whitePieces_ : blackPieces_; }
+	constexpr Bitboard getPosition(Color const &color) const 
+		{ return (color == WHITE) ? whitePieces_ : blackPieces_; }
 	
-	constexpr Bitboard getPieces(Color const &color, Piece const &piece) const { return board_[color][piece]; }
+	constexpr Bitboard getPieces(Color const &color, Piece const &piece) const 
+		{ return board_[color][piece]; }
 
 	constexpr Bitboard getOpponentBlockers() const
 		{ return (turn_ == WHITE) ? blackPieces_ : whitePieces_; }
@@ -67,11 +71,12 @@ public:
 	constexpr Bitboard getAllBlockers() const
 		{ return allPieces_;	}
 	
-	constexpr bool occupiedSquare(Square const &square) const { return (allPieces_ & (C64(1) << square)) ? true : false; }
+	constexpr bool occupiedSquare(Square const &square) const 
+		{ return (allPieces_ & (C64(1) << square)) ? true : false; }
 
 	const coords idPiece(Square const &square) const;
 
-	const ushort count(Color const &color = NO_COLOR) const;
+	const ushort count(Color const &color = ALL_COLOR) const;
 	const ushort countPieceType(Color const &color, Piece const &piece) const;
 
 	const std::vector<Square> getPieceOnSquare(Color const &color, Piece const &piece) const;

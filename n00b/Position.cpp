@@ -45,6 +45,12 @@ void Position::setNew()
 		putPiece(BLACK, PAWNS, Square(i));
 }
 
+void Position::resetPosition()
+{
+	board_.fill({});
+	whitePieces_= 0, blackPieces_ = 0, allPieces_ = 0;
+}
+
 
 void Position::putPiece(Color const &color, Piece const &piece, Square const &square)
 {
@@ -115,7 +121,7 @@ void Position::update(Color const &color)
 	if (color == WHITE)
 		for (ushort i = 0; i < 6; i++)
 			whitePieces_ = whitePieces_ | board_[WHITE][i];
-	else if (color == BLACK)
+	else if (color == Color::BLACK)
 		for (ushort i = 0; i < 6; i++)
 			blackPieces_ = blackPieces_ | board_[BLACK][i];
 

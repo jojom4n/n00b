@@ -14,7 +14,7 @@ void newGame()
 {	
 	Position *Chessboard = new Position();
 	Chessboard->setNew();
-	std::cout << std::endl << display_board(*Chessboard) << std::endl;
+	display_board(*Chessboard);
 	
 	// TEST MAGIC
 	uint64_t x = Attacks.rook(A1, Chessboard->getAllBlockers());
@@ -57,17 +57,15 @@ void newGame()
 
 void readCommand(std::stringstream &inputStream, Position &board)
 {
-	// let us count the words in the line
-	ushort numWords = 0;
-	std::string input = " ";
-	while (inputStream >> input) ++numWords;
+	int numWords = 0;
 
-	input = inputStream.str();
+	while (inputStream >> input) numWords++; // count the words in the input stream
 	
-	if (input.compare(0, 12, "fen position") == 0 && numWords > 2) {
-		if (fenValidate(input)) fenParser(input, board);
-	}
+	if (inputStream.str().substr(0,12) == "fen position")
+		if (numWords >= 3 && fenValidate(inputStream))
+			fenParser(inputStream, board);
+		else std::cout << "Sorry, no FEN or invalid FEN position.\n";
 	else
-		std::cout << "Sorry, invalid FEN position.\n\n";
+		std::cout << "Invalid command.\n";
 }
 

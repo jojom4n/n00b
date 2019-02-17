@@ -37,7 +37,7 @@ enum Square : const ushort
 	SQ_NUMBER, SQ_EMPTY
 };
 
-enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE};
+enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE, EN_PASSANT};
 
 enum PromotionTo : const bool {PAWN_TO_QUEEN, PAWN_TO_KNIGHT};
 

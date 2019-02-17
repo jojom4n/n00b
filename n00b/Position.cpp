@@ -69,8 +69,8 @@ const coords Position::idPiece(Square const &square) const
 		for (ushort y = 0; y < 6; y++)
 			if (board_[x][y] & (C64(1) << square))
 				return coords{ x,y };
-	
-	return { NULL, NULL };  // some error occurred
+
+	return { ALL_COLOR, NO_PIECE };  // some error occurred
 }
 
 

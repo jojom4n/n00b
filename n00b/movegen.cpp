@@ -17,9 +17,10 @@ void moveGeneration(Position const &board) {
 	const Bitboard ownPieces = board.getPosition(sideToMove);
 
 	// Pseudo-legal move generation for all pieces but pawns
-	for (ushort p = KING; p <= BISHOPS; p++)
+	for (ushort p = KING; p <= PAWNS; p++)
  {
 		Bitboard bb = board.getPieces(sideToMove, Piece(p));
+		MoveType type{}; // is a capture or a quiet move?
 		
 		while (bb) { // loop until this specific bitboard has a piece of its kind on it
 			Square squareFrom = Square(bitscan_reset(bb)); // find the square(s) with the particular piece;
@@ -43,6 +44,30 @@ void moveGeneration(Position const &board) {
 			case BISHOPS:
 				attacks = AttackTables.bishop(squareFrom, occupancy);
 				break;
+			case PAWNS: {
+				// For pawns, it's a bit more elaborated. First of all, we calculate a simple advance move
+				(sideToMove == WHITE) ? attacks |= ((C64(1) << squareFrom) << 8) & ~occupancy
+					: attacks |= ((C64(1) << squareFrom) >> 8) & ~occupancy;
+
+				/* Is the pawn on 2nd rank(or 7th rank, for black)?
+				If yes, let it move even two squares ahead. Note: en-passant, if applicable, will not
+				be set of course in Position instance, because: 1) we are manipulating a const instance;
+				2) we are only looking at available (pseudo-legal) moves, we are not MAKING them on the
+				board, and there will be no en-passant until the move will be made.
+				Therefore, en-passant will be managed by search & eval routines. Move generation routine,
+				though, will set a special bit for en-passant when adding a possible en-passant capture to
+				the list (look below, updateList routine) */
+				if (sideToMove == WHITE && (squareFrom / 8) == RANK_2)
+					attacks ^= (attacks << 8) & ~occupancy;
+				else if (sideToMove == BLACK && (squareFrom / 8) == RANK_7)
+					attacks ^= (attacks >> 8) & ~occupancy;
+
+				/* Now, we set in an empty bitboard the bit corresponding to squareFrom (i.e. where pawn is)
+				and compute if it can attack from there */
+				(sideToMove == WHITE) ? attacks |= AttackTables.whitePawn(C64(1) << squareFrom, occupancy)
+					: attacks |= AttackTables.blackPawn(C64(1) << squareFrom, occupancy);
+
+				break; }
 			default:
 				break;
 			}
@@ -51,24 +76,44 @@ void moveGeneration(Position const &board) {
 
 			while (attacks) { // scan the attack bitboard. For each attack, create the move and update the list
 				Square squareTo = Square(bitscan_reset(attacks));
-				MoveType type{}; // is a capture or a quiet move?
 
-				// determine move type
-				((occupancy >> squareTo) & 1ULL) ? type = CAPTURE : type = QUIET;
+				/* For all pieces but pawns we determine move type: if squareTo is occupied by enemy piece,
+				then it's a capture. For pawns we will have to take care of en-passant outside of this whole loop */
+				(p != PAWNS && (occupancy >> squareTo) & 1ULL) ? type = CAPTURE : type = QUIET;
 				updateMoveList(squareFrom, squareTo, type);
 			}
 		}
 
 	}
 
-	/* For pawns, it's a bit more elaborated. First of all, we calculate captures, if any */
-	Bitboard attacks{};
-	(sideToMove == WHITE) ? attacks = AttackTables.whitePawn(board.getPieces(WHITE, PAWNS), occupancy) 
-		: attacks = AttackTables.blackPawn(board.getPieces(BLACK,PAWNS), occupancy);
-	
-	
-	
-	if (board.getEnPassant() != SQ_EMPTY) attacks &= board.getEnPassant();
+	// Last, add to the list eventual en-passant moves
+	if (board.getEnPassant() != SQ_EMPTY) {	// is there an en-passant square in the position?
+		Square const enpassant = board.getEnPassant();
+		Bitboard attacks{};
+
+		switch (sideToMove) {
+		case WHITE: // is there a white pawn attacking the en-passant square?
+			if (board.idPiece(Square(enpassant - 7)).x == WHITE && board.idPiece(Square(enpassant - 7)).y == PAWNS) {
+				Square squareFrom = Square(enpassant - 7);
+				updateMoveList(squareFrom, enpassant, EN_PASSANT);
+			}
+			else if (board.idPiece(Square(enpassant - 9)).x == WHITE && board.idPiece(Square(enpassant - 9)).y == PAWNS) {
+				Square squareFrom = Square(enpassant - 9);
+				updateMoveList(squareFrom, enpassant, EN_PASSANT);
+			}
+			break;
+		case BLACK:
+			if (board.idPiece(Square(enpassant + 7)).x == BLACK && board.idPiece(Square(enpassant + 7)).y == PAWNS) {
+				Square squareFrom = Square(enpassant + 7);
+				updateMoveList(squareFrom, enpassant, EN_PASSANT);
+			}
+			else if (board.idPiece(Square(enpassant + 9)).x == WHITE && board.idPiece(Square(enpassant + 9)).y == PAWNS) {
+				Square squareFrom = Square(enpassant + 9);
+				updateMoveList(squareFrom, enpassant, EN_PASSANT);
+			}
+			break;
+		}			
+	}
 }
 
 

@@ -75,11 +75,11 @@ const ushort SHIFT_BISHOP[64] = {
 };
 
 extern struct Mask Masks;
-extern struct LookupTable AttackTables;
+extern struct LookupTable MoveTables;
 
 void rookMagic()
 {
-	AttackTables.rookMagic.fill({});
+	MoveTables.rookMagic.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
@@ -94,7 +94,7 @@ void rookMagic()
 			uint64_t index = ((blockerboard[i] & Masks.linesEx[square]) 
 				* MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
 			
-			AttackTables.rookMagic[square][ushort(index)] = tmp_rook;
+			MoveTables.rookMagic[square][ushort(index)] = tmp_rook;
 		}
 	}
 }
@@ -102,7 +102,7 @@ void rookMagic()
 
 void bishopMagic()
 {
-	AttackTables.bishopMagic.fill({});
+	MoveTables.bishopMagic.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
@@ -117,7 +117,7 @@ void bishopMagic()
 			uint64_t index = ((blockerboard[i] & Masks.diagonalsEx[square]) 
 				* MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square];
 
-			AttackTables.bishopMagic[square][ushort(index)] = tmp_bishop;
+			MoveTables.bishopMagic[square][ushort(index)] = tmp_bishop;
 		}
 	}
 }

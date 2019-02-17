@@ -125,27 +125,27 @@ void displayMoveList(Position const &board) {
 	std::cout << "\n" << output;
 }
 
-const char printPiece (coords const &coordinates)
+const char printPiece (PieceID const &ID)
 {
-	switch (coordinates.y)
+	switch (ID.y)
 	{
 	case KING:
-		return (coordinates.x == WHITE) ? 'K' : 'k';
+		return (ID.x == WHITE) ? 'K' : 'k';
 		break;
 	case QUEEN:
-		return (coordinates.x == WHITE) ? 'Q' : 'q';
+		return (ID.x == WHITE) ? 'Q' : 'q';
 		break;
 	case ROOKS:
-		return (coordinates.x == WHITE) ? 'R' : 'r';
+		return (ID.x == WHITE) ? 'R' : 'r';
 		break;
 	case KNIGHTS:
-		return (coordinates.x == WHITE) ? 'N' : 'n';
+		return (ID.x == WHITE) ? 'N' : 'n';
 		break;
 	case BISHOPS:
-		return (coordinates.x == WHITE) ? 'B' : 'b';
+		return (ID.x == WHITE) ? 'B' : 'b';
 		break;
 	case PAWNS:
-		return (coordinates.x == WHITE) ? 'P' : 'p';
+		return (ID.x == WHITE) ? 'P' : 'p';
 		break;
 	default:
 		return NULL; // some error occurred

@@ -60,7 +60,7 @@ void Position::putPiece(Color const &color, Piece const &piece, Square const &sq
 }
 
 
-const coords Position::idPiece(Square const &square) const
+const PieceID Position::idPiece(Square const &square) const
 {
 	/* let us AND the bit set in the square (1ULL << square) with the main bitboards,
 	until we find the one containing that bit */
@@ -68,7 +68,7 @@ const coords Position::idPiece(Square const &square) const
 	for (ushort x = 0; x < 2; x++)
 		for (ushort y = 0; y < 6; y++) {
 			if (board_[x][y] & (C64(1) << square))
-				return coords{ x,y };
+				return PieceID{ x,y };
 		}
 
 	return { ALL_COLOR, NO_PIECE };  // some error occurred

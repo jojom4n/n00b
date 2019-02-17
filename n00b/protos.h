@@ -33,7 +33,7 @@ void fenParser(std::stringstream &fen, Position &board);
 //display.cpp
 void displayBoard(Position const &board);
 void displayMoveList(Position const &board);
-const char printPiece(coords const &coordinates);
+const char printPiece(PieceID const &ID);
 
 // movegen.cpp
 void moveGeneration(Position const &board);

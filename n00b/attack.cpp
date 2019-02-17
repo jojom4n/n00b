@@ -4,7 +4,7 @@
 #include "protos.h"
 
 struct Mask Masks;
-struct LookupTable AttackTables;
+struct LookupTable MoveTables;
 
 void initAttacks()
 {		
@@ -172,7 +172,7 @@ void raysEx()
 
 void kingMask()
 {
-	AttackTables.king.fill({});
+	MoveTables.king.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		uint64_t kingPosition{0}, north, south, west, east, northWest, southWest, northEast, southEast;
@@ -187,7 +187,7 @@ void kingMask()
 		northEast = (kingPosition & NOT_FILE_H) << 9;
 		southEast = (kingPosition & NOT_FILE_H) >> 7;
 
-		AttackTables.king[square] = north | south | west | east | northWest | southWest
+		MoveTables.king[square] = north | south | west | east | northWest | southWest
 			| northEast | southEast;
 	}
 }
@@ -195,7 +195,7 @@ void kingMask()
 
 void knightMask()
 {
-	AttackTables.knight.fill({});
+	MoveTables.knight.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		uint64_t knightPosition{ 0 }, nnw, nne, ne, se, sse, ssw, sw, nw;
@@ -210,21 +210,21 @@ void knightMask()
 		sw = (knightPosition & NOT_FILE_AB) >> 10;
 		nw = (knightPosition & NOT_FILE_AB) << 6;
 
-		AttackTables.knight[square] = nnw | nne | ne | se | sse | ssw | sw | nw;
+		MoveTables.knight[square] = nnw | nne | ne | se | sse | ssw | sw | nw;
 	}
 }
 
 
 const Bitboard LookupTable::rook(Square const &square, Bitboard const &blockers) const
 {
-	return AttackTables.rookMagic[square]
+	return MoveTables.rookMagic[square]
 		[((blockers & Masks.linesEx[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
 }
 
 
 const Bitboard LookupTable::bishop(Square const &square, Bitboard const &blockers) const
 {
-	return AttackTables.bishopMagic[square]
+	return MoveTables.bishopMagic[square]
 		[((blockers & Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];
 }
 

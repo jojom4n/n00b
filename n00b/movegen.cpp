@@ -4,7 +4,7 @@
 #include "defs.h"
 #include "protos.h"
 
-extern struct LookupTable AttackTables;
+extern struct LookupTable MoveTables;
 std::list<Move> moveList;
 
 /* TODO: MoveGeneration special function when Position returns king under check, so that we only
@@ -31,20 +31,20 @@ void moveGeneration(Position const &board) {
 			// get attack bitboard for the piece, given its square
 			switch (p) {
 			case KING:
-				attacks = AttackTables.king[squareFrom];
+				attacks = MoveTables.king[squareFrom];
 				break;
 			case QUEEN:
-				attacks = AttackTables.bishop(squareFrom, occupancy)
-					| AttackTables.rook(squareFrom, occupancy);
+				attacks = MoveTables.bishop(squareFrom, occupancy)
+					| MoveTables.rook(squareFrom, occupancy);
 				break;
 			case ROOKS:
-				attacks = AttackTables.rook(squareFrom, occupancy);
+				attacks = MoveTables.rook(squareFrom, occupancy);
 				break;
 			case KNIGHTS:
-				attacks = AttackTables.knight[squareFrom];
+				attacks = MoveTables.knight[squareFrom];
 				break;
 			case BISHOPS:
-				attacks = AttackTables.bishop(squareFrom, occupancy);
+				attacks = MoveTables.bishop(squareFrom, occupancy);
 				break;
 			case PAWNS: {
 				// For pawns, it's a bit more elaborated. First of all, we calculate a simple advance move
@@ -66,8 +66,8 @@ void moveGeneration(Position const &board) {
 
 				/* Now, we set in an empty bitboard the bit corresponding to squareFrom (i.e. where pawn is)
 				and compute if it can attack from there */
-				(sideToMove == WHITE) ? attacks |= AttackTables.whitePawn(C64(1) << squareFrom, occupancy)
-					: attacks |= AttackTables.blackPawn(C64(1) << squareFrom, occupancy);
+				(sideToMove == WHITE) ? attacks |= MoveTables.whitePawn(C64(1) << squareFrom, occupancy)
+					: attacks |= MoveTables.blackPawn(C64(1) << squareFrom, occupancy);
 
 				break; }
 			default:

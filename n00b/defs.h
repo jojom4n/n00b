@@ -54,7 +54,7 @@ enum RaysKnight : const ushort {NORTH_NORTH_WEST, NORTH_NORTH_EAST, NORTH_EAST_E
 
 
 // OTHER TYPES
-struct coords { ushort x; ushort y; };
+struct PieceID { ushort x; ushort y; };
 
 // see magic.cpp
 constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;

@@ -8,7 +8,7 @@
 
 std::string input = " ";
 extern struct Mask Masks;
-extern struct LookupTable AttackTables;
+extern struct LookupTable MoveTables;
 extern std::list<Move> moveList;
 extern std::map<std::string, Square> StringToSquareMap;
 extern std::map<Square, std::string> SquareToStringMap;

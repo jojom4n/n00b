@@ -12,9 +12,9 @@
 class Position
 {
 	std::array<std::array<Bitboard, 6>, 2> board_;
-	Bitboard whitePieces_ {}, blackPieces_ {}, allPieces_ {};
-	ushort enPassantSquare_ {SQ_EMPTY};
-	bool turn_ = WHITE; // who has the move?
+	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
+	Square enPassantSquare_ {SQ_EMPTY};
+	Color turn_ = WHITE; // who has the move?
 	ushort moveNumber_ = 1; // number of moves. Default to 1
 	ushort halfMove_ = 0; // number of half-moves. Default to 0
 	bool checkmate_ = false; // is the player checkmated?
@@ -31,11 +31,11 @@ public:
 
 	void resetPosition();
 	
-	constexpr bool getTurn() const { return turn_; }
-	void setTurn(bool const& b) { turn_ = b; }
+	constexpr Color getTurn() const { return turn_; }
+	void setTurn(Color const& b) { turn_ = b; }
 
-	constexpr ushort getEnPassant() const { return enPassantSquare_; }
-	void setEnPassant(const ushort &square) { enPassantSquare_ = square; }
+	constexpr Square getEnPassant() const { return enPassantSquare_; }
+	void setEnPassant(const Square &square) { enPassantSquare_ = square; }
 	
 	constexpr ushort getMoveNumber() const { return moveNumber_; }
 	void setMoveNumber(ushort const &move) { moveNumber_ = move; }
@@ -63,13 +63,6 @@ public:
 	
 	constexpr Bitboard getPieces(Color const &color, Piece const &piece) const 
 		{ return board_[color][piece]; }
-
-	constexpr Bitboard getOpponentBlockers() const
-		{ return (turn_ == WHITE) ? blackPieces_ : whitePieces_; }
-	constexpr Bitboard getPlayerBlockers() const
-		{ return (turn_ == WHITE) ? whitePieces_ : blackPieces_; }
-	constexpr Bitboard getAllBlockers() const
-		{ return allPieces_;	}
 	
 	constexpr bool occupiedSquare(Square const &square) const 
 		{ return (allPieces_ & (C64(1) << square)) ? true : false; }

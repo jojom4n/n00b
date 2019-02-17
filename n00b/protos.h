@@ -34,23 +34,28 @@ void fenParser(std::stringstream &fen, Position &board);
 void display_board(Position const &board);
 const char printPiece(coords const &coordinates);
 
+// movegen.cpp
+void moveGeneration(Position const &board);
+void updateMoveList(Square const &squareFrom, Square const &squareTo,
+	MoveType const &type, PromotionTo const &promoteTo = PAWN_TO_QUEEN);
+
 // bitscan.cpp
 #if defined(__GNUC__)  // GCC, Clang, ICC
-const Square bitscan_fwd(Bitboard const &b);
-const Square bitscan_rvs(Bitboard const &b);
+const ushort bitscan_fwd(Bitboard const &b);
+const ushort bitscan_rvs(Bitboard const &b);
 #elif defined(_MSC_VER)  // MSVC
 #ifdef _WIN64  // MSVC, WIN64
-const Square bitscan_fwd(Bitboard const &b);
-const Square bitscan_rvs(Bitboard const &b);
+const ushort bitscan_fwd(Bitboard const &b);
+const ushort bitscan_rvs(Bitboard const &b);
 #else  // MSVC, WIN32
-const Square bitscan_fwd(Bitboard const &b);
-const Square bitscan_rvs(Bitboard const &b);
+const ushort bitscan_fwd(Bitboard const &b);
+const ushort bitscan_rvs(Bitboard const &b);
 #endif
 #else  // Compiler is neither GCC nor MSVC compatible
 #error "Compiler not supported."
 #endif
 
 const ushort popcount(Bitboard const &b);
-const Square bitscan_reset(Bitboard &b, bool reverse = 0);
+const ushort bitscan_reset(Bitboard &b, bool reverse = 0);
 
 #endif

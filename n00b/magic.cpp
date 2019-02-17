@@ -75,16 +75,16 @@ const ushort SHIFT_BISHOP[64] = {
 };
 
 extern struct Mask Masks;
-extern struct AttackTable Attacks;
+extern struct LookupTable AttackTables;
 
 void rookMagic()
 {
-	Attacks.rookMagic.fill({});
+	AttackTables.rookMagic.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
-		Bitboard tmp_rook {};
+		Bitboard tmp_rook{};
 		ushort bits = popcount(Masks.linesEx[square]);
 
 		for (ushort i = 0; i < (1 << bits); i++) {
@@ -94,7 +94,7 @@ void rookMagic()
 			uint64_t index = ((blockerboard[i] & Masks.linesEx[square]) 
 				* MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
 			
-			Attacks.rookMagic[square][ushort(index)] = tmp_rook;
+			AttackTables.rookMagic[square][ushort(index)] = tmp_rook;
 		}
 	}
 }
@@ -102,12 +102,12 @@ void rookMagic()
 
 void bishopMagic()
 {
-	Attacks.bishopMagic.fill({});
+	AttackTables.bishopMagic.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
-		Bitboard tmp_bishop {};
+		Bitboard tmp_bishop{};
 		ushort bits = popcount(Masks.diagonalsEx[square]);
 
 		for (ushort i = 0; i < (1 << bits); i++) {
@@ -117,7 +117,7 @@ void bishopMagic()
 			uint64_t index = ((blockerboard[i] & Masks.diagonalsEx[square]) 
 				* MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square];
 
-			Attacks.bishopMagic[square][ushort(index)] = tmp_bishop;
+			AttackTables.bishopMagic[square][ushort(index)] = tmp_bishop;
 		}
 	}
 }
@@ -125,7 +125,7 @@ void bishopMagic()
 
 const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboard b)
 {
-	Bitboard result {};
+	Bitboard result{};
 
 	for (ushort i = 0, j = 0; i < bits; i++) {
 		j = bitscan_reset(b);
@@ -138,7 +138,7 @@ const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboar
 
 const Bitboard gen_r_attks(ushort const &square, Bitboard const &blockerboard)
 {
-	Bitboard result {};
+	Bitboard result{};
 
 	for (ushort rank = RANK_INDEX + 1; rank <= 7; rank++) {
 		result |= C64(1) << (FILE_INDEX + rank * 8);
@@ -166,7 +166,7 @@ const Bitboard gen_r_attks(ushort const &square, Bitboard const &blockerboard)
 
 const Bitboard gen_b_attks(ushort const &square, Bitboard const &blockerboard)
 {
-	Bitboard result {};
+	Bitboard result{};
 
 	for (short rank = RANK_INDEX + 1, file = FILE_INDEX + 1;
 		rank <= RANK_8 && file <= FILE_H; rank++, file++)

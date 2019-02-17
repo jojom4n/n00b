@@ -3,14 +3,14 @@
 #include "Position.h"
 #include <sstream>
 
-bool fenValidate(const std::stringstream &fen)
+bool fenValidate(const std::stringstream &fen)  // TODO!!!!
 {
 	return true;
 }
 
 void fenParser(std::stringstream &fen, Position &board)
 {
-	std::vector<std::string> buffer {};
+	std::vector<std::string> buffer{};
 	std::string word;
 	
 	// "rewind" the input stream (i.e. clear its EOF state and rewind to start position)
@@ -128,8 +128,8 @@ void fenParser(std::stringstream &fen, Position &board)
 
 	// En passant square
 	std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower); // lower-case the en-passant value, just in case
-	if (StringSquareMap.find(buffer[5]) != StringSquareMap.end()) // is there a valid value, corresponding to map?
-		board.setEnPassant(StringSquareMap[buffer[5]]);
+	if (StringToSquareMap.find(buffer[5]) != StringToSquareMap.end()) // is there a valid value, corresponding to map?
+		board.setEnPassant(StringToSquareMap[buffer[5]]);
 	else
 		board.setEnPassant(SQ_EMPTY);
 

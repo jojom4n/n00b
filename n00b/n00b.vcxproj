@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="bitscan.cpp" />
     <ClCompile Include="fen.cpp" />
+    <ClCompile Include="movegen.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="game.cpp" />

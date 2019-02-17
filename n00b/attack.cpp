@@ -4,7 +4,7 @@
 #include "protos.h"
 
 struct Mask Masks;
-struct AttackTable Attacks;
+struct LookupTable AttackTables;
 
 void initAttacks()
 {		
@@ -172,7 +172,7 @@ void raysEx()
 
 void kingMask()
 {
-	Attacks.king.fill({});
+	AttackTables.king.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		uint64_t kingPosition{0}, north, south, west, east, northWest, southWest, northEast, southEast;
@@ -187,7 +187,7 @@ void kingMask()
 		northEast = (kingPosition & NOT_FILE_H) << 9;
 		southEast = (kingPosition & NOT_FILE_H) >> 7;
 
-		Attacks.king[square] = north | south | west | east | northWest | southWest
+		AttackTables.king[square] = north | south | west | east | northWest | southWest
 			| northEast | southEast;
 	}
 }
@@ -195,7 +195,7 @@ void kingMask()
 
 void knightMask()
 {
-	Attacks.knight.fill({});
+	AttackTables.knight.fill({});
 
 	for (ushort square = A1; square <= H8; square++) {
 		uint64_t knightPosition{ 0 }, nnw, nne, ne, se, sse, ssw, sw, nw;
@@ -210,30 +210,30 @@ void knightMask()
 		sw = (knightPosition & NOT_FILE_AB) >> 10;
 		nw = (knightPosition & NOT_FILE_AB) << 6;
 
-		Attacks.knight[square] = nnw | nne | ne | se | sse | ssw | sw | nw;
+		AttackTables.knight[square] = nnw | nne | ne | se | sse | ssw | sw | nw;
 	}
 }
 
 
-const Bitboard AttackTable::rook(Square const &square, Bitboard const &blockers) const
+const Bitboard LookupTable::rook(Square const &square, Bitboard const &blockers) const
 {
-	return Attacks.rookMagic[square]
+	return AttackTables.rookMagic[square]
 		[((blockers & Masks.linesEx[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
 }
 
 
-const Bitboard AttackTable::bishop(Square const &square, Bitboard const &blockers) const
+const Bitboard LookupTable::bishop(Square const &square, Bitboard const &blockers) const
 {
-	return Attacks.bishopMagic[square]
+	return AttackTables.bishopMagic[square]
 		[((blockers & Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];
 }
 
-const Bitboard AttackTable::whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const
+const Bitboard LookupTable::whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const
 {
-	return (((pawn << 7) & NOT_FILE_H) | (pawn << 9) & NOT_FILE_A) & occupancy;
+	return (((pawn << 7) & NOT_FILE_A) | (pawn << 9) & NOT_FILE_H) & occupancy;
 }
 
-const Bitboard AttackTable::blackPawn(Bitboard const &pawn, Bitboard const &occupancy) const
+const Bitboard LookupTable::blackPawn(Bitboard const &pawn, Bitboard const &occupancy) const
 {
-	return (((pawn >> 7) & NOT_FILE_H) | (pawn >> 9) & NOT_FILE_A) & occupancy;
+	return (((pawn >> 7) & NOT_FILE_A) | (pawn >> 9) & NOT_FILE_H) & occupancy;
 }

@@ -4,7 +4,7 @@
 #include "Position.h"
 #include "protos.h"
 
-std::map<std::string, Square> StringSquareMap = {
+extern std::map<std::string, Square> StringToSquareMap = {
 	{ "a1",A1 }, { "b1",B1 }, { "c1",C1 }, { "d1",D1 }, { "e1",E1 }, { "f1",F1 }, { "g1",G1 }, { "h1",H1 },
 	{ "a2",A2 }, { "b2",B2 }, { "c2",C2 }, { "d2",D2 }, { "e2",E2 }, { "f2",F2 }, { "g2",G2 }, { "h2",H2 },
 	{ "a3",A3 }, { "b3",A3 }, { "c3",C3 }, { "d3",D3 }, { "e3",E3 }, { "f3",F3 }, { "g3",G3 }, { "h3",H3 },
@@ -16,7 +16,7 @@ std::map<std::string, Square> StringSquareMap = {
 	{ "-",SQ_EMPTY }
 };
 
-std::map<Square, std::string> SquareStringMap = {
+extern std::map<Square, std::string> SquareToStringMap = {
 	{ A1,"a1" }, { B1,"b1" }, { C1,"c1" }, { D1,"d1"}, {E1,"e1" }, { F1,"f1"}, {G1,"g1"},{H1,"h1"},
 	{ A2,"a2" }, { B2,"b2" }, { C2,"c2" }, { D2,"d2"}, {E2,"e2" }, { F2,"f2"}, {G2,"g2"},{H2,"h2"},
 	{ A3,"a3" }, { B3,"b3" }, { C3,"c3" }, { D3,"d3"}, {E3,"e3" }, { F3,"f3"}, {G3,"g3"},{H3,"h3"},
@@ -90,7 +90,7 @@ void display_board(Position const &board)
 	std::string castleDisplayBlack = CastleMap[board.getCastle(BLACK)];
 	std::transform(castleDisplayBlack.begin(), castleDisplayBlack.end(), castleDisplayBlack.begin(), ::tolower);
 	std::cout << "Castling rights: " << CastleMap[board.getCastle(WHITE)] << castleDisplayBlack << std::endl;
-	std::cout << "En-passant square: " << SquareStringMap[Square(board.getEnPassant())] << "\t";
+	std::cout << "En-passant square: " << SquareToStringMap[Square(board.getEnPassant())] << "\t";
 	std::cout << "Half-move: " << board.getHalfMove() << "\tMove number: " << board.getMoveNumber();
 	std::cout << std::endl;
 }

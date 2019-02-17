@@ -6,14 +6,18 @@
 #include <string>
 #include <array>
 #include <map>
+#include <list>
+#include <bitset>
 
 #define C64(constantuint64_t) constantuint64_t##ULL
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
 
-typedef unsigned short int ushort;
+using ushort = unsigned short int;
 
-typedef uint64_t Bitboard;
+using Bitboard = uint64_t;
+
+using Move = uint16_t;
 
 // ENUMS
 enum Piece : const ushort { KING, QUEEN, ROOKS, KNIGHTS, BISHOPS, PAWNS, NO_PIECE };
@@ -33,7 +37,9 @@ enum Square : const ushort
 	SQ_NUMBER, SQ_EMPTY
 };
 
-extern std::map<std::string, Square> StringSquareMap;
+enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE};
+
+enum PromotionTo : const bool {PAWN_TO_QUEEN, PAWN_TO_KNIGHT};
 
 enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
 
@@ -79,7 +85,7 @@ struct Mask {
 	std::array<std::array<Bitboard,SQ_NUMBER>, RAYS_NUMBER>raysEx;
 };
 
-struct AttackTable {
+struct LookupTable {
 	std::array<Bitboard, SQ_NUMBER> king;
 	std::array<Bitboard, SQ_NUMBER> knight;
 	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
@@ -90,10 +96,17 @@ struct AttackTable {
 	const Bitboard bishop(Square const &square, Bitboard const &blockers) const;
 };
 
-extern const std::array<std::string, 65> squares_to_string;
+// see magic.cpp and attack.cpp
 extern const Bitboard MAGIC_ROOK[64];
 extern const Bitboard MAGIC_BISHOP[64];
 extern const ushort SHIFT_ROOK[64];
 extern const ushort SHIFT_BISHOP[64];
+
+// see display.cpp
+extern std::map<std::string, Square> StringToSquareMap;
+extern std::map<Square, std::string> SquareToStringMap;
+
+// see movegen.cpp
+extern std::list<Move> moveList;
 
 #endif

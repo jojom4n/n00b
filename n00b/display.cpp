@@ -33,7 +33,7 @@ std::map<ushort, std::string> CastleMap = {
 };
 
 
-void display_board(Position const &board)
+void displayBoard(Position const &board)
 {
 	std::string output = "+---+---+---+---+---+---+---+---+\n";
 
@@ -95,6 +95,35 @@ void display_board(Position const &board)
 	std::cout << std::endl;
 }
 
+void displayMoveList(Position const &board) {
+	std::cout << "Available moves: ";
+	std::string output = "";
+	
+	for (auto& elem : moveList)
+	{
+		Square squareFrom{}, squareTo{};
+		ushort moveType = ((1 << 3) - 1) & (elem >> 1);
+		squareFrom = Square(((1 << 6) - 1) & (elem >> 10));
+		squareTo = Square(((1 << 6) - 1) & (elem >> 4));
+
+		switch (board.idPiece(squareFrom).y) {
+		case PAWNS:
+			if (moveType == CAPTURE || moveType == EN_PASSANT)
+				output += SquareToStringMap[squareFrom] + "x";
+			break;
+		default:
+			output += printPiece(board.idPiece(squareFrom));
+			if (moveType == CAPTURE) output += "x";
+			break;
+		}
+
+		output += SquareToStringMap[squareTo];
+		if (moveType == EN_PASSANT) output += " e.p."; 
+		output += "\t";
+	}
+	
+	std::cout << "\n" << output;
+}
 
 const char printPiece (coords const &coordinates)
 {

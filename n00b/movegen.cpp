@@ -10,13 +10,15 @@ std::list<Move> moveList;
 /* TODO: MoveGeneration special function when Position returns king under check, so that we only
 generate evasion moves */
 
+/* TODO: CASTLE and PROMOTION */
+
 void moveGeneration(Position const &board) {
 	moveList.clear(); // let us clear the movelist. We want a new movelist for every generation
 	Color sideToMove = board.getTurn(); // which side are we generating moves for? 
 	const Bitboard occupancy = board.getPosition();
 	const Bitboard ownPieces = board.getPosition(sideToMove);
 
-	// Pseudo-legal move generation for all pieces but pawns
+	// Pseudo-legal move generation for all pieces
 	for (ushort p = KING; p <= PAWNS; p++)
  {
 		Bitboard bb = board.getPieces(sideToMove, Piece(p));
@@ -79,7 +81,7 @@ void moveGeneration(Position const &board) {
 
 				/* For all pieces but pawns we determine move type: if squareTo is occupied by enemy piece,
 				then it's a capture. For pawns we will have to take care of en-passant outside of this whole loop */
-				(p != PAWNS && (occupancy >> squareTo) & 1ULL) ? type = CAPTURE : type = QUIET;
+				((occupancy >> squareTo) & 1ULL) ? type = CAPTURE : type = QUIET;
 				updateMoveList(squareFrom, squareTo, type);
 			}
 		}
@@ -102,15 +104,17 @@ void moveGeneration(Position const &board) {
 				updateMoveList(squareFrom, enpassant, EN_PASSANT);
 			}
 			break;
-		case BLACK:
+		case BLACK: // is there a black pawn attacking the en-passant square?
 			if (board.idPiece(Square(enpassant + 7)).x == BLACK && board.idPiece(Square(enpassant + 7)).y == PAWNS) {
 				Square squareFrom = Square(enpassant + 7);
 				updateMoveList(squareFrom, enpassant, EN_PASSANT);
 			}
-			else if (board.idPiece(Square(enpassant + 9)).x == WHITE && board.idPiece(Square(enpassant + 9)).y == PAWNS) {
+			else if (board.idPiece(Square(enpassant + 9)).x == BLACK && board.idPiece(Square(enpassant + 9)).y == PAWNS) {
 				Square squareFrom = Square(enpassant + 9);
 				updateMoveList(squareFrom, enpassant, EN_PASSANT);
 			}
+			break;
+		default:
 			break;
 		}			
 	}

@@ -137,5 +137,5 @@ void fenParser(std::stringstream &fen, Position &board)
 
 	board.setMoveNumber(std::stoi(buffer[7], nullptr, 0)); // set move number
 	   	 
-	display_board(board);
+	displayBoard(board);
 }

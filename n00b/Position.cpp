@@ -66,9 +66,10 @@ const coords Position::idPiece(Square const &square) const
 	until we find the one containing that bit */
 
 	for (ushort x = 0; x < 2; x++)
-		for (ushort y = 0; y < 6; y++)
+		for (ushort y = 0; y < 6; y++) {
 			if (board_[x][y] & (C64(1) << square))
 				return coords{ x,y };
+		}
 
 	return { ALL_COLOR, NO_PIECE };  // some error occurred
 }

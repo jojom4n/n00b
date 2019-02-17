@@ -31,7 +31,8 @@ bool fenValidate(const std::stringstream &fen);
 void fenParser(std::stringstream &fen, Position &board);
 
 //display.cpp
-void display_board(Position const &board);
+void displayBoard(Position const &board);
+void displayMoveList(Position const &board);
 const char printPiece(coords const &coordinates);
 
 // movegen.cpp

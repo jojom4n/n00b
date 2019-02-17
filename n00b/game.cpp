@@ -17,12 +17,10 @@ void newGame()
 {	
 	Position *Chessboard = new Position();
 	Chessboard->setNew();
-	display_board(*Chessboard);
+	displayBoard(*Chessboard);
 	
 	for (;;)
 	{
-		Bitboard Whitepawns = AttackTables.blackPawn(Chessboard->getPieces(BLACK, PAWNS), Chessboard->getPosition());
-		std::cout << Whitepawns << std::endl;
 		(Chessboard->getTurn() == WHITE) ? 
 			std::cout << "\nwhite>> " : std::cout << "\nblack>> ";
 
@@ -42,25 +40,15 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	while (inputStream >> input) numWords++; // count the words in the input stream
 	
 	if (inputStream.str().substr(0, 12) == "fen position")
-		if (numWords >= 3 && fenValidate(inputStream)) 
+		if (numWords >= 3 && fenValidate(inputStream))
 			fenParser(inputStream, board);
 		else std::cout << "Sorry, no FEN or invalid FEN position.\n";
 	else if (inputStream.str().substr(0, 8) == "movelist" && numWords == 1) {
 		moveGeneration(board);
-		std::cout << "Available moves: ";
-		for (auto& elem : moveList)
-		{
-			Square squareFrom{}, squareTo{};
-			ushort moveType = ((1 << 3) - 1) & (elem >> 1);
-			squareFrom = Square(((1 << 6) - 1) & (elem >> 10));
-			squareTo = Square(((1 << 6) - 1) & (elem >> 4));
-			std::string output = "";
-			output += printPiece(board.idPiece(squareFrom));
-			if (moveType == CAPTURE) output += "x";
-			output += SquareToStringMap[squareTo] + "\t";
-			std::cout << output;
-		}
+		displayMoveList(board);
 	}
+	else if ((inputStream.str().substr(0, 12) == "display board" && numWords == 2))
+		displayBoard(board);
 	else
 		std::cout << "Invalid command.\n";
 }

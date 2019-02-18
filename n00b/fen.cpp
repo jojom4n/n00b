@@ -3,8 +3,18 @@
 #include "Position.h"
 #include <sstream>
 
-bool fenValidate(const std::stringstream &fen)  // TODO!!!!
+bool fenValidate(std::stringstream &fen)  // TODO!!!!
 {
+	std::vector<std::string> buffer{};
+	std::string word;
+
+	// "rewind" the input stream (i.e. clear its EOF state and rewind to start position)
+	fen.clear();
+	fen.seekg(0);
+
+	while (fen >> word)
+		buffer.push_back(word); // extract from the input stream to a string vector
+	
 	return true;
 }
 

@@ -3,7 +3,7 @@
 #include "Position.h"
 #include <sstream>
 
-bool fenValidate(std::stringstream &fen)  // TODO!!!!
+bool fenValidate(std::stringstream &fen)
 {
 	std::vector<std::string> buffer{};
 	std::string word;
@@ -15,6 +15,110 @@ bool fenValidate(std::stringstream &fen)  // TODO!!!!
 	while (fen >> word)
 		buffer.push_back(word); // extract from the input stream to a string vector
 	
+	/* Validate the position inside the FEN. To be valid, we must have 8 rows, 8 files and two kings.
+	Besides, characters cannot be different from 0-8 and piece letters.
+	rnbqkbnr / pppppppp / 8 / 8 / 8 / 8 / PPPPPPPP / RNBQKBNR w KQkq - 0 1 */
+
+	ushort rows{}, files{};
+	bool whiteKing{}, blackKing{};
+	
+	for (ushort i = 0; i < buffer[2].length(); i++)
+	{
+		char c = ' ';
+		c = buffer[2][i];
+		
+		switch(c) {
+			case 'K':
+				whiteKing = true;
+				files++;
+				break;
+			case 'k':
+				blackKing = true;
+				files++;
+				break;
+			case '/':
+				rows++;
+				if (files != 8) 
+					return false;
+				else 
+					files=0; // reset files every time we meet a "/"
+				break;
+			case 'r':
+			case 'R':
+			case 'n':
+			case 'N':
+			case 'b':
+			case 'B':
+			case 'q':
+			case 'Q':
+			case 'p':
+			case 'P':
+				files++;
+				break;
+			case '1': // if character is a number, then jump corresponding files
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+				files += c - '0';
+				break;
+			default:
+				return false;
+				break;
+		}
+	}
+
+	if (!(rows == 7) || !(whiteKing) || !(blackKing)) // 7 are the '/' in valid FEN
+		return false;
+	
+	// this part of FEN must be 'w' or 'b'
+	if (!(buffer[3] == "w") && !(buffer[3]=="b"))
+		return false;
+
+	/* castling from FEN. It must be '-' or some combination of 'K','Q','k','q',
+	anyway maximum 4 characters */
+	if (buffer[4].length() == 1) {
+		if (!(buffer[4] == "-"))
+			return false;
+	}
+	else if (buffer[4].length() != 4)
+			return false;
+	else if (buffer[4].length() == 4) {
+		for (ushort i = 0; i < buffer[4].length(); i++) {
+			char c = ' ';
+			c = buffer[4][i];
+			if (c != 'K' && c != 'K' && c != 'Q' && c != 'q')
+				return false;
+		}
+	}
+
+	// now verify en-passant in FEN. It must be '-' or a square
+	if (buffer[5].length() == 1) {
+		if (!(buffer[5] == "-"))
+			return false;
+	}
+	else if (!(StringToSquareMap[buffer[5]]))
+		return false;
+
+	// check if half-move and move number are real digit
+	for (int i = 0; i < buffer[6].length(); i++) {
+		char c = ' ';
+		c = buffer[6][i];
+		if (!isdigit(c))
+			return false;
+	}
+
+	for (int i = 0; i < buffer[7].length(); i++) {
+		char c = ' ';
+		c = buffer[7][i];
+		if (!isdigit(c))
+			return false;
+	}
+
+	// if none of the above conditions was true, then FEN is valid
 	return true;
 }
 

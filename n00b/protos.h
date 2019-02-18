@@ -27,7 +27,7 @@ void newGame();
 void readCommand(std::stringstream &inputStream, Position &board);
 
 // fen.cpp
-bool fenValidate(const std::stringstream &fen);
+bool fenValidate(std::stringstream &fen);
 void fenParser(std::stringstream &fen, Position &board);
 
 //display.cpp

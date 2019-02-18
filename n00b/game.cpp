@@ -19,7 +19,7 @@ void newGame()
 	Chessboard->setNew();
 	displayBoard(*Chessboard);
 	
-	for (;;)
+	do 
 	{
 		(Chessboard->getTurn() == WHITE) ? 
 			std::cout << "\nwhite>> " : std::cout << "\nblack>> ";
@@ -30,7 +30,9 @@ void newGame()
 		readCommand(lineStream, *Chessboard);
 
 		std::cout << std::endl;
-	}
+	} while (input != "quit");
+	
+	delete Chessboard;
 }
 
 void readCommand(std::stringstream &inputStream, Position &board)
@@ -49,6 +51,8 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	}
 	else if ((inputStream.str().substr(0, 12) == "display board" && numWords == 2))
 		displayBoard(board);
+	else if (inputStream.str().substr(0, 4) == "quit")
+		return;
 	else
 		std::cout << "Invalid command.\n";
 }

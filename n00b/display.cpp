@@ -123,6 +123,10 @@ void displayMoveList(Position const &board) {
 				output += "0-0-0";
 			else if ((moveType == CASTLE) && ((squareFrom == H8) || (squareFrom == H1)))
 				output += "0-0";
+			else {
+				output += printPiece(board.idPiece(squareFrom));
+				if (moveType == CAPTURE) output += "x";
+			}
 			break;
 		default:
 			output += printPiece(board.idPiece(squareFrom));

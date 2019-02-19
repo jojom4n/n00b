@@ -47,7 +47,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		moveGeneration(board);
 		displayMoveList(board);
 	}
-	else if ((inputStream.str().substr(0, 12) == "display board" && numWords == 2))
+	else if ((inputStream.str().substr(0, 12) == "display" && numWords == 1))
 		displayBoard(board);
 	else if (inputStream.str().substr(0, 4) == "quit" && numWords == 1)
 		return;

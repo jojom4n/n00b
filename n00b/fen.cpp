@@ -80,13 +80,33 @@ bool fenValidate(std::stringstream &fen)
 
 	/* Castling rights from FEN. It must be '-' or some combination of 'K','Q','k','q',
 	anyway maximum 4 characters */
+	ushort countK{}, countk{}, countQ{}, countq{}; // avoid two 'K's or two 'Q's (black or white)
+
 	if (buffer[4].length() > 4)
 			return false;
 	else {
 		for (ushort i = 0; i < buffer[4].length(); i++) {
 			char c = ' ';
 			c = buffer[4][i];
-			if (c != 'K' && c != 'K' && c != 'Q' && c != 'q' && c!= '-')
+			if (!(c == 'K') && !(c == 'k') && !(c == 'Q') && !(c == 'q') && !(c == '-'))
+				return false;
+			
+			switch (c) {
+			case 'K':
+				countK++;
+				break;
+			case 'k':
+				countk++;
+				break;
+			case 'Q':
+				countQ++;
+				break;
+			case 'q':
+				countq++;
+				break;
+			}
+
+			if (countK > 1 || countk > 1 || countQ > 1 || countq > 1)
 				return false;
 		}
 	}

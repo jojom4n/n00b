@@ -30,7 +30,7 @@ void newGame()
 		readCommand(lineStream, *Chessboard);
 
 		std::cout << std::endl;
-	} while (input != "quit" && input != "new");
+	} while (input != "quit");
 }
 
 void readCommand(std::stringstream &inputStream, Position &board)

@@ -191,6 +191,7 @@ void updateMoveList(Square const &squareFrom, Square const &squareTo,
 																				if any			 to...
 	
 	*/
+
 	Move move{};
 	move = (move << 6) | squareFrom;
 	move = (move << 6) | squareTo;

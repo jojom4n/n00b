@@ -30,9 +30,7 @@ void newGame()
 		readCommand(lineStream, *Chessboard);
 
 		std::cout << std::endl;
-	} while (input != "quit");
-	
-	delete Chessboard;
+	} while (input != "quit" && input != "new");
 }
 
 void readCommand(std::stringstream &inputStream, Position &board)
@@ -51,8 +49,12 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	}
 	else if ((inputStream.str().substr(0, 12) == "display board" && numWords == 2))
 		displayBoard(board);
-	else if (inputStream.str().substr(0, 4) == "quit")
+	else if (inputStream.str().substr(0, 4) == "quit" && numWords == 1)
 		return;
+	else if (inputStream.str().substr(0, 3) == "new" && numWords == 1) {
+		delete &board;
+		newGame();
+	}
 	else
 		std::cout << "Invalid command.\n";
 }

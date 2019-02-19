@@ -18,7 +18,7 @@ using ushort = unsigned short int;
 
 using Bitboard = uint64_t;
 
-using Move = uint16_t;
+using Move = uint32_t;
 
 // ENUMS
 enum Piece : const ushort { KING, QUEEN, ROOKS, KNIGHTS, BISHOPS, PAWNS, NO_PIECE };
@@ -40,7 +40,7 @@ enum Square : const ushort
 
 enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE, EN_PASSANT};
 
-enum PromotionTo : const bool {PAWN_TO_QUEEN, PAWN_TO_KNIGHT};
+enum {PAWN_TO_QUEEN, PAWN_TO_KNIGHT};
 
 enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
 
@@ -55,7 +55,7 @@ enum RaysKnight : const ushort {NORTH_NORTH_WEST, NORTH_NORTH_EAST, NORTH_EAST_E
 
 
 // OTHER TYPES
-struct PieceID { ushort x; ushort y; };
+struct PieceID { Color color; Piece piece; };
 
 // see magic.cpp
 constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;

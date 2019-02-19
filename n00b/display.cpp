@@ -102,14 +102,27 @@ void displayMoveList(Position const &board) {
 	for (auto& elem : moveList)
 	{
 		Square squareFrom{}, squareTo{};
-		ushort moveType = ((1 << 3) - 1) & (elem >> 1);
-		squareFrom = Square(((1 << 6) - 1) & (elem >> 10));
-		squareTo = Square(((1 << 6) - 1) & (elem >> 4));
+		ushort moveType = ((C64(1) << 3) - 1) & (elem >> 4);
+		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 17));
+		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 11));
+		bool promotedTo = ((C64(1) << 1) - 1) & (elem);
 
-		switch (board.idPiece(squareFrom).y) {
+		switch (board.idPiece(squareFrom).piece) {
 		case PAWNS:
 			if (moveType == CAPTURE || moveType == EN_PASSANT)
 				output += SquareToStringMap[squareFrom] + "x";
+			else if (moveType == PROMOTION) {
+				char c = ' ';
+				(promotedTo == 0) ? c = 'N' : c = 'Q';
+				output += SquareToStringMap[squareTo] + "=";
+				output += c;
+			}
+			break;
+		case ROOKS:
+			if ((moveType == CASTLE) && ((squareFrom == A8) || (squareFrom == A1)))
+				output += "0-0-0";
+			else if ((moveType == CASTLE) && ((squareFrom == H8) || (squareFrom == H1)))
+				output += "0-0";
 			break;
 		default:
 			output += printPiece(board.idPiece(squareFrom));
@@ -117,8 +130,11 @@ void displayMoveList(Position const &board) {
 			break;
 		}
 
-		output += SquareToStringMap[squareTo];
+		if (moveType != PROMOTION && moveType != CASTLE) 
+			output += SquareToStringMap[squareTo];
+		
 		if (moveType == EN_PASSANT) output += " e.p."; 
+
 		output += "\t";
 	}
 	
@@ -127,25 +143,25 @@ void displayMoveList(Position const &board) {
 
 const char printPiece (PieceID const &ID)
 {
-	switch (ID.y)
+	switch (ID.piece)
 	{
 	case KING:
-		return (ID.x == WHITE) ? 'K' : 'k';
+		return (ID.color == WHITE) ? 'K' : 'k';
 		break;
 	case QUEEN:
-		return (ID.x == WHITE) ? 'Q' : 'q';
+		return (ID.color == WHITE) ? 'Q' : 'q';
 		break;
 	case ROOKS:
-		return (ID.x == WHITE) ? 'R' : 'r';
+		return (ID.color == WHITE) ? 'R' : 'r';
 		break;
 	case KNIGHTS:
-		return (ID.x == WHITE) ? 'N' : 'n';
+		return (ID.color == WHITE) ? 'N' : 'n';
 		break;
 	case BISHOPS:
-		return (ID.x == WHITE) ? 'B' : 'b';
+		return (ID.color == WHITE) ? 'B' : 'b';
 		break;
 	case PAWNS:
-		return (ID.x == WHITE) ? 'P' : 'p';
+		return (ID.color == WHITE) ? 'P' : 'p';
 		break;
 	default:
 		return NULL; // some error occurred

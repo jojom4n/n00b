@@ -68,7 +68,7 @@ const PieceID Position::idPiece(Square const &square) const
 	for (ushort x = 0; x < 2; x++)
 		for (ushort y = 0; y < 6; y++) {
 			if (board_[x][y] & (C64(1) << square))
-				return PieceID{ x,y };
+				return PieceID{ (Color)x, (Piece)y };
 		}
 
 	return { ALL_COLOR, NO_PIECE };  // some error occurred

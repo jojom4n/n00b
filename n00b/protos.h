@@ -37,8 +37,8 @@ const char printPiece(PieceID const &ID);
 
 // movegen.cpp
 void moveGeneration(Position const &board);
-void updateMoveList(Square const &squareFrom, Square const &squareTo,
-	MoveType const &type, PromotionTo const &promoteTo = PAWN_TO_QUEEN);
+void updateMoveList(Square const &squareFrom, Square const &squareTo, Color const &color, 
+	ushort const &piece, MoveType const &type, Piece const &captured, bool const &promoteTo);
 
 // bitscan.cpp
 #if defined(__GNUC__)  // GCC, Clang, ICC

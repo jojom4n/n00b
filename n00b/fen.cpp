@@ -74,23 +74,19 @@ bool fenValidate(std::stringstream &fen)
 	if (!(rows == 7) || !(whiteKing) || !(blackKing)) // 7 are the '/' in valid FEN
 		return false;
 	
-	// this part of FEN must be 'w' or 'b'
+	// Side to move. This part of FEN must be 'w' or 'b'
 	if (!(buffer[3] == "w") && !(buffer[3]=="b"))
 		return false;
 
-	/* castling from FEN. It must be '-' or some combination of 'K','Q','k','q',
+	/* Castling rights from FEN. It must be '-' or some combination of 'K','Q','k','q',
 	anyway maximum 4 characters */
-	if (buffer[4].length() == 1) {
-		if (!(buffer[4] == "-"))
+	if (buffer[4].length() > 4)
 			return false;
-	}
-	else if (buffer[4].length() != 4)
-			return false;
-	else if (buffer[4].length() == 4) {
+	else {
 		for (ushort i = 0; i < buffer[4].length(); i++) {
 			char c = ' ';
 			c = buffer[4][i];
-			if (c != 'K' && c != 'K' && c != 'Q' && c != 'q')
+			if (c != 'K' && c != 'K' && c != 'Q' && c != 'q' && c!= '-')
 				return false;
 		}
 	}
@@ -118,7 +114,7 @@ bool fenValidate(std::stringstream &fen)
 			return false;
 	}
 
-	// if none of the above conditions was true, then FEN is valid
+	// if none of the above conditions occurs, then FEN is valid
 	return true;
 }
 

@@ -38,7 +38,7 @@ bool fenValidate(std::stringstream &fen)
 				break;
 			case '/':
 				rows++;
-				if (files != 8) 
+				if (!(files == 8)) 
 					return false;
 				else 
 					files=0; // reset files every time we meet a "/"
@@ -159,7 +159,7 @@ void fenParser(std::stringstream &fen, Position &board)
 
 	for (ushort i = 0, r = RANK_8; i < buffer[2].length(); i++) { // loop until end of FEN string
 		c = buffer[2][i]; // read a character from FEN string
-		if (c != '/') // is the end of the row in FEN string?
+		if (!(c == '/')) // is the end of the row in FEN string?
 			switch (c) { // if not, compute the character
 			case 'R':
 				board.putPiece(WHITE, ROOKS, Square((8 * r) + f));
@@ -258,7 +258,7 @@ void fenParser(std::stringstream &fen, Position &board)
 
 	// En passant square
 	std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower); // lower-case the en-passant value, just in case
-	if (StringToSquareMap.find(buffer[5]) != StringToSquareMap.end()) // is there a valid value, corresponding to map?
+	if (!(StringToSquareMap.find(buffer[5]) == StringToSquareMap.end())) // is there a valid value, corresponding to map?
 		board.setEnPassant(StringToSquareMap[buffer[5]]);
 	else
 		board.setEnPassant(SQ_EMPTY);

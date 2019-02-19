@@ -7,7 +7,9 @@
 extern struct LookupTable MoveTables;
 std::list<Move> moveList;
 
-void moveGeneration(Position const &board) {
+
+void moveGeneration(Position const &board) 
+{
 	moveList.clear(); // let us clear the movelist. We want a new movelist for every generation
 	Color sideToMove = board.getTurn(); // which side are we generating moves for? 
 	const Bitboard occupancy = board.getPosition();
@@ -181,7 +183,8 @@ void moveGeneration(Position const &board) {
 
 void updateMoveList(Square const &squareFrom, Square const &squareTo,
 	Color const &color, ushort const &piece, MoveType const &type, Piece const &captured,
-	bool const &promoteTo) {
+	bool const &promoteTo)
+{
 	
 	/* combine squareFrom, squareTo and type into a binary number
 	We use a 32-bit number (Move = uint32_t, see defs.h), composed in the following way:

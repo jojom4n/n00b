@@ -6,11 +6,9 @@
 
 class Evaluation
 {
-	const struct PieceValue_ {
-		const ushort pawn{ 1 }, knight{ 3 }, bishop{ 3 }, rook{ 5 }, queen{ 9 }, king{ 200 };
-	};
-
-	std::array<int, 2> Material;
+	std::array<int, 2> material_;
+	const std::map <Piece, ushort> pieceValue_
+		{ {PAWN, 1}, {KNIGHT, 3}, {BISHOP, 3}, {ROOK, 5}, {QUEEN, 9}, {KING, 200} };
 	int score;
 
 

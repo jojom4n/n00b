@@ -4,7 +4,7 @@
 
 Evaluation::Evaluation()
 {
-	Material.fill({});
+	material_.fill({});
 }
 
 

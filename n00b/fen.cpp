@@ -162,35 +162,35 @@ void fenParser(std::stringstream &fen, Position &board)
 		if (!(c == '/')) // is the end of the row in FEN string?
 			switch (c) { // if not, compute the character
 			case 'R':
-				board.putPiece(WHITE, ROOKS, Square((8 * r) + f));
+				board.putPiece(WHITE, ROOK, Square((8 * r) + f));
 				f++;
 				break;
 			case 'r':
-				board.putPiece(BLACK, ROOKS, Square((8 * r) + f));
+				board.putPiece(BLACK, ROOK, Square((8 * r) + f));
 				f++;
 				break;
 			case 'N':
-				board.putPiece(WHITE, KNIGHTS, Square((8 * r) + f));
+				board.putPiece(WHITE, KNIGHT, Square((8 * r) + f));
 				f++;
 				break;
 			case 'n':
-				board.putPiece(BLACK, KNIGHTS, Square((8 * r) + f));
+				board.putPiece(BLACK, KNIGHT, Square((8 * r) + f));
 				f++;
 				break;
 			case 'B':
-				board.putPiece(WHITE, BISHOPS, Square((8 * r) + f));
+				board.putPiece(WHITE, BISHOP, Square((8 * r) + f));
 				f++;
 				break;
 			case 'b':
-				board.putPiece(BLACK, BISHOPS, Square((8 * r) + f));
+				board.putPiece(BLACK, BISHOP, Square((8 * r) + f));
 				f++;
 				break;
 			case 'P':
-				board.putPiece(WHITE, PAWNS, Square((8 * r) + f));
+				board.putPiece(WHITE, PAWN, Square((8 * r) + f));
 				f++;
 				break;
 			case 'p':
-				board.putPiece(BLACK, PAWNS, Square((8 * r) + f));
+				board.putPiece(BLACK, PAWN, Square((8 * r) + f));
 				f++;
 				break;
 			case 'Q':

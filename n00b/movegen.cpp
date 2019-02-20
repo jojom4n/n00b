@@ -16,7 +16,7 @@ void moveGeneration(Position const &board)
 	const Bitboard ownPieces = board.getPosition(sideToMove);
 
 	// ***** PSEUDO-LEGAL MOVES FOR ALL PIECE *****
-	for (ushort piece = KING; piece <= PAWNS; piece++)
+	for (ushort piece = KING; piece <= PAWN; piece++)
  {
 		Bitboard bb = board.getPieces(sideToMove, Piece(piece));
 		MoveType type{}; // is a capture or a quiet move?
@@ -35,16 +35,16 @@ void moveGeneration(Position const &board)
 				attacks = MoveTables.bishop(squareFrom, occupancy)
 					| MoveTables.rook(squareFrom, occupancy);
 				break;
-			case ROOKS:
+			case ROOK:
 				attacks = MoveTables.rook(squareFrom, occupancy);
 				break;
-			case KNIGHTS:
+			case KNIGHT:
 				attacks = MoveTables.knight[squareFrom];
 				break;
-			case BISHOPS:
+			case BISHOP:
 				attacks = MoveTables.bishop(squareFrom, occupancy);
 				break;
-			case PAWNS: {
+			case PAWN: {
 				// For pawns, it's a bit more elaborated. First of all, we calculate a simple advance move
 				(sideToMove == WHITE) ? attacks |= ((C64(1) << squareFrom) << 8) & ~occupancy
 					: attacks |= ((C64(1) << squareFrom) >> 8) & ~occupancy;
@@ -82,7 +82,7 @@ void moveGeneration(Position const &board)
 					type = CAPTURE;
 					captured = board.idPiece(squareTo).piece;
 				} // end if
-				else if (piece == PAWNS // is the move a pawn promotion?
+				else if (piece == PAWN // is the move a pawn promotion?
 					&& (squareFrom / 8) == RANK_7 && (squareTo / 8) == RANK_8) { 
 					type = PROMOTION;
 				} // end else if
@@ -107,44 +107,44 @@ void moveGeneration(Position const &board)
 	
 	// ***** CASTLE MOVES, IF AVAILABLE *****
 	if (board.getCastle(sideToMove) == QUEENSIDE) {
-		if (board.idPiece(A8).piece == ROOKS && board.idPiece(E8).piece == KING) {
+		if (board.idPiece(A8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(A8, occupancy) >> E8) & C64(1))
-				updateMoveList(A8, D8, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(A8, D8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
-		else if (board.idPiece(A1).piece == ROOKS && board.idPiece(E1).piece == KING) {
+		else if (board.idPiece(A1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(A1, occupancy) >> E1) & C64(1))
-				updateMoveList(A1, D1, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(A1, D1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
 	}
 	
 	else if (board.getCastle(sideToMove) == KINGSIDE) {
-		if (board.idPiece(H8).piece == ROOKS && board.idPiece(E8).piece == KING) {
+		if (board.idPiece(H8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(H8, occupancy) >> E8) & C64(1))
-				updateMoveList(H8, F8, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(H8, F8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
-		else if (board.idPiece(H1).piece == ROOKS && board.idPiece(E1).piece == KING) {
+		else if (board.idPiece(H1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(H1, occupancy) >> E1) & C64(1))
-				updateMoveList(H1, F1, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(H1, F1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
 	}
 
 	else if (board.getCastle(sideToMove) == ALL) {
-		if (board.idPiece(A8).piece == ROOKS && board.idPiece(E8).piece == KING) {
+		if (board.idPiece(A8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(A8, occupancy) >> E8) & C64(1))
-				updateMoveList(A8, D8, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(A8, D8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
-		else if (board.idPiece(A1).piece == ROOKS && board.idPiece(E1).piece == KING) {
+		else if (board.idPiece(A1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(A1, occupancy) >> E1) & C64(1))
-				updateMoveList(A1, D1, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(A1, D1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
 
-		if (board.idPiece(H8).piece == ROOKS && board.idPiece(E8).piece == KING) {
+		if (board.idPiece(H8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(H8, occupancy) >> E8) & C64(1))
-				updateMoveList(H8, F8, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(H8, F8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
-		else if (board.idPiece(H1).piece == ROOKS && board.idPiece(E1).piece == KING) {
+		else if (board.idPiece(H1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(H1, occupancy) >> E1) & C64(1))
-				updateMoveList(H1, F1, sideToMove, ROOKS, CASTLE, NO_PIECE, 0);
+				updateMoveList(H1, F1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
 		}
 	}
 
@@ -156,23 +156,23 @@ void moveGeneration(Position const &board)
 		
 		switch (sideToMove) {
 		case WHITE: // is there a white pawn attacking the en-passant square?
-			if (board.idPiece(Square(enpassant - 7)).color == WHITE && board.idPiece(Square(enpassant - 7)).piece == PAWNS) {
+			if (board.idPiece(Square(enpassant - 7)).color == WHITE && board.idPiece(Square(enpassant - 7)).piece == PAWN) {
 				Square squareFrom = Square(enpassant - 7);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWNS, EN_PASSANT, PAWNS, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
 			}
-			else if (board.idPiece(Square(enpassant - 9)).color == WHITE && board.idPiece(Square(enpassant - 9)).piece == PAWNS) {
+			else if (board.idPiece(Square(enpassant - 9)).color == WHITE && board.idPiece(Square(enpassant - 9)).piece == PAWN) {
 				Square squareFrom = Square(enpassant - 9);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWNS, EN_PASSANT, PAWNS, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
-			if (board.idPiece(Square(enpassant + 7)).color == BLACK && board.idPiece(Square(enpassant + 7)).piece == PAWNS) {
+			if (board.idPiece(Square(enpassant + 7)).color == BLACK && board.idPiece(Square(enpassant + 7)).piece == PAWN) {
 				Square squareFrom = Square(enpassant + 7);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWNS, EN_PASSANT, PAWNS, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
 			}
-			else if (board.idPiece(Square(enpassant + 9)).color == BLACK && board.idPiece(Square(enpassant + 9)).piece == PAWNS) {
+			else if (board.idPiece(Square(enpassant + 9)).color == BLACK && board.idPiece(Square(enpassant + 9)).piece == PAWN) {
 				Square squareFrom = Square(enpassant + 9);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWNS, EN_PASSANT, PAWNS, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
 			}
 			break;
 		} // end switch		

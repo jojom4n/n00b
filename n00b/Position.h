@@ -20,7 +20,6 @@ class Position
 	bool checkmate_ = false; // is the player checkmated?
 	std::array<ushort, 2> castle_ {ALL, ALL}; // castling rights for each player. Default to all
 	std::array<ushort, 2> playerTime_ {600}; // time in seconds. Default to 10 mins
-		
 	void update(Color const &color);
 
 public:
@@ -28,7 +27,6 @@ public:
 	~Position();
 
 	void setNew();
-
 	void resetPosition();
 	
 	constexpr Color getTurn() const { return turn_; }

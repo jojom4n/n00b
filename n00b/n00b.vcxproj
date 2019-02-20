@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Evaluation.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="pch.h" />
@@ -162,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitscan.cpp" />
+    <ClCompile Include="Evaluation.cpp" />
     <ClCompile Include="fen.cpp" />
     <ClCompile Include="movegen.cpp" />
     <ClCompile Include="Position.cpp" />

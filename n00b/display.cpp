@@ -108,7 +108,7 @@ void displayMoveList(Position const &board) {
 		bool promotedTo = ((C64(1) << 1) - 1) & (elem);
 
 		switch (board.idPiece(squareFrom).piece) {
-		case PAWNS:
+		case PAWN:
 			if (moveType == CAPTURE || moveType == EN_PASSANT)
 				output += SquareToStringMap[squareFrom] + "x";
 			else if (moveType == PROMOTION) {
@@ -118,7 +118,7 @@ void displayMoveList(Position const &board) {
 				output += c;
 			}
 			break;
-		case ROOKS:
+		case ROOK:
 			if ((moveType == CASTLE) && ((squareFrom == A8) || (squareFrom == A1)))
 				output += "0-0-0";
 			else if ((moveType == CASTLE) && ((squareFrom == H8) || (squareFrom == H1)))
@@ -155,16 +155,16 @@ const char printPiece (PieceID const &ID)
 	case QUEEN:
 		return (ID.color == WHITE) ? 'Q' : 'q';
 		break;
-	case ROOKS:
+	case ROOK:
 		return (ID.color == WHITE) ? 'R' : 'r';
 		break;
-	case KNIGHTS:
+	case KNIGHT:
 		return (ID.color == WHITE) ? 'N' : 'n';
 		break;
-	case BISHOPS:
+	case BISHOP:
 		return (ID.color == WHITE) ? 'B' : 'b';
 		break;
-	case PAWNS:
+	case PAWN:
 		return (ID.color == WHITE) ? 'P' : 'p';
 		break;
 	default:

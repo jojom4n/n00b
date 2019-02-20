@@ -21,28 +21,28 @@ void Position::setNew()
 	// white pieces
 	putPiece(WHITE, KING, E1);
 	putPiece(WHITE, QUEEN, D1);
-	putPiece(WHITE, ROOKS, A1);
-	putPiece(WHITE, ROOKS, H1);
-	putPiece(WHITE, KNIGHTS, B1);
-	putPiece(WHITE, KNIGHTS, G1);
-	putPiece(WHITE, BISHOPS, C1);
-	putPiece(WHITE, BISHOPS, F1);
+	putPiece(WHITE, ROOK, A1);
+	putPiece(WHITE, ROOK, H1);
+	putPiece(WHITE, KNIGHT, B1);
+	putPiece(WHITE, KNIGHT, G1);
+	putPiece(WHITE, BISHOP, C1);
+	putPiece(WHITE, BISHOP, F1);
 	
 	for (ushort i = A2; i <= H2; i++)
-		putPiece(WHITE, PAWNS, Square(i));
+		putPiece(WHITE, PAWN, Square(i));
 
 	//black pieces
 	putPiece(BLACK, KING, E8);
 	putPiece(BLACK, QUEEN, D8);
-	putPiece(BLACK, ROOKS, A8);
-	putPiece(BLACK, ROOKS, H8);
-	putPiece(BLACK, KNIGHTS, B8);
-	putPiece(BLACK, KNIGHTS, G8);
-	putPiece(BLACK, BISHOPS, C8);
-	putPiece(BLACK, BISHOPS, F8);
+	putPiece(BLACK, ROOK, A8);
+	putPiece(BLACK, ROOK, H8);
+	putPiece(BLACK, KNIGHT, B8);
+	putPiece(BLACK, KNIGHT, G8);
+	putPiece(BLACK, BISHOP, C8);
+	putPiece(BLACK, BISHOP, F8);
 
 	for (ushort i = A7; i <= H7; i++)
-		putPiece(BLACK, PAWNS, Square(i));
+		putPiece(BLACK, PAWN, Square(i));
 }
 
 

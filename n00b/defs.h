@@ -21,7 +21,7 @@ using Bitboard = uint64_t;
 using Move = uint32_t;
 
 // ENUMS
-enum Piece : const ushort { KING, QUEEN, ROOKS, KNIGHTS, BISHOPS, PAWNS, NO_PIECE };
+enum Piece : const ushort { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
 
 enum Color : const ushort { BLACK, WHITE, ALL_COLOR };
 

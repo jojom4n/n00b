@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <string>
 #include <iostream>
+#include <vector>
 #include "Position.h"
 #include "protos.h"
 
@@ -96,11 +97,11 @@ void displayBoard(Position const &board)
 }
 
 
-void displayMoveList(Position const &board) {
+void displayMoveList(Position const &board, std::vector<Move> const &m) {
 	std::cout << "Available moves: ";
 	std::string output = "";
 	
-	for (auto& elem : moveList)
+	for (auto& elem : m)
 	{
 		Square squareFrom{}, squareTo{};
 		ushort moveType = ((C64(1) << 3) - 1) & (elem >> 5);
@@ -121,9 +122,9 @@ void displayMoveList(Position const &board) {
 			}
 			break;
 		case ROOK:
-			if ((moveType == CASTLE) && ((squareFrom == A8) || (squareFrom == A1)))
+			if ((moveType == CASTLE_Q) && ((squareFrom == A8) || (squareFrom == A1)))
 				output += "0-0-0";
-			else if ((moveType == CASTLE) && ((squareFrom == H8) || (squareFrom == H1)))
+			else if ((moveType == CASTLE_K) && ((squareFrom == H8) || (squareFrom == H1)))
 				output += "0-0";
 			else {
 				output += printPiece(board.idPiece(squareFrom));
@@ -136,7 +137,7 @@ void displayMoveList(Position const &board) {
 			break;
 		}
 
-		if (moveType != PROMOTION && moveType != CASTLE) 
+		if (moveType != PROMOTION && moveType != CASTLE_Q && moveType != CASTLE_K) 
 			output += SquareToStringMap[squareTo];
 		
 		if (moveType == EN_PASSANT) output += " e.p."; 

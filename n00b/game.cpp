@@ -3,13 +3,13 @@
 #include <string>
 #include <sstream>
 #include "Position.h"
+#include "Evaluation.h"
 #include "defs.h"
 #include "protos.h"
 
 std::string input = " ";
 extern struct Mask Masks;
 extern struct LookupTable MoveTables;
-extern std::list<Move> moveList;
 extern std::map<std::string, Square> StringToSquareMap;
 extern std::map<Square, std::string> SquareToStringMap;
 
@@ -44,8 +44,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 			fenParser(inputStream, board);
 		else std::cout << "Sorry, no FEN or invalid FEN position.\n";
 	else if (inputStream.str().substr(0, 8) == "movelist" && numWords == 1) {
-		moveGeneration(board);
-		displayMoveList(board);
+		std::vector<Move> moveList;
+		moveList = moveGeneration(board);
+		displayMoveList(board, moveList);
 	}
 	else if ((inputStream.str().substr(0, 12) == "display" && numWords == 1))
 		displayBoard(board);
@@ -54,6 +55,10 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 3) == "new" && numWords == 1) {
 		delete &board;
 		newGame();
+	}
+	else if (inputStream.str().substr(0, 6) == "search" && numWords == 1) {
+		int score = negamax(board, 5);
+		std::cout << score << std::endl;
 	}
 	else
 		std::cout << "Invalid command.\n";

@@ -54,7 +54,8 @@ public:
 		{ (color == WHITE) ? playerTime_[WHITE] = time : playerTime_[BLACK] = time;	}
 	
 	void putPiece(Color const &color, Piece const &piece, Square const &square);
-
+	void removePiece(Color const &color, Piece const &piece, Square const &square);
+	
 	constexpr Bitboard getPosition() const { return allPieces_; }
 	constexpr Bitboard getPosition(Color const &color) const 
 		{ return (color == WHITE) ? whitePieces_ : blackPieces_; }

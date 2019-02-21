@@ -6,8 +6,7 @@
 #include <string>
 #include <array>
 #include <map>
-#include <list>
-#include <bitset>
+#include <vector>
 
 #define C64(constantuint64_t) constantuint64_t##ULL
 
@@ -38,7 +37,7 @@ enum Square : const ushort
 	SQ_NUMBER, SQ_EMPTY
 };
 
-enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE, EN_PASSANT};
+enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE_K, CASTLE_Q, EN_PASSANT};
 
 enum Check : const bool {NO_CHECK, CHECK};
 
@@ -109,7 +108,6 @@ extern const ushort SHIFT_BISHOP[64];
 extern std::map<std::string, Square> StringToSquareMap;
 extern std::map<Square, std::string> SquareToStringMap;
 
-// see movegen.cpp
-extern std::list<Move> moveList;
+extern std::vector<Move> moveList;
 
 #endif

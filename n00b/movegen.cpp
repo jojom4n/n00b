@@ -14,6 +14,7 @@ void moveGeneration(Position const &board)
 	Color sideToMove = board.getTurn(); // which side are we generating moves for? 
 	const Bitboard occupancy = board.getPosition();
 	const Bitboard ownPieces = board.getPosition(sideToMove);
+	Check check{}; // is the move a check to opponent king?
 
 	// ***** PSEUDO-LEGAL MOVES FOR ALL PIECE *****
 	for (ushort piece = KING; piece <= PAWN; piece++)
@@ -74,6 +75,9 @@ void moveGeneration(Position const &board)
 
 			while (attacks) { // scan the attack bitboard. For each attack, create the move and update the list
 				Square squareTo = Square(bitscan_reset(attacks));
+				
+				check = verifyCheck(Piece(piece), squareTo, board);
+				
 				Piece captured{NO_PIECE};
 
 				/* For all pieces we determine move type: if squareTo is occupied by enemy piece, then
@@ -89,15 +93,15 @@ void moveGeneration(Position const &board)
 				else 
 					type = QUIET;
 
-				// ***** PAWN PROMOTIONS *****
-				if (type == PROMOTION) { /* if it's a promotion, we update twice: once 
-											with pawn promoting to knight, once with 
-											same pawn promoting to queen */
-					updateMoveList(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT);
-					updateMoveList(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN);
-				} // end if
-				else 
-					updateMoveList(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
+					// ***** PAWN PROMOTIONS *****
+					if (type == PROMOTION) { /* if it's a promotion, we update twice: once
+												with pawn promoting to knight, once with
+												same pawn promoting to queen */
+						updateMoveList(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT, check);
+						updateMoveList(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN, check);
+					} // end if
+					else
+						updateMoveList(squareFrom, squareTo, sideToMove, piece, type, captured, 0, check);
 			} // end while (attacks)
 
 		} // end while (bb)
@@ -109,42 +113,42 @@ void moveGeneration(Position const &board)
 	if (board.getCastle(sideToMove) == QUEENSIDE) {
 		if (board.idPiece(A8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(A8, occupancy) >> E8) & C64(1))
-				updateMoveList(A8, D8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(A8, D8, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 		else if (board.idPiece(A1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(A1, occupancy) >> E1) & C64(1))
-				updateMoveList(A1, D1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(A1, D1, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 	}
 	
 	else if (board.getCastle(sideToMove) == KINGSIDE) {
 		if (board.idPiece(H8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(H8, occupancy) >> E8) & C64(1))
-				updateMoveList(H8, F8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(H8, F8, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 		else if (board.idPiece(H1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(H1, occupancy) >> E1) & C64(1))
-				updateMoveList(H1, F1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(H1, F1, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 	}
 
 	else if (board.getCastle(sideToMove) == ALL) {
 		if (board.idPiece(A8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(A8, occupancy) >> E8) & C64(1))
-				updateMoveList(A8, D8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(A8, D8, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 		else if (board.idPiece(A1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(A1, occupancy) >> E1) & C64(1))
-				updateMoveList(A1, D1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(A1, D1, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 
 		if (board.idPiece(H8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(H8, occupancy) >> E8) & C64(1))
-				updateMoveList(H8, F8, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(H8, F8, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 		else if (board.idPiece(H1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(H1, occupancy) >> E1) & C64(1))
-				updateMoveList(H1, F1, sideToMove, ROOK, CASTLE, NO_PIECE, 0);
+				updateMoveList(H1, F1, sideToMove, ROOK, CASTLE, NO_PIECE, 0, check);
 		}
 	}
 
@@ -158,40 +162,83 @@ void moveGeneration(Position const &board)
 		case WHITE: // is there a white pawn attacking the en-passant square?
 			if (board.idPiece(Square(enpassant - 7)).color == WHITE && board.idPiece(Square(enpassant - 7)).piece == PAWN) {
 				Square squareFrom = Square(enpassant - 7);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check);
 			}
 			else if (board.idPiece(Square(enpassant - 9)).color == WHITE && board.idPiece(Square(enpassant - 9)).piece == PAWN) {
 				Square squareFrom = Square(enpassant - 9);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check);
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
 			if (board.idPiece(Square(enpassant + 7)).color == BLACK && board.idPiece(Square(enpassant + 7)).piece == PAWN) {
 				Square squareFrom = Square(enpassant + 7);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check);
 			}
 			else if (board.idPiece(Square(enpassant + 9)).color == BLACK && board.idPiece(Square(enpassant + 9)).piece == PAWN) {
 				Square squareFrom = Square(enpassant + 9);
-				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0);
+				updateMoveList(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check);
 			}
 			break;
 		} // end switch		
 
-	} // end main 'if'
+	} // end main 'if (board.getEnPassant() != SQ_EMPTY)'
+
+	
+
+
+
+}
+
+
+Check verifyCheck(Piece const &piece, Square const &square, Position const &board) {
+	std::vector<Square> opponentKing = board.getPieceOnSquare(Color(!board.getTurn()), KING);
+	Bitboard attacksToKing{};
+	const Bitboard occupancy = board.getPosition();
+	const Bitboard ownPieces = board.getPosition(board.getTurn());
+
+	switch (piece) {
+	case KING:
+		attacksToKing = MoveTables.king[square];
+		break;
+	case QUEEN:
+		attacksToKing = MoveTables.bishop(square, occupancy)
+			| MoveTables.rook(square, occupancy);
+		break;
+	case ROOK:
+		attacksToKing = MoveTables.rook(square, occupancy);
+		break;
+	case KNIGHT:
+		attacksToKing = MoveTables.knight[square];
+		break;
+	case BISHOP:
+		attacksToKing = MoveTables.bishop(square, occupancy);
+		break;
+	case PAWN: 
+		(board.getTurn() == WHITE) ? attacksToKing |= MoveTables.whitePawn(C64(1) << square, occupancy)
+			: attacksToKing |= MoveTables.blackPawn(C64(1) << square, occupancy);
+		break; 
+	}
+
+	while (attacksToKing) {
+		Square squareTo = Square(bitscan_reset(attacksToKing));
+		if (ushort(squareTo) == ushort(opponentKing[0])) return CHECK;
+	}
+
+	return NO_CHECK;
 }
 
 
 void updateMoveList(Square const &squareFrom, Square const &squareTo,
 	Color const &color, ushort const &piece, MoveType const &type, Piece const &captured,
-	bool const &promoteTo)
+	bool const &promoteTo, Check const &check)
 {
 	
 	/* combine squareFrom, squareTo and type into a binary number
 	We use a 32-bit number (Move = uint32_t, see defs.h), composed in the following way:
 
-	000000000   	000000		 000000		  0		 000	    000			     000			   0
-	 unused       SquareFrom	SquareTo	Color	Piece	Type of move	Piece captured,    Promotion
-																				if any			 to...
+	00000000   	000000		 000000		  0		 000	    000			     000			   0		0
+	 unused    SquareFrom	SquareTo	Color	Piece	Type of move	Piece captured,    Promotion  Check?
+																			if any			 to...
 	
 	*/
 
@@ -207,7 +254,14 @@ void updateMoveList(Square const &squareFrom, Square const &squareTo,
 		move = (move << 1) | 1;
 	else
 		move = (move << 1) | 0;
+
+	if (check == 1)
+		move = (move << 1) | 1;
+	else
+		move = (move << 1) | 0;
 	
 	// update the list of moves with the new move
 	moveList.push_back(move);
 }
+
+

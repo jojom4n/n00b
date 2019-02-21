@@ -40,6 +40,8 @@ enum Square : const ushort
 
 enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE, EN_PASSANT};
 
+enum Check : const bool {NO_CHECK, CHECK};
+
 enum {PAWN_TO_QUEEN, PAWN_TO_KNIGHT};
 
 enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };

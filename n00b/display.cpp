@@ -95,6 +95,7 @@ void displayBoard(Position const &board)
 	std::cout << std::endl;
 }
 
+
 void displayMoveList(Position const &board) {
 	std::cout << "Available moves: ";
 	std::string output = "";
@@ -102,10 +103,11 @@ void displayMoveList(Position const &board) {
 	for (auto& elem : moveList)
 	{
 		Square squareFrom{}, squareTo{};
-		ushort moveType = ((C64(1) << 3) - 1) & (elem >> 4);
-		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 17));
-		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 11));
-		bool promotedTo = ((C64(1) << 1) - 1) & (elem);
+		ushort moveType = ((C64(1) << 3) - 1) & (elem >> 5);
+		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 18));
+		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 12));
+		bool promotedTo = ((C64(1) << 1) - 1) & (elem >> 1);
+		bool check = ((C64(1) << 1) - 1) & (elem);
 
 		switch (board.idPiece(squareFrom).piece) {
 		case PAWN:
@@ -139,11 +141,14 @@ void displayMoveList(Position const &board) {
 		
 		if (moveType == EN_PASSANT) output += " e.p."; 
 
+		if (check == CHECK) output += "+";
+
 		output += "\t";
 	}
 	
 	std::cout << "\n" << output;
 }
+
 
 const char printPiece (PieceID const &ID)
 {

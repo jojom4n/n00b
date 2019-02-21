@@ -37,8 +37,9 @@ const char printPiece(PieceID const &ID);
 
 // movegen.cpp
 void moveGeneration(Position const &board);
+Check verifyCheck(Piece const &piece, Square const &squareTo, Position const &board);
 void updateMoveList(Square const &squareFrom, Square const &squareTo, Color const &color, 
-	ushort const &piece, MoveType const &type, Piece const &captured, bool const &promoteTo);
+	ushort const &piece, MoveType const &type, Piece const &captured, bool const &promoteTo, Check const &check);
 
 // bitscan.cpp
 #if defined(__GNUC__)  // GCC, Clang, ICC

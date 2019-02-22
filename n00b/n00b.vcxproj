@@ -166,6 +166,7 @@
     <ClCompile Include="evaluation.cpp" />
     <ClCompile Include="fen.cpp" />
     <ClCompile Include="movegen.cpp" />
+    <ClCompile Include="overloading.cpp" />
     <ClCompile Include="Position.cpp" />
     <ClCompile Include="display.cpp" />
     <ClCompile Include="game.cpp" />

@@ -5,10 +5,10 @@
 #include "psqt.h"
 
 const std::map <Piece, ushort> pieceValue_
-{ {PAWN, 100}, {KNIGHT, 300}, {BISHOP, 300}, {ROOK, 500}, {QUEEN, 900}, {KING, 2000} };
+{ {PAWN, 100}, {KNIGHT, 300}, {BISHOP, 320}, {ROOK, 500}, {QUEEN, 900}, {KING, 2000} };
 
 
-int evaluate(Position const &pos)
+const short evaluate(Position const &pos)
 {
 	short scoreW{}, scoreB{};
 	scoreW = evMaterial(pos, WHITE) + evPSQT(pos, WHITE);
@@ -18,7 +18,7 @@ int evaluate(Position const &pos)
 }
 
 
-short evMaterial (Position const &pos, Color const &color)
+const short evMaterial (Position const &pos, Color const &color)
 {
 	ushort numRook{}, numBishop{}, numKnight{}, numQueen{}, numPawn{};
 
@@ -38,7 +38,7 @@ short evMaterial (Position const &pos, Color const &color)
 }
 
 
-short evPSQT(Position const &p, Color const &color)
+const short evPSQT(Position const &p, Color const &color)
 {
 	short scorePSQT{};
 

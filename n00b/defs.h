@@ -13,18 +13,19 @@
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
 
-using ushort = unsigned short int;
+using ushort = unsigned short;
 
 using Bitboard = uint64_t;
 
 using Move = uint32_t;
+
 
 // ENUMS
 enum Piece : const ushort { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
 
 enum Color : const ushort { BLACK, WHITE, ALL_COLOR };
 
-enum Square : const ushort
+enum Square : const short
 {
 	A1, B1, C1, D1, E1, F1, G1, H1,
 	A2, B2, C2, D2, E2, F2, G2, H2,
@@ -45,9 +46,9 @@ enum {PAWN_TO_QUEEN, PAWN_TO_KNIGHT};
 
 enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
 
-enum File : const ushort { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER };
+enum File : const short { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER };
 
-enum Rank : const ushort { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER };
+enum Rank : const short { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER };
 
 enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, RAYS_NUMBER};
 
@@ -57,6 +58,7 @@ enum RaysKnight : const ushort {NORTH_NORTH_WEST, NORTH_NORTH_EAST, NORTH_EAST_E
 
 // OTHER TYPES
 struct PieceID { Color color; Piece piece; };
+
 
 // see magic.cpp
 constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
@@ -105,8 +107,9 @@ extern const ushort SHIFT_ROOK[64];
 extern const ushort SHIFT_BISHOP[64];
 
 // see display.cpp
-extern std::map<std::string, Square> StringToSquareMap;
-extern std::map<Square, std::string> SquareToStringMap;
+extern std::map<std::string, Square> stringToSquareMap;
+extern std::map<Square, std::string> squareToStringMap;
 
 extern std::vector<Move> moveList;
+
 #endif

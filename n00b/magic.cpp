@@ -81,7 +81,7 @@ void rookMagic()
 {
 	MoveTables.rookMagic.fill({});
 
-	for (ushort square = A1; square <= H8; square++) {
+	for (Square square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_rook{};
@@ -104,7 +104,7 @@ void bishopMagic()
 {
 	MoveTables.bishopMagic.fill({});
 
-	for (ushort square = A1; square <= H8; square++) {
+	for (Square square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_bishop{};
@@ -136,64 +136,64 @@ const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboar
 }
 
 
-const Bitboard gen_r_attks(ushort const &square, Bitboard const &blockerboard)
+const Bitboard gen_r_attks(Square const &square, Bitboard const &blockerboard)
 {
 	Bitboard result{};
 
-	for (ushort rank = RANK_INDEX + 1; rank <= 7; rank++) {
-		result |= C64(1) << (FILE_INDEX + rank * 8);
-		if (blockerboard & (C64(1) << (FILE_INDEX + rank * 8))) break;
+	for (Rank r = Rank(RANK_INDEX + 1); r <= 7; r++) {
+		result |= C64(1) << (FILE_INDEX + r * 8);
+		if (blockerboard & (C64(1) << (FILE_INDEX + r * 8))) break;
 	}
 
-	for (short rank = RANK_INDEX - 1; rank >= 0; rank--) {
-		result |= C64(1) << (FILE_INDEX + rank * 8);
-		if (blockerboard & (C64(1) << (FILE_INDEX + rank * 8))) break;
+	for (Rank r = Rank(RANK_INDEX - 1); r >= 0; r--) {
+		result |= C64(1) << (FILE_INDEX + r * 8);
+		if (blockerboard & (C64(1) << (FILE_INDEX + r * 8))) break;
 	}
 
-	for (ushort file = FILE_INDEX + 1; file <= 7; file++) {
-		result |= C64(1) << (file + RANK_INDEX * 8);
-		if (blockerboard & (C64(1) << (file + RANK_INDEX * 8))) break;
+	for (File f = File(FILE_INDEX + 1); f <= 7; f++) {
+		result |= C64(1) << (f + RANK_INDEX * 8);
+		if (blockerboard & (C64(1) << (f + RANK_INDEX * 8))) break;
 	}
 
-	for (short file = FILE_INDEX - 1; file >= 0; file--) {
-		result |= C64(1) << (file + RANK_INDEX * 8);
-		if (blockerboard & (C64(1) << (file + RANK_INDEX * 8))) break;
+	for (File f = File(FILE_INDEX - 1); f >= 0; f--) {
+		result |= C64(1) << (f + RANK_INDEX * 8);
+		if (blockerboard & (C64(1) << (f + RANK_INDEX * 8))) break;
 	}
 	
 	return result;
 }
 
 
-const Bitboard gen_b_attks(ushort const &square, Bitboard const &blockerboard)
+const Bitboard gen_b_attks(Square const &square, Bitboard const &blockerboard)
 {
 	Bitboard result{};
 
-	for (short rank = RANK_INDEX + 1, file = FILE_INDEX + 1;
-		rank <= RANK_8 && file <= FILE_H; rank++, file++)
+	for (ushort r = RANK_INDEX + 1, f = FILE_INDEX + 1;
+		r <= RANK_8 && f <= FILE_H; r++, f++)
 	{
-		result |= C64(1) << (file + rank * 8);
-		if (blockerboard & (C64(1) << (file + rank * 8))) break;
+		result |= C64(1) << (f + r * 8);
+		if (blockerboard & (C64(1) << (f + r * 8))) break;
 	}
 
-	for (short rank = RANK_INDEX + 1, file = FILE_INDEX - 1;
-		rank <= RANK_8 && file >= FILE_A; rank++, file--)
+	for (short r = RANK_INDEX + 1, f = FILE_INDEX - 1;
+		r <= RANK_8 && f >= FILE_A; r++, f--)
 	{
-		result |= C64(1) << (file + rank * 8);
-		if (blockerboard & (C64(1) << (file + rank * 8))) break;
+		result |= C64(1) << (f + r * 8);
+		if (blockerboard & (C64(1) << (f + r * 8))) break;
 	}
 
-	for (short rank = RANK_INDEX - 1, file = FILE_INDEX + 1;
-		rank >= RANK_1 && file <= FILE_H; rank--, file++)
+	for (short r = RANK_INDEX - 1, f = FILE_INDEX + 1;
+		r >= RANK_1 && f <= FILE_H; r--, f++)
 	{
-		result |= C64(1) << (file + rank * 8);
-		if (blockerboard & (C64(1) << (file + rank * 8))) break;
+		result |= C64(1) << (f + r * 8);
+		if (blockerboard & (C64(1) << (f + r * 8))) break;
 	}
 
-	for (short rank = RANK_INDEX - 1, file = FILE_INDEX - 1;
-		rank >= RANK_1 && file >= FILE_A; rank--, file--)
+	for (short r = RANK_INDEX - 1, f = FILE_INDEX - 1;
+		r >= RANK_1 && f >= FILE_A; r--, f--)
 	{
-		result |= C64(1) << (file + rank * 8);
-		if (blockerboard & (C64(1) << (file + rank * 8))) break;
+		result |= C64(1) << (f + r * 8);
+		if (blockerboard & (C64(1) << (f + r * 8))) break;
 	}
 
 	return result;

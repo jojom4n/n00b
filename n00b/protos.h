@@ -20,8 +20,8 @@ void knightMask();
 
 // magic.cpp
 const Bitboard gen_blockerboard(ushort const &index, ushort const &bits, Bitboard b);
-const Bitboard gen_r_attks(ushort const &square, Bitboard const &blockerboard);
-const Bitboard gen_b_attks(ushort const &square, Bitboard const &blockerboard);
+const Bitboard gen_r_attks(Square const &square, Bitboard const &blockerboard);
+const Bitboard gen_b_attks(Square const &square, Bitboard const &blockerboard);
 void rookMagic();
 void bishopMagic();
 
@@ -32,7 +32,7 @@ void readCommand(std::stringstream &inputStream, Position &board);
 
 
 // fen.cpp
-bool fenValidate(std::stringstream &fen);
+const bool fenValidate(std::stringstream &fen);
 void fenParser(std::stringstream &fen, Position &board);
 
 
@@ -44,23 +44,22 @@ const char printPiece(PieceID const &ID);
 
 // movegen.cpp
 std::vector<Move> moveGeneration(Position const &board);
-Check verifyCheck(Piece const &piece, Square const &squareTo, Position const &board);
-Move composeMove(Square const &squareFrom, Square const &squareTo, Color const &color, 
+const Check verifyCheck(Piece const &piece, Square const &squareTo, Position const &board);
+const Move composeMove(Square const &squareFrom, Square const &squareTo, Color const &color, 
 	ushort const &piece, MoveType const &type, Piece const &captured, bool const &promoteTo, Check const &check);
 void doMove(Move const m, Position &p);
 void undoMove(Move const m, Position &p);
 
 
-// Evaluation.cpp
-int evaluate(Position const &pos);
-short evMaterial(Position const &pos, Color const &color);
-short evPSQT(Position const &p, Color const &color);
+// evaluation.cpp
+const short evaluate(Position const &pos);
+const short evMaterial(Position const &pos, Color const &color);
+const short evPSQT(Position const &p, Color const &color);
 
 
 // search.cpp
-// short negamax(Position &p, short depth);
-short negamax(Position &p, short depth, int alpha, int beta);
-Move calculateBestMove(Position &p, short depth);
+const short negamax(Position &p, short depth, short alpha, short beta);
+const Move calculateBestMove(Position &p, short depth);
 
 
 // bitscan.cpp
@@ -80,5 +79,16 @@ const ushort bitscan_rvs(Bitboard const &b);
 #endif
 const ushort popcount(Bitboard const &b);
 const ushort bitscan_reset(Bitboard &b, bool reverse = 0);
+
+
+// overloading.cpp
+Square operator++(Square& s, int);
+Square operator--(Square& s, int);
+File operator++(File &f, int);
+File operator--(File &f, int);
+Rank operator++(Rank &r, int);
+Rank operator--(Rank &r, int);
+
+
 
 #endif

@@ -3,7 +3,7 @@
 #include "Position.h"
 #include <sstream>
 
-bool fenValidate(std::stringstream &fen)
+const bool fenValidate(std::stringstream &fen)
 {
 	std::vector<std::string> buffer{};
 	std::string word;
@@ -41,7 +41,7 @@ bool fenValidate(std::stringstream &fen)
 				if (!(files == 8)) 
 					return false;
 				else 
-					files=0; // reset files every time we meet a "/"
+					files=0; // reset files every time we meet a '/'
 				break;
 			case 'r':
 			case 'R':
@@ -116,7 +116,7 @@ bool fenValidate(std::stringstream &fen)
 		if (!(buffer[5] == "-"))
 			return false;
 	}
-	else if (!(StringToSquareMap[buffer[5]]))
+	else if (!(stringToSquareMap[buffer[5]]))
 		return false;
 
 	// check if half-move and move number are real digit
@@ -137,6 +137,7 @@ bool fenValidate(std::stringstream &fen)
 	// if none of the above conditions occurs, then FEN is valid
 	return true;
 }
+
 
 void fenParser(std::stringstream &fen, Position &board)
 {
@@ -159,6 +160,7 @@ void fenParser(std::stringstream &fen, Position &board)
 
 	for (ushort i = 0, r = RANK_8; i < buffer[2].length(); i++) { // loop until end of FEN string
 		c = buffer[2][i]; // read a character from FEN string
+		
 		if (!(c == '/')) // is the end of the row in FEN string?
 			switch (c) { // if not, compute the character
 			case 'R':
@@ -235,6 +237,7 @@ void fenParser(std::stringstream &fen, Position &board)
 	
 	for (ushort i = 0; i < buffer[4].length(); i++) {
 		c = buffer[4][i];
+		
 		switch (c) {
 		case 'K':
 			castle_white += 1;
@@ -258,8 +261,8 @@ void fenParser(std::stringstream &fen, Position &board)
 
 	// En passant square
 	std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower); // lower-case the en-passant value, just in case
-	if (!(StringToSquareMap.find(buffer[5]) == StringToSquareMap.end())) // is there a valid value, corresponding to map?
-		board.setEnPassant(StringToSquareMap[buffer[5]]);
+	if (!(stringToSquareMap.find(buffer[5]) == stringToSquareMap.end())) // is there a valid value, corresponding to map?
+		board.setEnPassant(stringToSquareMap[buffer[5]]);
 	else
 		board.setEnPassant(SQ_EMPTY);
 

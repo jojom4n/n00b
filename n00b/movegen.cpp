@@ -188,7 +188,7 @@ std::vector<Move> moveGeneration(Position const &board)
 }
 
 
-Check verifyCheck(Piece const &piece, Square const &square, Position const &board) {
+const Check verifyCheck(Piece const &piece, Square const &square, Position const &board) {
 	Square opponentKing = Square(bitscan_fwd(board.getPieces(Color(!board.getTurn()), KING)));
 	Bitboard attacksToKing{};
 	const Bitboard occupancy = board.getPosition();
@@ -223,7 +223,7 @@ Check verifyCheck(Piece const &piece, Square const &square, Position const &boar
 }
 
 
-Move composeMove(Square const &squareFrom, Square const &squareTo,
+const Move composeMove(Square const &squareFrom, Square const &squareTo,
 	Color const &color, ushort const &piece, MoveType const &type, Piece const &captured,
 	bool const &promoteTo, Check const &check)
 {

@@ -13,6 +13,7 @@ extern struct LookupTable MoveTables;
 extern std::map<std::string, Square> StringToSquareMap;
 extern std::map<Square, std::string> SquareToStringMap;
 
+
 void newGame()
 {	
 	Position *Chessboard = new Position();
@@ -57,7 +58,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		newGame();
 	}
 	else if (inputStream.str().substr(0, 6) == "search" && numWords == 1) {
-		int score = negamax(board, 5);
+		int score = negamax(board, 4);
 		std::cout << score << std::endl;
 	}
 	else

@@ -117,23 +117,12 @@ const ushort Position::countPieceType(Color const &color, Piece const &piece) co
 
 const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece const &piece) const
 {
-	std::vector<Square> square;
-	Bitboard count = board_[color][piece];
+	std::vector<Square> squares;
 	
-	while (count)
-		{ square.push_back(Square(bitscan_reset(count))); }
+	Bitboard tmp = board_[color][piece];
+
+	while (tmp > 0) 
+		 squares.push_back(Square(bitscan_reset(tmp)));
 	
-	return square;
-}
-
-
-void Position::update(Color const &color)
-{
-	if (color == WHITE)
-		for (ushort i = 0; i < 6; i++)
-			whitePieces_ |= board_[WHITE][i];		
-	else if (color == Color::BLACK)
-		for (ushort i = 0; i < 6; i++) 
-			blackPieces_ |= board_[BLACK][i];
-	allPieces_ = whitePieces_ | blackPieces_;
+	return squares;
 }

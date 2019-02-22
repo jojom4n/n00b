@@ -109,5 +109,4 @@ extern std::map<std::string, Square> StringToSquareMap;
 extern std::map<Square, std::string> SquareToStringMap;
 
 extern std::vector<Move> moveList;
-
 #endif

@@ -159,6 +159,7 @@
     <ClInclude Include="defs.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="protos.h" />
+    <ClInclude Include="psqt.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitscan.cpp" />

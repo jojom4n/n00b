@@ -45,21 +45,20 @@ const char printPiece(PieceID const &ID);
 // movegen.cpp
 std::vector<Move> moveGeneration(Position const &board);
 Check verifyCheck(Piece const &piece, Square const &squareTo, Position const &board);
-Move formMove(Square const &squareFrom, Square const &squareTo, Color const &color, 
+Move composeMove(Square const &squareFrom, Square const &squareTo, Color const &color, 
 	ushort const &piece, MoveType const &type, Piece const &captured, bool const &promoteTo, Check const &check);
 void doMove(Move const m, Position &p);
-void undoMove(Move const m, Position &p, Position const &copy);
+void undoMove(Move const m, Position &p);
 
 
 // Evaluation.cpp
 int evaluate(Position const &pos);
-int evMaterial(Position const &pos);
-int evPSQT(Position const &p);
+short evMaterial(Position const &pos, Color const &color);
+short evPSQT(Position const &p, Color const &color);
 
 
 // search.cpp
-short negamax(Position p, short depth);
-constexpr short max(short const &x, short const &y) { return (x > y) ? x : y; }
+short negamax(Position &p, short depth);
 
 
 // bitscan.cpp

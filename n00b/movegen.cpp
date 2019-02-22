@@ -75,7 +75,7 @@ std::vector<Move> moveGeneration(Position const &board)
 			while (attacks) { // scan the attack bitboard. For each attack, create the move and update the list
 				Square squareTo = Square(bitscan_reset(attacks));
 				
-				// check = verifyCheck(Piece(piece), squareTo, board);
+				check = verifyCheck(Piece(piece), squareTo, board);
 				
 				Piece captured{NO_PIECE};
 
@@ -96,11 +96,11 @@ std::vector<Move> moveGeneration(Position const &board)
 					if (type == PROMOTION) { /* if it's a promotion, we update twice: once
 												with pawn promoting to knight, once with
 												same pawn promoting to queen */
-						moveList.push_back(formMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT, check));
-						moveList.push_back(formMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN, check));
+						moveList.push_back(composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT, check));
+						moveList.push_back(composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN, check));
 					} // end if
 					else
-						moveList.push_back(formMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0, check));
+						moveList.push_back(composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0, check));
 			} // end while (attacks)
 
 		} // end while (bb)
@@ -112,42 +112,42 @@ std::vector<Move> moveGeneration(Position const &board)
 	if (board.getCastle(sideToMove) == QUEENSIDE) {
 		if (board.idPiece(A8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(A8, occupancy) >> E8) & C64(1))
-				moveList.push_back(formMove(A8, D8, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(A8, D8, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
 		}
 		else if (board.idPiece(A1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(A1, occupancy) >> E1) & C64(1))
-				moveList.push_back(formMove(A1, D1, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(A1, D1, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
 		}
 	}
 	
 	else if (board.getCastle(sideToMove) == KINGSIDE) {
 		if (board.idPiece(H8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(H8, occupancy) >> E8) & C64(1))
-				moveList.push_back(formMove(H8, F8, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(H8, F8, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
 		}
 		else if (board.idPiece(H1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(H1, occupancy) >> E1) & C64(1))
-				moveList.push_back(formMove(H1, F1, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(H1, F1, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
 		}
 	}
 
 	else if (board.getCastle(sideToMove) == ALL) {
 		if (board.idPiece(A8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(A8, occupancy) >> E8) & C64(1))
-				moveList.push_back(formMove(A8, D8, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(A8, D8, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
 		}
 		else if (board.idPiece(A1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(A1, occupancy) >> E1) & C64(1))
-				moveList.push_back(formMove(A1, D1, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(A1, D1, sideToMove, ROOK, CASTLE_Q, NO_PIECE, 0, check));
 		}
 
 		if (board.idPiece(H8).piece == ROOK && board.idPiece(E8).piece == KING) {
 			if ((MoveTables.rook(H8, occupancy) >> E8) & C64(1))
-				moveList.push_back(formMove(H8, F8, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(H8, F8, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
 		}
 		else if (board.idPiece(H1).piece == ROOK && board.idPiece(E1).piece == KING) {
 			if ((MoveTables.rook(H1, occupancy) >> E1) & C64(1))
-				moveList.push_back(formMove(H1, F1, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
+				moveList.push_back(composeMove(H1, F1, sideToMove, ROOK, CASTLE_K, NO_PIECE, 0, check));
 		}
 	}
 
@@ -161,21 +161,21 @@ std::vector<Move> moveGeneration(Position const &board)
 		case WHITE: // is there a white pawn attacking the en-passant square?
 			if (board.idPiece(Square(enpassant - 7)).color == WHITE && board.idPiece(Square(enpassant - 7)).piece == PAWN) {
 				Square squareFrom = Square(enpassant - 7);
-				moveList.push_back(formMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
+				moveList.push_back(composeMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
 			}
 			else if (board.idPiece(Square(enpassant - 9)).color == WHITE && board.idPiece(Square(enpassant - 9)).piece == PAWN) {
 				Square squareFrom = Square(enpassant - 9);
-				moveList.push_back(formMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
+				moveList.push_back(composeMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
 			if (board.idPiece(Square(enpassant + 7)).color == BLACK && board.idPiece(Square(enpassant + 7)).piece == PAWN) {
 				Square squareFrom = Square(enpassant + 7);
-				moveList.push_back(formMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
+				moveList.push_back(composeMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
 			}
 			else if (board.idPiece(Square(enpassant + 9)).color == BLACK && board.idPiece(Square(enpassant + 9)).piece == PAWN) {
 				Square squareFrom = Square(enpassant + 9);
-				moveList.push_back(formMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
+				moveList.push_back(composeMove(squareFrom, enpassant, sideToMove, PAWN, EN_PASSANT, PAWN, 0, check));
 			}
 			break;
 		} // end switch		
@@ -187,15 +187,12 @@ std::vector<Move> moveGeneration(Position const &board)
 
 
 Check verifyCheck(Piece const &piece, Square const &square, Position const &board) {
-	std::vector<Square> opponentKing = board.getPieceOnSquare(Color(!board.getTurn()), KING);
+	Square opponentKing = Square(bitscan_fwd(board.getPieces(Color(!board.getTurn()), KING)));
 	Bitboard attacksToKing{};
 	const Bitboard occupancy = board.getPosition();
 	const Bitboard ownPieces = board.getPosition(board.getTurn());
 
 	switch (piece) {
-	case KING:
-		attacksToKing = MoveTables.king[square];
-		break;
 	case QUEEN:
 		attacksToKing = MoveTables.bishop(square, occupancy)
 			| MoveTables.rook(square, occupancy);
@@ -217,14 +214,14 @@ Check verifyCheck(Piece const &piece, Square const &square, Position const &boar
 
 	while (attacksToKing) {
 		Square squareTo = Square(bitscan_reset(attacksToKing));
-		if (ushort(squareTo) == ushort(opponentKing[0])) return CHECK;
+		if (ushort(squareTo) == ushort(opponentKing)) return CHECK;
 	}
 
 	return NO_CHECK;
 }
 
 
-Move formMove(Square const &squareFrom, Square const &squareTo,
+Move composeMove(Square const &squareFrom, Square const &squareTo,
 	Color const &color, ushort const &piece, MoveType const &type, Piece const &captured,
 	bool const &promoteTo, Check const &check)
 {
@@ -300,27 +297,25 @@ void doMove(Move const m, Position &p)
 		p.setHalfMove(0);
 		p.setTurn(Color(!p.getTurn()));
 		break;
-	case PROMOTION: {
-		p.removePiece(color, piece, squareFrom);
-		Piece opponent = p.idPiece(squareTo).piece;
-
-		if (!(opponent == NO_PIECE)) {
-			p.removePiece(Color(!color), opponent, squareTo);
+	case PROMOTION: 
+		p.removePiece(color, piece, squareTo);
+		if (captured) {
+			p.removePiece(Color(!color), captured, squareTo);
 			p.setHalfMove(0);
 		}
 		else
-			p.setHalfMove(p.getHalfMove() + 1);
+			p.setHalfMove(p.getHalfMove() - 1);
 
 		(promotedTo == PAWN_TO_KNIGHT) ? p.putPiece(color, KNIGHT, squareTo) : p.putPiece(color, QUEEN, squareTo);
 
 		p.setTurn(Color(!p.getTurn()));
-		break; }
+		break;
 	case CASTLE_Q: {
 		Square kingPos = p.getPieceOnSquare(color, KING)[0];
 		p.removePiece(color, piece, squareFrom);
 		p.removePiece(color, KING, Square(kingPos));
 		p.putPiece(color, piece, squareTo);
-		p.putPiece(color, KING, Square(kingPos + 2));
+		p.putPiece(color, KING, Square(kingPos -2));
 
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() + 1);
@@ -333,7 +328,7 @@ void doMove(Move const m, Position &p)
 		p.removePiece(color, piece, squareFrom);
 		p.removePiece(color, KING, Square(kingPos));
 		p.putPiece(color, piece, squareTo);
-		p.putPiece(color, KING, Square(kingPos - 2));
+		p.putPiece(color, KING, Square(kingPos + 2));
 
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() + 1);
@@ -344,8 +339,8 @@ void doMove(Move const m, Position &p)
 	case EN_PASSANT:
 		p.removePiece(color, piece, squareFrom);
 		
-		(color == WHITE) ? p.removePiece(color, PAWN, Square(squareTo + 8))
-			: p.removePiece(color, PAWN, Square(squareTo - 8));
+		(color == WHITE) ? p.removePiece(color, PAWN, Square(squareTo - 8))
+			: p.removePiece(color, PAWN, Square(squareTo + 8));
 		
 		p.putPiece(color, piece, squareTo);
 		
@@ -360,7 +355,89 @@ void doMove(Move const m, Position &p)
 }
 
 
-void undoMove(Move const m, Position &p, Position const &copy)
+void undoMove(Move const m, Position &p)
 {
-	p = copy;
+	Square squareFrom{}, squareTo{};
+	ushort moveType = ((C64(1) << 3) - 1) & (m >> 5);
+	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 18));
+	squareTo = Square(((C64(1) << 6) - 1) & (m >> 12));
+	Color color = Color(((C64(1) << 1) - 1) & (m >> 11));
+	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 8));
+	Piece captured = Piece(((C64(1) << 3) - 1) & (m >> 2));
+	bool promotedTo = ((C64(1) << 1) - 1) & (m >> 1);
+	bool check = ((C64(1) << 1) - 1) & (m);
+
+	switch (moveType)
+	{
+	case QUIET:
+		p.removePiece(color, piece, squareTo);
+		p.putPiece(color, piece, squareFrom);
+
+		if ((piece == PAWN && (squareTo / 8) == RANK_4 && (squareFrom / 8) == RANK_2)
+			|| (piece == PAWN && (squareTo / 8) == RANK_5 && (squareFrom / 8) == RANK_7))
+			p.setEnPassant(SQ_EMPTY);
+
+		if (color == WHITE)
+			p.setMoveNumber(p.getMoveNumber() - 1);
+
+		p.setHalfMove(p.getHalfMove() - 1);
+		break;
+	case CAPTURE:
+		p.removePiece(color, piece, squareTo);
+		p.putPiece(Color(!color), captured, squareTo);
+		p.putPiece(color, piece, squareFrom);
+
+		if (color == WHITE)
+			p.setMoveNumber(p.getMoveNumber() - 1);
+
+		p.setHalfMove(0); // PROBLEM. HOW DO WE RESTORE THIS???????
+		break;
+	case PROMOTION: 
+		(promotedTo == PAWN_TO_KNIGHT) ? p.removePiece(color, KNIGHT, squareTo) : p.removePiece(color, QUEEN, squareTo);
+		p.putPiece(color, captured, squareTo);
+		p.putPiece(color, PAWN, squareFrom);
+		
+		if (color == WHITE)
+			p.setMoveNumber(p.getMoveNumber() - 1);
+		
+		break; 
+	case CASTLE_Q: {
+		Square kingPos = p.getPieceOnSquare(color, KING)[0];
+		p.removePiece(color, piece, squareTo);
+		p.removePiece(color, KING, Square(kingPos));
+		p.putPiece(color, piece, squareFrom);
+		p.putPiece(color, KING, Square(kingPos + 2));
+
+		if (color == WHITE)
+			p.setMoveNumber(p.getMoveNumber() - 1);
+
+		p.setHalfMove(p.getHalfMove() - 1);
+		break; }
+	case CASTLE_K: {
+		Square kingPos = p.getPieceOnSquare(color, KING)[0];
+		p.removePiece(color, piece, squareTo);
+		p.removePiece(color, KING, Square(kingPos));
+		p.putPiece(color, piece, squareFrom);
+		p.putPiece(color, KING, Square(kingPos - 2));
+
+		if (color == WHITE)
+			p.setMoveNumber(p.getMoveNumber() - 1);
+
+		p.setHalfMove(p.getHalfMove() - 1);
+		break; }
+	case EN_PASSANT:
+		p.removePiece(color, piece, squareTo);
+
+		(color == WHITE) ? p.putPiece(color, PAWN, Square(squareTo - 8))
+			: p.putPiece(color, PAWN, Square(squareTo + 8));
+
+		p.putPiece(color, piece, squareFrom);
+
+		if (color == WHITE)
+			p.setMoveNumber(p.getMoveNumber() - 1);
+
+		p.setHalfMove(0); // PROBLEM!!! WHERE DO WE RESTORE THIS FROM????
+		(color == WHITE) ? p.setEnPassant(Square(squareTo - 8)) : p.setEnPassant(Square(squareTo + 8));
+		break;
+	}
 }

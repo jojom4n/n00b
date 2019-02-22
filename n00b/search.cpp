@@ -12,11 +12,11 @@ short negamax(Position &p, short depth) {
 	std::vector<Move> moveList = moveGeneration(p);
 
 	for (int i = 0; i < moveList.size(); i++) {
-		/*Move m = moveList[i];
+		Move m = moveList[i];
 		doMove(m, p);
 		score = -negamax(p, depth - 1);
 		undoMove(m, p);
-		if (score > bestScore) bestScore = score;*/
+		if (score > bestScore) bestScore = score;
 	}
 	
 	return bestScore;

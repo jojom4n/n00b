@@ -42,11 +42,11 @@ short evPSQT(Position const &p, Color const &color)
 {
 	short scorePSQT{};
 
-/* 	for (int i = 0; i < 6; i++)
+ 	for (int i = 0; i < 6; i++)
 	{
 		for (auto &square : p.getPieceOnSquare(color, Piece(i)))
 			scorePSQT += PSQT[i][ushort(square)];
 	}
-*/
+
 	return scorePSQT;
 }

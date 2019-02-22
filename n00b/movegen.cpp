@@ -299,7 +299,7 @@ void doMove(Move const m, Position &p)
 		break;
 	case PROMOTION: 
 		p.removePiece(color, piece, squareTo);
-		if (captured) {
+		if (captured != NO_PIECE) {
 			p.removePiece(Color(!color), captured, squareTo);
 			p.setHalfMove(0);
 		}
@@ -394,7 +394,7 @@ void undoMove(Move const m, Position &p)
 		break;
 	case PROMOTION: 
 		(promotedTo == PAWN_TO_KNIGHT) ? p.removePiece(color, KNIGHT, squareTo) : p.removePiece(color, QUEEN, squareTo);
-		p.putPiece(color, captured, squareTo);
+		if (captured != NO_PIECE) p.putPiece(color, captured, squareTo);
 		p.putPiece(color, PAWN, squareFrom);
 		
 		if (color == WHITE)

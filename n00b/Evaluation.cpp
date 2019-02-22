@@ -12,9 +12,9 @@ int evaluate(Position const &pos)
 {
 	short scoreW{}, scoreB{};
 	scoreW = evMaterial(pos, WHITE) + evPSQT(pos, WHITE);
-	scoreB = evMaterial(pos, WHITE) + evPSQT(pos, WHITE);
+	scoreB = evMaterial(pos, BLACK) + evPSQT(pos, BLACK);
 	
-	return (pos.getTurn() == WHITE) ? (scoreW - scoreB) : (scoreB - scoreW);
+	return (scoreW - scoreB);
 }
 
 

@@ -3,21 +3,45 @@
 #include "Position.h"
 #include "protos.h"
 
-short negamax(Position &p, short depth) {
-	short score{}, bestScore = -INFINITY;
 
+short negamax(Position &p, short depth, int alpha, int beta)
+{
 	if (depth == 0)
 		return evaluate(p);
 
 	std::vector<Move> moveList = moveGeneration(p);
 
-	for (int i = 0; i < moveList.size(); i++) {
-		Move m = moveList[i];
+	for (auto &m : moveList) {
 		doMove(m, p);
-		score = -negamax(p, depth - 1);
+		int score = -negamax(p, depth - 1, -beta, -alpha);
 		undoMove(m, p);
-		if (score > bestScore) bestScore = score;
+
+		if (score > alpha)
+			alpha = score;
 	}
-	
-	return bestScore;
+
+	return alpha;
+}
+
+Move calculateBestMove(Position &p, short depth)
+{
+	std::vector<Move> moveList = moveGeneration(p);
+
+	Move bestMove = 0;
+
+	int maxScore = -INFINITY;
+
+	for (auto &m : moveList) {
+		doMove(m, p);
+		int score = -negamax(p, depth - 1, -INFINITY, +INFINITY);
+		undoMove(m, p);
+
+		if (score > maxScore)
+		{
+			maxScore = score;
+			bestMove = m;
+		}
+	}
+
+	return bestMove;
 }

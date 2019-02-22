@@ -58,8 +58,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		newGame();
 	}
 	else if (inputStream.str().substr(0, 6) == "search" && numWords == 1) {
-		int score = negamax(board, 4);
-		std::cout << score << std::endl;
+		Move m = calculateBestMove(board, 1);
+		doMove(m, board);
+		displayBoard(board);
 	}
 	else
 		std::cout << "Invalid command.\n";

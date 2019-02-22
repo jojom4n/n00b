@@ -58,7 +58,9 @@ short evPSQT(Position const &p, Color const &color);
 
 
 // search.cpp
-short negamax(Position &p, short depth);
+// short negamax(Position &p, short depth);
+short negamax(Position &p, short depth, int alpha, int beta);
+Move calculateBestMove(Position &p, short depth);
 
 
 // bitscan.cpp

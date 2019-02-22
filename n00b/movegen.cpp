@@ -64,13 +64,15 @@ std::vector<Move> moveGeneration(Position const &board)
 
 				/* Now, we set in an empty bitboard the bit corresponding to squareFrom (i.e. where pawn is)
 				and compute if it can attack from there */
-				(sideToMove == WHITE) ? attacks |= MoveTables.whitePawn(C64(1) << squareFrom, occupancy)
-					: attacks |= MoveTables.blackPawn(C64(1) << squareFrom, occupancy);
+				(sideToMove == WHITE) ? attacks |= MoveTables.whitePawn(C64(1) << squareFrom, ~ownPieces)
+					& occupancy : attacks |= MoveTables.blackPawn(C64(1) << squareFrom, ~ownPieces)
+					& occupancy;
+				// attacks &= occupancy;
 
 				break; } // end case PAWNS
 			} // end switch (piece)
 
-			attacks &= ~ownPieces; // exclude own pieces from attacks
+			if (piece != PAWN) attacks &= ~ownPieces; // exclude own pieces from attacks
 
 			while (attacks) { // scan the attack bitboard. For each attack, create the move and update the list
 				Square squareTo = Square(bitscan_reset(attacks));
@@ -377,29 +379,32 @@ void undoMove(Move const m, Position &p)
 			|| (piece == PAWN && (squareTo / 8) == RANK_5 && (squareFrom / 8) == RANK_7))
 			p.setEnPassant(SQ_EMPTY);
 
-		if (color == WHITE)
+		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
 		p.setHalfMove(p.getHalfMove() - 1);
+		p.setTurn(Color(!p.getTurn()));
 		break;
 	case CAPTURE:
 		p.removePiece(color, piece, squareTo);
 		p.putPiece(Color(!color), captured, squareTo);
 		p.putPiece(color, piece, squareFrom);
 
-		if (color == WHITE)
+		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
 		p.setHalfMove(0); // PROBLEM. HOW DO WE RESTORE THIS???????
+		p.setTurn(Color(!p.getTurn()));
 		break;
 	case PROMOTION: 
 		(promotedTo == PAWN_TO_KNIGHT) ? p.removePiece(color, KNIGHT, squareTo) : p.removePiece(color, QUEEN, squareTo);
 		if (captured != NO_PIECE) p.putPiece(color, captured, squareTo);
 		p.putPiece(color, PAWN, squareFrom);
 		
-		if (color == WHITE)
+		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 		
+		p.setTurn(Color(!p.getTurn()));
 		break; 
 	case CASTLE_Q: {
 		Square kingPos = p.getPieceOnSquare(color, KING)[0];
@@ -408,10 +413,11 @@ void undoMove(Move const m, Position &p)
 		p.putPiece(color, piece, squareFrom);
 		p.putPiece(color, KING, Square(kingPos + 2));
 
-		if (color == WHITE)
+		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
 		p.setHalfMove(p.getHalfMove() - 1);
+		p.setTurn(Color(!p.getTurn()));
 		break; }
 	case CASTLE_K: {
 		Square kingPos = p.getPieceOnSquare(color, KING)[0];
@@ -420,10 +426,11 @@ void undoMove(Move const m, Position &p)
 		p.putPiece(color, piece, squareFrom);
 		p.putPiece(color, KING, Square(kingPos - 2));
 
-		if (color == WHITE)
+		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
 		p.setHalfMove(p.getHalfMove() - 1);
+		p.setTurn(Color(!p.getTurn()));
 		break; }
 	case EN_PASSANT:
 		p.removePiece(color, piece, squareTo);
@@ -433,11 +440,12 @@ void undoMove(Move const m, Position &p)
 
 		p.putPiece(color, piece, squareFrom);
 
-		if (color == WHITE)
+		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
 		p.setHalfMove(0); // PROBLEM!!! WHERE DO WE RESTORE THIS FROM????
 		(color == WHITE) ? p.setEnPassant(Square(squareTo - 8)) : p.setEnPassant(Square(squareTo + 8));
+		p.setTurn(Color(!p.getTurn()));
 		break;
 	}
 }

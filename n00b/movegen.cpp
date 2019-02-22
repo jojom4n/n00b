@@ -351,9 +351,12 @@ void doMove(Move const m, Position &p)
 		
 		p.setHalfMove(0);
 		p.setTurn(Color(!p.getTurn()));
-		p.setEnPassant(SQ_EMPTY);
 		break;
 	}
+
+
+	if (squareTo != p.getEnPassant())
+		p.setEnPassant(SQ_EMPTY);
 }
 
 

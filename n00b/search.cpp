@@ -1,11 +1,15 @@
 #include "pch.h"
 #include <cmath>
+#include <iostream>
 #include "Position.h"
 #include "protos.h"
 
+int positions;
 
 short negamax(Position &p, short depth, int alpha, int beta)
 {
+	positions++;
+
 	if (depth == 0)
 		return evaluate(p);
 
@@ -29,7 +33,7 @@ Move calculateBestMove(Position &p, short depth)
 
 	Move bestMove = 0;
 
-	int maxScore = -INFINITY;
+	int maxScore = -10000;
 
 	for (auto &m : moveList) {
 		doMove(m, p);
@@ -43,5 +47,6 @@ Move calculateBestMove(Position &p, short depth)
 		}
 	}
 
+	std::cout << positions << std::endl;
 	return bestMove;
 }

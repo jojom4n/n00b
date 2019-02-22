@@ -58,7 +58,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		newGame();
 	}
 	else if (inputStream.str().substr(0, 6) == "search" && numWords == 1) {
-		Move m = calculateBestMove(board, 1);
+		Move m = calculateBestMove(board, 5);
 		doMove(m, board);
 		displayBoard(board);
 	}

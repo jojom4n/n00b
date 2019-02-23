@@ -2,7 +2,7 @@
 #include "Position.h"
 
 
-void doMove(Move const m, Position &p)
+void doMove(Move const &m, Position &p)
 {
 	Square squareFrom{}, squareTo{};
 	ushort moveType = ((C64(1) << 3) - 1) & (m >> 5);
@@ -42,13 +42,15 @@ void doMove(Move const m, Position &p)
 		p.setTurn(Color(!p.getTurn()));
 		break;
 	case PROMOTION:
-		p.removePiece(color, piece, squareTo);
-		if (captured != NO_PIECE) {
+		p.removePiece(color, piece, squareFrom);
+		
+		if (!(captured == NO_PIECE)) {
 			p.removePiece(Color(!color), captured, squareTo);
 			p.setHalfMove(0);
 		}
 		else
-			p.setHalfMove(p.getHalfMove() - 1);
+			p.setHalfMove(p.getHalfMove() + 1);
+			
 
 		(promotedTo == PAWN_TO_KNIGHT) ? p.putPiece(color, KNIGHT, squareTo) : p.putPiece(color, QUEEN, squareTo);
 
@@ -65,6 +67,7 @@ void doMove(Move const m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
+		p.setCastle(color, p.getCastle(color) -2);
 		p.setTurn(Color(!p.getTurn()));
 		break;	}
 	case CASTLE_K: {
@@ -78,13 +81,14 @@ void doMove(Move const m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
+		p.setCastle(color, p.getCastle(color) - 1);
 		p.setTurn(Color(!p.getTurn()));
 		break; }
 	case EN_PASSANT:
 		p.removePiece(color, piece, squareFrom);
 
-		(color == WHITE) ? p.removePiece(color, PAWN, Square(squareTo - 8))
-			: p.removePiece(color, PAWN, Square(squareTo + 8));
+		(color == WHITE) ? p.removePiece(Color(!color), PAWN, Square(squareTo - 8))
+			: p.removePiece(Color(!color), PAWN, Square(squareTo + 8));
 
 		p.putPiece(color, piece, squareTo);
 
@@ -92,19 +96,19 @@ void doMove(Move const m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(0);
+		p.setEnPassant(SQ_EMPTY);
 		p.setTurn(Color(!p.getTurn()));
 		break;
 	}
 
-
-	if (squareTo != p.getEnPassant())
+	if (!(moveType == EN_PASSANT) && !(p.getEnPassant() == SQ_EMPTY))
 		p.setEnPassant(SQ_EMPTY);
 }
 
 
-void undoMove(Move const m, Position &p)
+void undoMove(Move const &m, Position &p, Position const &backup)
 {
-	Square squareFrom{}, squareTo{};
+	/* Square squareFrom{}, squareTo{};
 	ushort moveType = ((C64(1) << 3) - 1) & (m >> 5);
 	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 18));
 	squareTo = Square(((C64(1) << 6) - 1) & (m >> 12));
@@ -138,14 +142,21 @@ void undoMove(Move const m, Position &p)
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
-		p.setHalfMove(0); // PROBLEM. HOW DO WE RESTORE THIS???????
+		p.setHalfMove(p.getBackupHalfMove());
 		p.setTurn(Color(!p.getTurn()));
 		break;
 	case PROMOTION:
 		(promotedTo == PAWN_TO_KNIGHT) ? p.removePiece(color, KNIGHT, squareTo) : p.removePiece(color, QUEEN, squareTo);
-		if (captured != NO_PIECE) p.putPiece(color, captured, squareTo);
-		p.putPiece(color, PAWN, squareFrom);
-
+		
+		if (!(captured == NO_PIECE)) {
+			p.putPiece(color, captured, squareTo);
+			p.setHalfMove(p.getBackupHalfMove());
+		}
+		else {
+			p.putPiece(color, PAWN, squareFrom);
+			p.setHalfMove(p.getHalfMove() - 1);
+		}
+		
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
@@ -179,18 +190,20 @@ void undoMove(Move const m, Position &p)
 		break; }
 	case EN_PASSANT:
 		p.removePiece(color, piece, squareTo);
-
-		(color == WHITE) ? p.putPiece(color, PAWN, Square(squareTo - 8))
-			: p.putPiece(color, PAWN, Square(squareTo + 8));
-
-		p.putPiece(color, piece, squareFrom);
-
+		(color == WHITE) ? p.putPiece(Color(!color), PAWN, Square(squareTo -8))
+				: p.putPiece(Color(!color), PAWN, Square(squareTo + 8));
+		
+		p.setHalfMove(p.getBackupHalfMove());
+		
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() - 1);
 
-		p.setHalfMove(0); // PROBLEM!!! WHERE DO WE RESTORE THIS FROM????
-		(color == WHITE) ? p.setEnPassant(Square(squareTo - 8)) : p.setEnPassant(Square(squareTo + 8));
+		// p.setEnPassant(p.getBackupEP());
 		p.setTurn(Color(!p.getTurn()));
 		break;
 	}
+
+		p.setEnPassant(p.getBackupEP()); */
+
+	p = backup;
 }

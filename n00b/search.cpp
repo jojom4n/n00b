@@ -14,11 +14,12 @@ const short negamax(Position &p, short depth, short alpha, short beta)
 		return evaluate(p);
 
 	std::vector<Move> moveList = moveGeneration(p);
+	Position copy = p;
 
 	for (auto &m : moveList) {
-		doMove(m, p);
+		doMove(m, copy);
 		int score = -negamax(p, depth - 1, -beta, -alpha);
-		undoMove(m, p);
+		undoMove(m, copy, p);
 
 		if (score > alpha)
 			alpha = score;
@@ -34,10 +35,12 @@ const Move calculateBestMove(Position &p, short depth)
 	Move bestMove = 0;
 	int maxScore = -(std::numeric_limits<int>::max());
 
+	Position copy = p;
+
 	for (auto &m : moveList) {
-		doMove(m, p);
+		doMove(m, copy);
 		int score = -negamax(p, depth - 1, -(std::numeric_limits<short>::max()), +(std::numeric_limits<short>::max()));
-		undoMove(m, p);
+		undoMove(m, copy, p);
 
 		if (score > maxScore) {
 			maxScore = score;

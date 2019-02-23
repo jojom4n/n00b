@@ -54,6 +54,8 @@ std::vector<Move> moveGeneration(Position const &board)
 				MoveType type = setType(p, moves, board, squareFrom, squareTo);	
 				check = isCheck(p, squareTo, board); // is the move a check to opponent king?
 				Piece captured = board.idPiece(squareTo).piece;
+				
+				if (captured == KING) break; // captured can't be enemy king
 
 				if (type == CAPTURE) {
 					Move m = composeMove(squareFrom, squareTo, sideToMove, p, type, captured, 0, check);

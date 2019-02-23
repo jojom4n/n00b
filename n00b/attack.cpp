@@ -152,8 +152,8 @@ void raysEx()
 	for (Square square = A1; square <= H8; square++) {
 		if (square <= H7) Masks.raysEx[NORTH][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH][square]);
 		if (square >= A2) Masks.raysEx[SOUTH][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH][square]);
-		if (FILE_INDEX != FILE_A) Masks.raysEx[WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[WEST][square]);
-		if (FILE_INDEX != FILE_H) Masks.raysEx[EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[EAST][square]);
+		if (!(FILE_INDEX == FILE_A)) Masks.raysEx[WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[WEST][square]);
+		if (!(FILE_INDEX == FILE_H)) Masks.raysEx[EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[EAST][square]);
 
 		if (Masks.raysEx[NORTH_WEST][square]) 
 			Masks.raysEx[NORTH_WEST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_WEST][square]);

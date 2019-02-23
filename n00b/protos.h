@@ -54,8 +54,8 @@ const Move composeMove(Square const &squareFrom, Square const &squareTo, Color c
 
 
 // makemove.cpp
-void doMove(Move const m, Position &p);
-void undoMove(Move const m, Position &p);
+void doMove(Move const &m, Position &p);
+void undoMove(Move const &m, Position &p, Position const &backup);
 
 
 // evaluation.cpp

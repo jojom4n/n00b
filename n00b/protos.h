@@ -44,9 +44,16 @@ const char printPiece(PieceID const &ID);
 
 // movegen.cpp
 std::vector<Move> moveGeneration(Position const &board);
-const Check verifyCheck(Piece const &piece, Square const &squareTo, Position const &board);
+const Bitboard pawnMoves(Color const &c, Square const &from, Bitboard const &occ, Bitboard const &own);
+void castleMoves(Position const &p, Check isCheck);
+void enPassant(Position const &p, Check const &isCheck);
+const Check isCheck(Piece const &piece, Square const &squareTo, Position const &board);
+const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to);
 const Move composeMove(Square const &squareFrom, Square const &squareTo, Color const &color, 
 	ushort const &piece, MoveType const &type, Piece const &captured, bool const &promoteTo, Check const &check);
+
+
+// makemove.cpp
 void doMove(Move const m, Position &p);
 void undoMove(Move const m, Position &p);
 
@@ -88,6 +95,7 @@ File operator++(File &f, int);
 File operator--(File &f, int);
 Rank operator++(Rank &r, int);
 Rank operator--(Rank &r, int);
+Piece operator++(Piece &p, int);
 
 
 

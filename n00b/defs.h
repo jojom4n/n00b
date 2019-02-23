@@ -21,7 +21,7 @@ using Move = uint32_t;
 
 
 // ENUMS
-enum Piece : const ushort { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
+enum Piece : const short { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
 
 enum Color : const ushort { BLACK, WHITE, ALL_COLOR };
 
@@ -109,7 +109,5 @@ extern const ushort SHIFT_BISHOP[64];
 // see display.cpp
 extern std::map<std::string, Square> stringToSquareMap;
 extern std::map<Square, std::string> squareToStringMap;
-
-extern std::vector<Move> moveList;
 
 #endif

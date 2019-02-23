@@ -165,6 +165,7 @@
     <ClCompile Include="bitscan.cpp" />
     <ClCompile Include="evaluation.cpp" />
     <ClCompile Include="fen.cpp" />
+    <ClCompile Include="makemove.cpp" />
     <ClCompile Include="movegen.cpp" />
     <ClCompile Include="overloading.cpp" />
     <ClCompile Include="Position.cpp" />

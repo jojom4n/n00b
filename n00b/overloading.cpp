@@ -43,3 +43,10 @@ Rank operator--(Rank &r, int) {
 	r = static_cast<Rank>((static_cast<int>(r) - 1));
 	return temp;
 }
+
+
+Piece operator++(Piece &p, int) {
+	Piece temp = p;
+	p = static_cast<Piece>((static_cast<int>(p) + 1));
+	return temp;
+}

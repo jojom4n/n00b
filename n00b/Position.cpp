@@ -81,7 +81,7 @@ const PieceID Position::idPiece(Square const &square) const
 				return PieceID{ (Color)x, (Piece)y };
 		}
 
-	return { ALL_COLOR, NO_PIECE };  // some error occurred
+	return { ALL_COLOR, NO_PIECE };  // no piece on square
 }
 
 

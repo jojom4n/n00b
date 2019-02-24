@@ -45,7 +45,14 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 8) == "movelist" && numWords == 1) {
 		std::vector<Move> moveList;
 		moveList = moveGeneration(board);
-		displayMoveList(board, moveList);
+		if (moveList.size() > 0) {
+			displayMoveList(board, moveList);
+		}
+		else
+		{
+			board.setCheckmate(true);
+			std::cout << "It's CHECKMATE!" << std::endl;
+		}
 	}
 
 	else if ((inputStream.str().substr(0, 12) == "display" && numWords == 1))
@@ -61,10 +68,16 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	
 	else if (inputStream.str().substr(0, 6) == "search" && numWords == 1) {
 		Move m = calculateBestMove(board, 3);
-		doMove(m, board);
-		displayBoard(board);
+		if (m) {
+			doMove(m, board);
+			displayBoard(board);
+		}
+		else
+		{
+			board.setCheckmate(true);
+			std::cout << "It's CHECKMATE!" << std::endl;
+		}	
 	}
-	
 	else
 		std::cout << "Invalid command.\n";
 }

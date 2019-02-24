@@ -45,7 +45,6 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 8) == "movelist" && numWords == 1) {
 		std::vector<Move> moveList;
 		moveList = moveGeneration(board);
-		moveList = pruneIllegal(moveList, board);
 		displayMoveList(board, moveList);
 	}
 

@@ -78,7 +78,7 @@ std::vector<Move> moveGeneration(Position const &board)
 
 	castleMoves(board, check);
 	enPassant(board, check);
-	moveList = pruneIllegal(moveList, board);
+	moveList = pruneIllegal(moveList, board); // prune the invalid moves from moveList
 	return moveList;
 }
 
@@ -295,59 +295,60 @@ const Move composeMove(Square const &squareFrom, Square const &squareTo,
 
 bool isLegal(Color const &c, Position const &p)
 {
-	Square kingPos = p.getPieceOnSquare(c, KING)[0];
+	Square kingPos = p.getPieceOnSquare(c, KING)[0]; //get King's square
 	Bitboard opponent{}, attackedBy{}, occ = p.getPosition();
 	
 	// ROOK
-	opponent = p.getPieces(Color(!c), ROOK);
-	attackedBy = MoveTables.rook(kingPos, occ);
-	if (attackedBy &= opponent) return false;
+	opponent = p.getPieces(Color(!c), ROOK); // get rook's bitboard
+	attackedBy = MoveTables.rook(kingPos, occ); // does rook's attack mask...
+	if (attackedBy &= opponent) return false; // ...intersect King's square?
 	
 	// BISHOP
-	opponent = p.getPieces(Color(!c), BISHOP);
-	attackedBy = MoveTables.bishop(kingPos, occ);
-	if (attackedBy &= opponent) return false;
+	opponent = p.getPieces(Color(!c), BISHOP); // get bishop's bitboard
+	attackedBy = MoveTables.bishop(kingPos, occ); // does bishop's attack mask...
+	if (attackedBy &= opponent) return false; // ...intersect King's square?
 	
 	// QUEEN
-	opponent = p.getPieces(Color(!c), QUEEN);
-	attackedBy = MoveTables.rook(kingPos, occ) | MoveTables.bishop(kingPos, occ);
-	if (attackedBy &= opponent) return false;
+	opponent = p.getPieces(Color(!c), QUEEN); // get queen's bitboard
+	attackedBy = MoveTables.rook(kingPos, occ) | MoveTables.bishop(kingPos, occ); // does queen's attack mask...
+	if (attackedBy &= opponent) return false; // ...intersect King's square?
 	
 	// KNIGHT
-	opponent = p.getPieces(Color(!c), KNIGHT);
-	attackedBy = MoveTables.knight[kingPos];
-	if (attackedBy &= opponent) return false;
+	opponent = p.getPieces(Color(!c), KNIGHT); // get knight's bitboard
+	attackedBy = MoveTables.knight[kingPos]; // does knight's attack mask...
+	if (attackedBy &= opponent) return false; // ...intersect King's square?
 	
 	// KING
-	opponent = p.getPieces(Color(!c), KING);
-	attackedBy = MoveTables.king[kingPos];
-	if (attackedBy &= opponent) return false;
+	opponent = p.getPieces(Color(!c), KING); // get enemy king's bitboard
+	attackedBy = MoveTables.king[kingPos]; // does enemy king's attack mask...
+	if (attackedBy &= opponent) return false; // ...intersect King's square?
 
 	//PAWNS
-	opponent = p.getPieces(Color(!c), PAWN);
+	opponent = p.getPieces(Color(!c), PAWN); // get pawn's bitboard
+	// does enemy pawn's attack mask...
 	(c == WHITE) ? attackedBy = MoveTables.blackPawn(opponent, occ) : attackedBy = MoveTables.whitePawn(opponent, occ);
-	if (attackedBy &= opponent) return false;
+	if (attackedBy &= opponent) return false; // ...intersect King's square?
 
-	return true;
+	return true; // if all of above tests fail, return King is safe and move is valid
 }
 
 
 const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position const &p)
 {
-	Position copy = p;
+	Position copy = p; // do a copy of position, for undoing move purposes
 	
-	for (auto it = moveList.begin(); it != moveList.end(); )
+	for (auto it = moveList.begin(); it != moveList.end(); ) // scroll through the moveList
 	{
-		Color c = Color(((C64(1) << 1) - 1) & (*it >> 11));
-		doMove(*it, copy);
+		Color c = Color(((C64(1) << 1) - 1) & (*it >> 11)); // who's moving?
+		doMove(*it, copy); // do the move
 		
-		if (!(isLegal(c, copy))) {
-			undoMove(*it, copy, p);
-			it = moveList.erase(it);
+		if (!(isLegal(c, copy))) { // if move is not legal...
+			undoMove(*it, copy, p); // undo the move...
+			it = moveList.erase(it); // and erase it from moveList
 		}
 		else {
-			undoMove(*it, copy, p);
-			it++;
+			undoMove(*it, copy, p); // else undo move...
+			it++; // ...retain the move, because it's valid, and check next one
 		} // end if
 	} // end for
 

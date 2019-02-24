@@ -67,7 +67,7 @@ void doMove(Move const &m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
-		p.setCastle(color, p.getCastle(color) -2);
+		p.setCastle(color, NONE);
 		p.setTurn(Color(!p.getTurn()));
 		break;	}
 	case CASTLE_K: {
@@ -81,7 +81,7 @@ void doMove(Move const &m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
-		p.setCastle(color, p.getCastle(color) - 1);
+		p.setCastle(color, NONE);
 		p.setTurn(Color(!p.getTurn()));
 		break; }
 	case EN_PASSANT:

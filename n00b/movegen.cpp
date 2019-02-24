@@ -6,23 +6,27 @@
 extern struct LookupTable MoveTables;
 std::vector<Move> moveList{};
 
-std::vector<Move> moveGeneration(Position const &board)
+const std::vector<Move> moveGeneration(Position const &p)
 {
 	moveList.clear();
-	Color sideToMove = board.getTurn(); // which side are we generating moves for? 
-	Check check{};
-	const Bitboard occupancy = board.getPosition();
-	const Bitboard ownPieces = board.getPosition(sideToMove);
+	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
+	
+	if (underCheck(sideToMove, p) > 1)
+		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
 
-	for (Piece p = KING; p <= PAWN; p++) {
-		Bitboard bb = board.getPieces(sideToMove, p);
+	Check check{};
+	const Bitboard occupancy = p.getPosition();
+	const Bitboard ownPieces = p.getPosition(sideToMove);
+
+	for (Piece piece = KING; piece <= PAWN; piece++) {
+		Bitboard bb = p.getPieces(sideToMove, piece);
 		
 		while (bb) { // loop until the bitboard has a piece on it
 			Square squareFrom = Square(bitscan_reset(bb)); // find the square(s) with the particular piece;
 			Bitboard moves{};
 			
 			// get move bitboard for the piece, given its square
-			switch (p) {
+			switch (piece) {
 			case KING:
 				moves = MoveTables.king[squareFrom];
 				break;
@@ -46,39 +50,68 @@ std::vector<Move> moveGeneration(Position const &board)
 				break;
 			}
 
-			if (!(p == PAWN))
+			if (!(piece == PAWN))
 				moves &= ~ownPieces; // exclude own pieces from moves
 			
 			while (moves) { // scan collected moves, determine their type and add them to list
 				Square squareTo = Square(bitscan_reset(moves));
-				MoveType type = setType(p, moves, board, squareFrom, squareTo);	
-				check = isChecking(p, squareTo, board); // is the move a check to opponent king?
-				Piece captured = board.idPiece(squareTo).piece;
+				MoveType type = setType(piece, moves, p, squareFrom, squareTo);	
+				check = isChecking(piece, squareTo, p); // is the move a check to opponent king?
+				Piece captured = p.idPiece(squareTo).piece;
 				
 				if (captured == KING) break; // captured can't be enemy king
 
 				if (type == CAPTURE) {
-					Move m = composeMove(squareFrom, squareTo, sideToMove, p, type, captured, 0, check);
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0, check);
 					moveList.push_back(m);
 				}
 				else if (type == PROMOTION) { 
 					// compose two moves: the first promoting to knight, the second to queen
-					Move m = composeMove(squareFrom, squareTo, sideToMove, p, type, captured, PAWN_TO_KNIGHT, check);
-					Move m2 = composeMove(squareFrom, squareTo, sideToMove, p, type, captured, PAWN_TO_QUEEN, check);
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT, check);
+					Move m2 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN, check);
 					moveList.push_back(m);
 					moveList.push_back(m2);
 				}
 				else {
-					Move m = composeMove(squareFrom, squareTo, sideToMove, p, type, captured, 0, check);
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0, check);
 					moveList.push_back(m);
 				}
 			} // end while (moves)
 		} // end while (bb)
 	} // end for loop
 
-	castleMoves(board, check);
-	enPassant(board, check);
-	moveList = pruneIllegal(moveList, board); // prune the invalid moves from moveList
+	if (!(underCheck(sideToMove, p))) // if King is not under check, calculate castles too
+		castleMoves(p, check);
+
+	enPassant(p, check);
+	moveList = pruneIllegal(moveList, p); // prune the invalid moves from moveList
+	return moveList;
+}
+
+
+const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
+{
+	const Bitboard occ = p.getPosition(), ownPieces = p.getPosition(c);
+	Bitboard moves{};
+	Square kingPos = p.getPieceOnSquare(c, KING)[0];
+	moves = MoveTables.king[kingPos] & ~ownPieces;
+
+	while (moves) { // scan collected moves, determine their type and add them to list
+		Square squareTo = Square(bitscan_reset(moves));
+		MoveType type = setType(KING, moves, p, kingPos, squareTo);
+		Piece captured = p.idPiece(squareTo).piece;
+
+		if (type == CAPTURE) {
+			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0, NO_CHECK);
+			moveList.push_back(m);
+		}
+		else {
+			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0, NO_CHECK);
+			moveList.push_back(m);
+		}
+	}
+
+	moveList = pruneIllegal(moveList, p);
 	return moveList;
 }
 
@@ -105,65 +138,41 @@ const Bitboard pawnMoves(Color const &c, Square const &from, Bitboard const &occ
 }
 
 
-void castleMoves(Position const &p, Check isCheck)
+void castleMoves(Position const &p, Check const &isCheck)
 {
 	Move m{};
 	Color c = p.getTurn();
 	Bitboard occ = p.getPosition();
 
-	if (p.getCastle(c) == QUEENSIDE) {
-
-		if (p.idPiece(A8).piece == ROOK && p.idPiece(E8).piece == KING) {
-			if ((MoveTables.rook(A8, occ) >> E8) & C64(1))
+	if (p.getCastle(c) == QUEENSIDE || p.getCastle(c) == ALL)
+		if (p.idPiece(A8).piece == ROOK && p.idPiece(E8).piece == KING)
+			
+			if ((MoveTables.rook(A8, occ) >> E8) & C64(1)) {
 				m = composeMove(A8, D8, c, ROOK, CASTLE_Q, NO_PIECE, 0, isCheck);
-		}
-		else if (p.idPiece(A1).piece == ROOK && p.idPiece(E1).piece == KING) {
-			if ((MoveTables.rook(A1, occ) >> E1) & C64(1))
+				moveList.push_back(m);
+			}
+
+		else if (p.idPiece(A1).piece == ROOK && p.idPiece(E1).piece == KING) 
+		
+			if ((MoveTables.rook(A1, occ) >> E1) & C64(1)) {
 				m = composeMove(A1, D1, c, ROOK, CASTLE_Q, NO_PIECE, 0, isCheck);
-		}
+				moveList.push_back(m);
+			}
 
-		if (m) moveList.push_back(m);
-
-	}
-
-	else if (p.getCastle(c) == KINGSIDE) {
-
-		if (p.idPiece(H8).piece == ROOK && p.idPiece(E8).piece == KING) {
-			if ((MoveTables.rook(H8, occ) >> E8) & C64(1))
+	if (p.getCastle(c) == KINGSIDE || p.getCastle(c) == ALL)
+		if (p.idPiece(H8).piece == ROOK && p.idPiece(E8).piece == KING)
+			
+			if ((MoveTables.rook(H8, occ) >> E8) & C64(1)) {
 				m = composeMove(H8, F8, c, ROOK, CASTLE_K, NO_PIECE, 0, isCheck);
-		}
-		else if (p.idPiece(H1).piece == ROOK && p.idPiece(E1).piece == KING) {
-			if ((MoveTables.rook(H1, occ) >> E1) & C64(1))
+				moveList.push_back(m);
+			}
+
+		else if (p.idPiece(H1).piece == ROOK && p.idPiece(E1).piece == KING) 
+		
+			if ((MoveTables.rook(H1, occ) >> E1) & C64(1)) {
 				m = composeMove(H1, F1, c, ROOK, CASTLE_K, NO_PIECE, 0, isCheck);
-		}
-
-		if (m) moveList.push_back(m);
-	}
-
-	else if (p.getCastle(c) == ALL) {
-
-		if (p.idPiece(A8).piece == ROOK && p.idPiece(E8).piece == KING) {
-			if ((MoveTables.rook(A8, occ) >> E8) & C64(1))
-				m = composeMove(A8, D8, c, ROOK, CASTLE_Q, NO_PIECE, 0, isCheck);
-		}
-		else if (p.idPiece(A1).piece == ROOK && p.idPiece(E1).piece == KING) {
-			if ((MoveTables.rook(A1, occ) >> E1) & C64(1))
-				m = composeMove(A1, D1, c, ROOK, CASTLE_Q, NO_PIECE, 0, isCheck);
-		}
-
-		if (m) moveList.push_back(m);
-
-		if (p.idPiece(H8).piece == ROOK && p.idPiece(E8).piece == KING) {
-			if ((MoveTables.rook(H8, occ) >> E8) & C64(1))
-				m = composeMove(H8, F8, c, ROOK, CASTLE_K, NO_PIECE, 0, isCheck);
-		}
-		else if (p.idPiece(H1).piece == ROOK && p.idPiece(E1).piece == KING) {
-			if ((MoveTables.rook(H1, occ) >> E1) & C64(1))
-				m = composeMove(H1, F1, c, ROOK, CASTLE_K, NO_PIECE, 0, isCheck);
-		}
-
-		if (m) moveList.push_back(m);
-	}
+				moveList.push_back(m);
+			}
 }
 
 
@@ -256,25 +265,24 @@ const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p,
 }
 
 
-const Move composeMove(Square const &squareFrom, Square const &squareTo,
-	Color const &color, ushort const &piece, MoveType const &type, Piece const &captured,
-	bool const &promoteTo, Check const &check)
+const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, 
+	MoveType const &type, Piece const &captured, bool const &promoteTo, Check const &check)
 {
 	
-	/* combine squareFrom, squareTo and type into a binary number
+	/* combine from, to and type into a binary number
 	We use a 32-bit number (Move = uint32_t, see defs.h), composed in the following way:
 
 	00000000   	000000		 000000		  0		 000	    000			     000			   0		0
-	 unused    SquareFrom	SquareTo	Color	Piece	Type of move	Piece captured,    Promotion  Check?
+	 unused      from 		   to		Color	Piece	Type of move	Piece captured,    Promotion  Check?
 																			if any			 to...
 	
 	*/
 
 	Move move{};
-	move = (move << 6) | squareFrom;
-	move = (move << 6) | squareTo;
-	move = (move << 1) | color;
-	move = (move << 3) | piece;
+	move = (move << 6) | from;
+	move = (move << 6) | to;
+	move = (move << 1) | c;
+	move = (move << 3) | p;
 	move = (move << 3) | type;
 	move = (move << 3) | captured;
 	
@@ -293,43 +301,50 @@ const Move composeMove(Square const &squareFrom, Square const &squareTo,
 }
 
 
-bool isLegal(Color const &c, Position const &p)
+short underCheck(Color const &c, Position const &p)
 {
 	Square kingPos = p.getPieceOnSquare(c, KING)[0]; //get King's square
 	Bitboard opponent{}, attackedBy{}, occ = p.getPosition();
+	short attackers{};
 	
 	// ROOK
 	opponent = p.getPieces(Color(!c), ROOK); // get rook's bitboard
 	attackedBy = MoveTables.rook(kingPos, occ); // does rook's attack mask...
-	if (attackedBy &= opponent) return false; // ...intersect King's square?
+	if (attackedBy &= opponent) // ...intersect King's square?
+		attackers += 1; 
 	
 	// BISHOP
 	opponent = p.getPieces(Color(!c), BISHOP); // get bishop's bitboard
 	attackedBy = MoveTables.bishop(kingPos, occ); // does bishop's attack mask...
-	if (attackedBy &= opponent) return false; // ...intersect King's square?
-	
+	if (attackedBy &= opponent) // ...intersect King's square?
+		attackers += 1;
+
 	// QUEEN
 	opponent = p.getPieces(Color(!c), QUEEN); // get queen's bitboard
 	attackedBy = MoveTables.rook(kingPos, occ) | MoveTables.bishop(kingPos, occ); // does queen's attack mask...
-	if (attackedBy &= opponent) return false; // ...intersect King's square?
-	
+	if (attackedBy &= opponent) // ...intersect King's square?
+		attackers += 1;
+
 	// KNIGHT
 	opponent = p.getPieces(Color(!c), KNIGHT); // get knight's bitboard
 	attackedBy = MoveTables.knight[kingPos]; // does knight's attack mask...
-	if (attackedBy &= opponent) return false; // ...intersect King's square?
-	
+	if (attackedBy &= opponent) // ...intersect King's square?
+		attackers += 1;
+
 	// KING
 	opponent = p.getPieces(Color(!c), KING); // get enemy king's bitboard
 	attackedBy = MoveTables.king[kingPos]; // does enemy king's attack mask...
-	if (attackedBy &= opponent) return false; // ...intersect King's square?
+	if (attackedBy &= opponent) // ...intersect King's square?
+		attackers += 1;
 
 	//PAWNS
 	opponent = p.getPieces(Color(!c), PAWN); // get pawn's bitboard
 	// does enemy pawn's attack mask...
 	(c == WHITE) ? attackedBy = MoveTables.blackPawn(opponent, occ) : attackedBy = MoveTables.whitePawn(opponent, occ);
-	if (attackedBy &= opponent) return false; // ...intersect King's square?
+	if (attackedBy &= opponent) // ...intersect King's square?
+		attackers += 1;
 
-	return true; // if all of above tests fail, return King is safe and move is valid
+	return attackers; // return number of pieces attacking the King
 }
 
 
@@ -342,7 +357,7 @@ const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position cons
 		Color c = Color(((C64(1) << 1) - 1) & (*it >> 11)); // who's moving?
 		doMove(*it, copy); // do the move
 		
-		if (!(isLegal(c, copy))) { // if move is not legal...
+		if (underCheck(c, copy)) { // if move is not legal...
 			undoMove(*it, copy, p); // undo the move...
 			it = moveList.erase(it); // and erase it from moveList
 		}

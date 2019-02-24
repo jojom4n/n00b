@@ -47,10 +47,12 @@ std::vector<Move> moveGeneration(Position const &board);
 const Bitboard pawnMoves(Color const &c, Square const &from, Bitboard const &occ, Bitboard const &own);
 void castleMoves(Position const &p, Check isCheck);
 void enPassant(Position const &p, Check const &isCheck);
-const Check isCheck(Piece const &piece, Square const &squareTo, Position const &board);
+const Check isChecking(Piece const &piece, Square const &squareTo, Position const &board);
 const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to);
 const Move composeMove(Square const &squareFrom, Square const &squareTo, Color const &color, 
 	ushort const &piece, MoveType const &type, Piece const &captured, bool const &promoteTo, Check const &check);
+bool isLegal(Color const &c, Position const &p);
+const std::vector<Move> pruneIllegal(std::vector<Move> &moveList, Position const &p);
 
 
 // makemove.cpp

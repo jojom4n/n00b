@@ -24,7 +24,7 @@ const short negamax(Position &p, short depth, short alpha, short beta)
 		if (score > alpha)
 			alpha = score;
 	}
-
+	
 	return alpha;
 }
 

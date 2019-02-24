@@ -52,7 +52,7 @@ std::vector<Move> moveGeneration(Position const &board)
 			while (moves) { // scan collected moves, determine their type and add them to list
 				Square squareTo = Square(bitscan_reset(moves));
 				MoveType type = setType(p, moves, board, squareFrom, squareTo);	
-				check = isCheck(p, squareTo, board); // is the move a check to opponent king?
+				check = isChecking(p, squareTo, board); // is the move a check to opponent king?
 				Piece captured = board.idPiece(squareTo).piece;
 				
 				if (captured == KING) break; // captured can't be enemy king
@@ -78,6 +78,7 @@ std::vector<Move> moveGeneration(Position const &board)
 
 	castleMoves(board, check);
 	enPassant(board, check);
+	moveList = pruneIllegal(moveList, board);
 	return moveList;
 }
 
@@ -203,7 +204,7 @@ void enPassant(Position const &p, Check const &isCheck)
 }
 
 
-const Check isCheck(Piece const &piece, Square const &sq, Position const &p) {
+const Check isChecking(Piece const &piece, Square const &sq, Position const &p) {
 	Square opponentKing = Square(bitscan_fwd(p.getPieces(Color(!p.getTurn()), KING)));
 	Bitboard attacksToKing{};
 	const Bitboard occ = p.getPosition();
@@ -291,3 +292,64 @@ const Move composeMove(Square const &squareFrom, Square const &squareTo,
 	return move;
 }
 
+
+bool isLegal(Color const &c, Position const &p)
+{
+	Square kingPos = p.getPieceOnSquare(c, KING)[0];
+	Bitboard opponent{}, attackedBy{}, occ = p.getPosition();
+	
+	// ROOK
+	opponent = p.getPieces(Color(!c), ROOK);
+	attackedBy = MoveTables.rook(kingPos, occ);
+	if (attackedBy &= opponent) return false;
+	
+	// BISHOP
+	opponent = p.getPieces(Color(!c), BISHOP);
+	attackedBy = MoveTables.bishop(kingPos, occ);
+	if (attackedBy &= opponent) return false;
+	
+	// QUEEN
+	opponent = p.getPieces(Color(!c), QUEEN);
+	attackedBy = MoveTables.rook(kingPos, occ) | MoveTables.bishop(kingPos, occ);
+	if (attackedBy &= opponent) return false;
+	
+	// KNIGHT
+	opponent = p.getPieces(Color(!c), KNIGHT);
+	attackedBy = MoveTables.knight[kingPos];
+	if (attackedBy &= opponent) return false;
+	
+	// KING
+	opponent = p.getPieces(Color(!c), KING);
+	attackedBy = MoveTables.king[kingPos];
+	if (attackedBy &= opponent) return false;
+
+	//PAWNS
+	opponent = p.getPieces(Color(!c), PAWN);
+	(c == WHITE) ? attackedBy = MoveTables.blackPawn(opponent, occ) : attackedBy = MoveTables.whitePawn(opponent, occ);
+	if (attackedBy &= opponent) return false;
+
+	return true;
+}
+
+
+const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position const &p)
+{
+	Position copy = p;
+	
+	for (auto it = moveList.begin(); it != moveList.end(); )
+	{
+		Color c = Color(((C64(1) << 1) - 1) & (*it >> 11));
+		doMove(*it, copy);
+		
+		if (!(isLegal(c, copy))) {
+			undoMove(*it, copy, p);
+			it = moveList.erase(it);
+		}
+		else {
+			undoMove(*it, copy, p);
+			it++;
+		} // end if
+	} // end for
+
+	return moveList;
+}

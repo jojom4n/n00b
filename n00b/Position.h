@@ -23,6 +23,9 @@ class Position
 public:
 	Position();
 	~Position();
+	
+	std::vector<ushort> WhiteEPmg_; // stores en-passant during move generation
+	std::vector<ushort> BlackEPmg_;
 
 	void setNew();
 	void resetPosition();
@@ -32,6 +35,11 @@ public:
 
 	constexpr Square getEnPassant() const { return enPassantSquare_; }
 	void setEnPassant(const Square &square) { enPassantSquare_ = square; }
+
+	/* size_t getEP_mg() const { return EP_movegen_.size(); }
+	Square getEP_mgValue(ushort const &i) const { return EP_movegen_[i]; }
+	void setEP_mg(const Square &square) { EP_movegen_.push_back(square); }
+	void resetEP_mg() { EP_movegen_.clear(); EP_movegen_.push_back(turn_); } */
 	
 	constexpr ushort getMoveNumber() const { return moveNumber_; }
 	void setMoveNumber(ushort const &move) { moveNumber_ = move; }

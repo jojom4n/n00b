@@ -6,7 +6,7 @@
 extern struct LookupTable MoveTables;
 std::vector<Move> moveList{};
 
-const std::vector<Move> moveGeneration(Position const &p)
+const std::vector<Move> moveGeneration(Position &p)
 {
 	moveList.clear();
 	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
@@ -17,7 +17,7 @@ const std::vector<Move> moveGeneration(Position const &p)
 	Check check{};
 	const Bitboard occupancy = p.getPosition();
 	const Bitboard ownPieces = p.getPosition(sideToMove);
-
+	
 	for (Piece piece = KING; piece <= PAWN; piece++) {
 		Bitboard bb = p.getPieces(sideToMove, piece);
 		
@@ -46,7 +46,7 @@ const std::vector<Move> moveGeneration(Position const &p)
 			case PAWN: 
 				/* For pawns, it's a bit more complicated, because they have no lookup tables.
 				For readibility, better pass the params to an appropriate function */
-				moves = pawnMoves(sideToMove, squareFrom, occupancy, ownPieces);		
+				moves = pawnMoves(p, squareFrom);	
 				break;
 			}
 
@@ -96,7 +96,25 @@ const std::vector<Move> moveGeneration(Position const &p)
 	if (!(underCheck(sideToMove, p))) // if King is not under check, calculate castles too
 		castleMoves(p, check);
 
-	enPassant(p, check);
+	if (!(p.getEnPassant() == SQ_EMPTY))
+		enPassant(p, p.getEnPassant(), sideToMove);
+
+	if (sideToMove == WHITE) {
+		if (p.WhiteEPmg_.size() > 0) {
+			for (auto &elem : p.WhiteEPmg_)
+				enPassant(p, Square(elem), sideToMove);
+			p.WhiteEPmg_.clear();
+		}
+	}
+	else if (sideToMove == BLACK) {
+		if (p.BlackEPmg_.size() > 0) {
+			for (auto &elem : p.BlackEPmg_)
+				enPassant(p, Square(elem), sideToMove);
+			p.BlackEPmg_.clear();
+		}
+	}
+
+
 	moveList = pruneIllegal(moveList, p); // prune the invalid moves from moveList
 	return moveList;
 }
@@ -131,19 +149,25 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 }
 
 
-const Bitboard pawnMoves(Color const &c, Square const &from, Bitboard const &occ, Bitboard const &own)
+const Bitboard pawnMoves(Position &p, Square const &from)
 {
-	Bitboard m{};
-
+	Color c = p.getTurn();
+	Bitboard m{}, occ = p.getPosition(), own = p.getPosition(c);
+	
 	(c == WHITE) ? m |= ((C64(1) << from) << 8) & ~occ
 		: m |= ((C64(1) << from) >> 8) & ~occ;
 
 	// Is the pawn on 2nd rank(or 7th rank, for black)? If yes, let it move even two squares ahead
-	if (c == WHITE && (from / 8) == RANK_2)
+	if (c == WHITE && (from / 8) == RANK_2) {
 		m ^= (m << 8) & ~occ;
-	else if (c == BLACK && (from / 8) == RANK_7)
+		if (m)
+			p.BlackEPmg_.push_back(bitscan_fwd(m)); // store EP square for next enemy's move
+	} 
+	else if (c == BLACK && (from / 8) == RANK_7) {
 		m ^= (m >> 8) & ~occ;
-
+		if (m)
+			p.WhiteEPmg_.push_back(bitscan_rvs(m)); // store EP square for next enemy's move
+		}
 	/* Set in an empty bitboard the bit corresponding to 'from' (i.e. where pawn is)
 	and compute if it can attack from there opponent's pieces*/
 	(c == WHITE) ? m |= MoveTables.whitePawn(C64(1) << from, ~own) & occ
@@ -199,44 +223,112 @@ void castleMoves(Position const &p, Check const &isCheck)
 }
 
 
-void enPassant(Position const &p, Check const &isCheck)
+void enPassant(Position const &p, Square const &enPassant, Color const &c)
 {
-	Color c = p.getTurn();
+	Bitboard moves{};
+	Move m{};
+	Check isCheck{};
 
-	if (!(p.getEnPassant() == SQ_EMPTY)) {	// is there an en-passant square in the position?
-		Square const enpassant = p.getEnPassant();
-		Bitboard moves{};
-		Move m;
-
+	if (!(enPassant % 8) == FILE_A && !((enPassant % 8) == FILE_H))
 		switch (c) {
 		case WHITE: // is there a white pawn attacking the en-passant square?
-			if (p.idPiece(Square(enpassant - 7)).color == WHITE && p.idPiece(Square(enpassant - 7)).piece == PAWN) {
-				Square squareFrom = Square(enpassant - 7);
-				m = composeMove(squareFrom, enpassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+			if (p.idPiece(Square(enPassant - 7)).color == WHITE && p.idPiece(Square(enPassant - 7)).piece == PAWN) {
+				Square squareFrom = Square(enPassant - 7);
+				Bitboard attacksToKing{}, occ = p.getPosition(),
+					oppKing = p.getPieces(WHITE, KING);
+				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				moveList.push_back(m);
 			}
-			else if (p.idPiece(Square(enpassant - 9)).color == WHITE && p.idPiece(Square(enpassant - 9)).piece == PAWN) {
-				Square squareFrom = Square(enpassant - 9);
-				m = composeMove(squareFrom, enpassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+			else if (p.idPiece(Square(enPassant - 9)).color == WHITE && p.idPiece(Square(enPassant - 9)).piece == PAWN) {
+				Square squareFrom = Square(enPassant - 9);
+				Bitboard attacksToKing{}, occ = p.getPosition(),
+					oppKing = p.getPieces(WHITE, KING);
+				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				moveList.push_back(m);
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
-			if (p.idPiece(Square(enpassant + 7)).color == BLACK && p.idPiece(Square(enpassant + 7)).piece == PAWN) {
-				Square squareFrom = Square(enpassant + 7);
-				m = composeMove(squareFrom, enpassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+			if (p.idPiece(Square(enPassant + 7)).color == BLACK && p.idPiece(Square(enPassant + 7)).piece == PAWN) {
+				Square squareFrom = Square(enPassant + 7);
+				Bitboard attacksToKing{}, occ = p.getPosition(), 
+					oppKing = p.getPieces(WHITE, KING);
+				attacksToKing|= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				moveList.push_back(m);
 			}
-			else if (p.idPiece(Square(enpassant + 9)).color == BLACK && p.idPiece(Square(enpassant + 9)).piece == PAWN) {
-				Square squareFrom = Square(enpassant + 9);
-				m = composeMove(squareFrom, enpassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+			else if (p.idPiece(Square(enPassant + 9)).color == BLACK && p.idPiece(Square(enPassant + 9)).piece == PAWN) {
+				Square squareFrom = Square(enPassant + 9);
+				Bitboard attacksToKing{}, occ = p.getPosition(),
+					oppKing = p.getPieces(WHITE, KING);
+				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				moveList.push_back(m);
 			}
 			break;
 		} // end switch	
 
-		moveList.push_back(m);
-	} // end if
+	if ((enPassant %8) == FILE_A)
+		switch (c) {
+		case WHITE: // is there a white pawn attacking the en-passant square?
+			if (p.idPiece(Square(enPassant - 7)).color == WHITE && p.idPiece(Square(enPassant - 7)).piece == PAWN) {
+				Square squareFrom = Square(enPassant - 7);
+				Bitboard attacksToKing{}, occ = p.getPosition(),
+					oppKing = p.getPieces(WHITE, KING);
+				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				moveList.push_back(m);
+			}
+			break;
+		case BLACK: // is there a black pawn attacking the en-passant square?
+			if (p.idPiece(Square(enPassant + 9)).color == BLACK && p.idPiece(Square(enPassant + 9)).piece == PAWN) {
+				Square squareFrom = Square(enPassant + 9);
+				Bitboard attacksToKing{}, occ = p.getPosition(),
+					oppKing = p.getPieces(WHITE, KING);
+				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				moveList.push_back(m);
+			}
+			break;
+		} // end switch	
+
+	if ((enPassant % 8 == FILE_H))
+		switch (c) {
+		case WHITE: // is there a white pawn attacking the en-passant square?
+			if (p.idPiece(Square(enPassant - 9)).color == WHITE && p.idPiece(Square(enPassant - 9)).piece == PAWN) {
+				Square squareFrom = Square(enPassant - 9);
+					Bitboard attacksToKing{}, occ = p.getPosition(),
+					oppKing = p.getPieces(WHITE, KING);
+					attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+					(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+					m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+					moveList.push_back(m);
+			}
+			break;
+		case BLACK: // is there a black pawn attacking the en-passant square?
+			if (p.idPiece(Square(enPassant + 7)).color == BLACK && p.idPiece(Square(enPassant + 7)).piece == PAWN) {
+				Square squareFrom = Square(enPassant + 7);
+				Bitboard attacksToKing{}, occ = p.getPosition(),
+					oppKing = p.getPieces(WHITE, KING);
+				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				moveList.push_back(m);
+			}
+			break;
+		} // end switch	
 }
 
 
-const Check isChecking(Piece const &piece, Square const &sq, Position const &p) {
+const Check isChecking(Piece const &piece, Square const &sq, Position const &p)
+{
 	Bitboard opponentKing = p.getPieces(Color(!p.getTurn()), KING);
 	Bitboard attacksToKing{};
 	const Bitboard occ = p.getPosition();

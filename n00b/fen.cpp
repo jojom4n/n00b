@@ -271,6 +271,9 @@ void fenParser(std::stringstream &fen, Position &board)
 	board.setHalfMove(std::stoi(buffer[6], nullptr, 0)); // set half move
 
 	board.setMoveNumber(std::stoi(buffer[7], nullptr, 0)); // set move number
+
+	board.BlackEPmg_.clear();
+	board.WhiteEPmg_.clear();
 	   	 
 	displayBoard(board);
 }

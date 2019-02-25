@@ -43,11 +43,11 @@ const char printPiece(PieceID const &ID);
 
 
 // movegen.cpp
-const std::vector<Move> moveGeneration(Position const &p);
+const std::vector<Move> moveGeneration(Position &p);
 const std::vector<Move> generateOnlyKing(Color const &c, Position const &p);
-const Bitboard pawnMoves(Color const &c, Square const &from, Bitboard const &occ, Bitboard const &own);
+const Bitboard pawnMoves(Position &p, Square const &from);
 void castleMoves(Position const &p, Check const &isCheck);
-void enPassant(Position const &p, Check const &isCheck);
+void enPassant(Position const &p, Square const &enPassant, Color const &c);
 const Check isChecking(Piece const &piece, Square const &squareTo, Position const &board);
 const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to);
 const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, MoveType const &type,
@@ -62,8 +62,9 @@ void undoMove(Move const &m, Position &p, Position const &backup);
 
 
 // perft.cpp
-unsigned long long perft(short depth, Position const &p);
-unsigned long long divide(short depth, Position const &p);
+template<bool Root> uint64_t perft(short depth, Position &p);
+// unsigned long long divide(short depth, Position &p);
+
 
 // evaluation.cpp
 const short evaluate(Position const &pos);
@@ -107,3 +108,49 @@ Piece operator++(Piece &p, int);
 
 
 #endif
+
+template<bool Root>
+inline uint64_t perft(short depth, Position &p)
+{
+	const std::vector<Move> moveList = moveGeneration(p);
+	uint64_t cnt, nodes = 0;
+	Position copy = p;
+	const bool leaf = (depth == 1);
+
+	for (const auto& m : moveList)
+	{
+		if (Root && depth == 0)
+			cnt = 1, nodes++;
+		else
+		{
+			doMove(m, copy);
+			cnt = leaf ? 1 : perft<false>(depth - 1, copy);
+			nodes += cnt;
+			undoMove(m, copy, p);
+		}
+		if (Root) {
+			Square squareFrom{}, squareTo{};
+			squareFrom = Square(((C64(1) << 6) - 1) & (m >> 20));
+			squareTo = Square(((C64(1) << 6) - 1) & (m >> 14));
+			ushort promotedTo = ((C64(1) << 3) - 1) & (m >> 1);
+			if (promotedTo)
+				switch (promotedTo) {
+				case PAWN_TO_QUEEN:
+					std::cout << "q";
+					break;
+				case PAWN_TO_KNIGHT:
+					std::cout << "n";
+					break;
+				case PAWN_TO_ROOK:
+					std::cout << "r";
+					break;
+				case PAWN_TO_BISHOP:
+					std::cout << "b";
+					break;
+				}
+			std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
+			std::cout << ": " << cnt << std::endl;
+		}
+	}
+	return nodes;
+}

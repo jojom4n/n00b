@@ -63,7 +63,7 @@ void undoMove(Move const &m, Position &p, Position const &backup);
 
 // perft.cpp
 unsigned long long perft(short depth, Position const &p);
-void divide(short depth, Position const &p);
+unsigned long long divide(short depth, Position const &p);
 
 // evaluation.cpp
 const short evaluate(Position const &pos);

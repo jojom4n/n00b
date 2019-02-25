@@ -82,9 +82,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		short depth = stoi(inputStream.str().substr(6, 1));
 		if (depth > 0) {
 			auto t1 = Clock::now();
-			unsigned long long nodes = perft(depth, board);
+			unsigned long long nodes = divide(depth, board);
 			auto t2 = Clock::now();
-			std::cout << "Nodes: " << nodes << std::endl;
+			std::cout << "Total nodes: " << nodes << std::endl;
 			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
 		}
 		else

@@ -22,10 +22,12 @@ unsigned long long perft(short depth, Position const &p)
 }
 
 
-/* void divide(short depth, Position const & p)
+unsigned long long divide(short depth, Position const & p)
 {
+	unsigned long long totalNodes = 0;
 	std::vector<Move> moveList = moveGeneration(p);
 	Position copy = p;
+
 	for (auto &elem : moveList) {
 		Square squareFrom{}, squareTo{};
 		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 20));
@@ -47,10 +49,12 @@ unsigned long long perft(short depth, Position const &p)
 				std::cout << "b";
 				break;
 			}
-		perft(depth, p);
-		totalNodes += nodes;
+		unsigned long long nodes = 0;
+		doMove(elem, copy);
+		nodes += perft(depth - 1, p);
 		std::cout << ": " << nodes << std::endl;
-		// undoMove(elem, copy, p);
+		undoMove(elem, copy, p);
+		totalNodes += nodes;
 	}
-	std::cout << ": " << nodes << std::endl;
-} */
+	return totalNodes;
+}

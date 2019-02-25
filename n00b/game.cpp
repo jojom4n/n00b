@@ -78,6 +78,18 @@ void readCommand(std::stringstream &inputStream, Position &board)
 			std::cout << "It's CHECKMATE!" << std::endl;
 		}	
 	}
+	else if (inputStream.str().substr(0, 5) == "perft" && numWords == 2) {
+		short depth = stoi(inputStream.str().substr(6, 1));
+		if (depth > 0) {
+			auto t1 = Clock::now();
+			unsigned long long nodes = perft(depth, board);
+			auto t2 = Clock::now();
+			std::cout << "Nodes: " << nodes << std::endl;
+			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
+		}
+		else
+			std::cout << "Invalid depth.\n";
+	}
 	else
 		std::cout << "Invalid command.\n";
 }

@@ -51,7 +51,7 @@ void enPassant(Position const &p, Check const &isCheck);
 const Check isChecking(Piece const &piece, Square const &squareTo, Position const &board);
 const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to);
 const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, MoveType const &type,
-	Piece const &captured, bool const &promoteTo, Check const &check);
+	Piece const &captured, ushort const &promoteTo, Check const &check);
 short underCheck(Color const &c, Position const &p);
 const std::vector<Move> pruneIllegal(std::vector<Move> &moveList, Position const &p);
 
@@ -60,6 +60,10 @@ const std::vector<Move> pruneIllegal(std::vector<Move> &moveList, Position const
 void doMove(Move const &m, Position &p);
 void undoMove(Move const &m, Position &p, Position const &backup);
 
+
+// perft.cpp
+unsigned long long perft(short depth, Position const &p);
+void divide(short depth, Position const &p);
 
 // evaluation.cpp
 const short evaluate(Position const &pos);

@@ -104,46 +104,29 @@ void displayMoveList(Position const &board, std::vector<Move> const &m) {
 	for (auto& elem : m)
 	{
 		Square squareFrom{}, squareTo{};
-		ushort moveType = ((C64(1) << 3) - 1) & (elem >> 5);
-		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 18));
-		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 12));
-		bool promotedTo = ((C64(1) << 1) - 1) & (elem >> 1);
-		bool check = ((C64(1) << 1) - 1) & (elem);
+		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 20));
+		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 14));
+		ushort promotedTo = ((C64(1) << 3) - 1) & (elem >> 1);
 
-		switch (board.idPiece(squareFrom).piece) {
-		case PAWN:
-			if (moveType == CAPTURE || moveType == EN_PASSANT)
-				output += squareToStringMap[squareFrom] + "x";
-			else if (moveType == PROMOTION) {
-				char c = ' ';
-				(promotedTo == 0) ? c = 'N' : c = 'Q';
-				output += squareToStringMap[squareTo] + "=";
-				output += c;
-			}
-			break;
-		case ROOK:
-			if ( (moveType == CASTLE_Q) && ( (squareFrom == A8) || (squareFrom == A1) ))
-				output += "0-0-0";
-			else if ( (moveType == CASTLE_K) && ( (squareFrom == H8) || (squareFrom == H1) ))
-				output += "0-0";
-			else {
-				output += printPiece(board.idPiece(squareFrom));
-				if (moveType == CAPTURE) output += "x";
-			}
-			break;
-		default:
-			output += printPiece(board.idPiece(squareFrom));
-			if (moveType == CAPTURE) output += "x";
-			break;
-		}
-
-		if (moveType != PROMOTION && moveType != CASTLE_Q && moveType != CASTLE_K) 
-			output += squareToStringMap[squareTo];
+		output += squareToStringMap[squareFrom];
+		output += squareToStringMap[squareTo];
 		
-		if (moveType == EN_PASSANT) output += " e.p."; 
-
-		if (check == CHECK) output += "+";
-
+		if (promotedTo)
+			switch (promotedTo) {
+			case PAWN_TO_QUEEN:
+				output += "q";
+				break;
+			case PAWN_TO_KNIGHT:
+				output += "n";
+				break;
+			case PAWN_TO_ROOK:
+				output += "r";
+				break;
+			case PAWN_TO_BISHOP:
+				output += "b";
+				break;
+			}
+		
 		output += "\t";
 	}
 	

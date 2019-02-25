@@ -15,10 +15,12 @@ const bool fenValidate(std::stringstream &fen)
 	while (fen >> word)
 		buffer.push_back(word); // extract from the input stream to a string vector
 	
+	if (!(buffer.size() == 8)) // is FEN complete?
+		return false;
+								
 	/* Validate the position inside the FEN. To be valid, we must have 8 rows, 8 files and two kings.
 	Besides, characters cannot be different from 0-8 and piece letters.
 	rnbqkbnr / pppppppp / 8 / 8 / 8 / 8 / PPPPPPPP / RNBQKBNR w KQkq - 0 1 */
-
 	ushort rows{}, files{};
 	bool whiteKing{}, blackKing{};
 	

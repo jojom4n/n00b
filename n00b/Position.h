@@ -65,6 +65,8 @@ public:
 	const ushort countPieceType(Color const &color, Piece const &piece) const;
 
 	const std::vector<Square> getPieceOnSquare(Color const &color, Piece const &piece) const;
+
+	const bool isSquareAttackedBy(Color const &color, Square const &square) const;
 };
 
 #endif

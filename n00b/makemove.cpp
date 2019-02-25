@@ -5,13 +5,13 @@
 void doMove(Move const &m, Position &p)
 {
 	Square squareFrom{}, squareTo{};
-	ushort moveType = ((C64(1) << 3) - 1) & (m >> 5);
-	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 18));
-	squareTo = Square(((C64(1) << 6) - 1) & (m >> 12));
-	Color color = Color(((C64(1) << 1) - 1) & (m >> 11));
-	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 8));
-	Piece captured = Piece(((C64(1) << 3) - 1) & (m >> 2));
-	bool promotedTo = ((C64(1) << 1) - 1) & (m >> 1);
+	ushort moveType = ((C64(1) << 3) - 1) & (m >> 7);
+	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 20));
+	squareTo = Square(((C64(1) << 6) - 1) & (m >> 14));
+	Color color = Color(((C64(1) << 1) - 1) & (m >> 13));
+	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 10));
+	Piece captured = Piece(((C64(1) << 3) - 1) & (m >> 4));
+	ushort promotedTo = ((C64(1) << 3) - 1) & (m >> 1);
 	bool check = ((C64(1) << 1) - 1) & (m);
 
 	switch (moveType)
@@ -28,7 +28,7 @@ void doMove(Move const &m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
-		p.setTurn(Color(!p.getTurn()));
+		p.setTurn(Color(!color));
 		break;
 	case CAPTURE:
 		p.removePiece(color, piece, squareFrom);
@@ -39,7 +39,7 @@ void doMove(Move const &m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(0);
-		p.setTurn(Color(!p.getTurn()));
+		p.setTurn(Color(!color));
 		break;
 	case PROMOTION:
 		p.removePiece(color, piece, squareFrom);
@@ -54,35 +54,33 @@ void doMove(Move const &m, Position &p)
 
 		(promotedTo == PAWN_TO_KNIGHT) ? p.putPiece(color, KNIGHT, squareTo) : p.putPiece(color, QUEEN, squareTo);
 
-		p.setTurn(Color(!p.getTurn()));
+		p.setTurn(Color(color));
 		break;
 	case CASTLE_Q: {
-		Square kingPos = p.getPieceOnSquare(color, KING)[0];
 		p.removePiece(color, piece, squareFrom);
-		p.removePiece(color, KING, Square(kingPos));
+		(color == WHITE) ? p.removePiece(color, ROOK, A1) : p.removePiece(color, ROOK, A8);
 		p.putPiece(color, piece, squareTo);
-		p.putPiece(color, KING, Square(kingPos - 2));
+		(color == WHITE) ? p.putPiece(color, ROOK, D1) : p.putPiece(color, ROOK, D8); 
 
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
 		p.setCastle(color, NONE);
-		p.setTurn(Color(!p.getTurn()));
+		p.setTurn(Color(!color));
 		break;	}
 	case CASTLE_K: {
-		Square kingPos = p.getPieceOnSquare(color, KING)[0];
 		p.removePiece(color, piece, squareFrom);
-		p.removePiece(color, KING, Square(kingPos));
+		(color == WHITE) ? p.removePiece(color, ROOK, H1) : p.removePiece(color, ROOK, H8);
 		p.putPiece(color, piece, squareTo);
-		p.putPiece(color, KING, Square(kingPos + 2));
+		(color == WHITE) ? p.putPiece(color, ROOK, F1) : p.putPiece(color, ROOK, F8);
 
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
 		p.setCastle(color, NONE);
-		p.setTurn(Color(!p.getTurn()));
+		p.setTurn(Color(!color));
 		break; }
 	case EN_PASSANT:
 		p.removePiece(color, piece, squareFrom);
@@ -97,12 +95,33 @@ void doMove(Move const &m, Position &p)
 
 		p.setHalfMove(0);
 		p.setEnPassant(SQ_EMPTY);
-		p.setTurn(Color(!p.getTurn()));
+		p.setTurn(Color(!color));
 		break;
 	}
 
 	if (!(moveType == EN_PASSANT) && !(p.getEnPassant() == SQ_EMPTY))
 		p.setEnPassant(SQ_EMPTY);
+
+	// if King moves, no more castle
+	if (!(moveType == CASTLE_Q) && !(moveType == CASTLE_K) && (piece == KING))
+		p.setCastle(color, NONE);
+
+	// if Rook moves, no more castle on that side
+	switch (color)
+	{
+	case WHITE:
+		if (!(moveType == CASTLE_Q) && (piece == ROOK) && (squareFrom == A1))
+			p.setCastle(WHITE, p.getCastle(WHITE) - 2);
+		if (!(moveType == CASTLE_K) && (piece == ROOK) && (squareFrom == H1))
+			p.setCastle(WHITE, p.getCastle(WHITE) - 1);
+		break;
+	case BLACK:
+		if (!(moveType == CASTLE_Q) && (piece == ROOK) && (squareFrom == A8))
+			p.setCastle(BLACK, p.getCastle(BLACK) - 2);
+		if (!(moveType == CASTLE_K) && (piece == ROOK) && (squareFrom == H8))
+			p.setCastle(BLACK, p.getCastle(BLACK) - 1);
+		break;
+	}
 }
 
 

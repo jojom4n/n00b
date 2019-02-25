@@ -7,16 +7,16 @@
 #include <array>
 #include <map>
 #include <vector>
+#include <chrono>
 
 #define C64(constantuint64_t) constantuint64_t##ULL
 
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
 
+using Clock = std::chrono::high_resolution_clock;
 using ushort = unsigned short;
-
 using Bitboard = uint64_t;
-
 using Move = uint32_t;
 
 
@@ -42,7 +42,7 @@ enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE_K, 
 
 enum Check : const bool {NO_CHECK, CHECK};
 
-enum {PAWN_TO_QUEEN, PAWN_TO_KNIGHT};
+enum {PAWN_TO_QUEEN = 1, PAWN_TO_KNIGHT, PAWN_TO_ROOK, PAWN_TO_BISHOP};
 
 enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
 

@@ -161,7 +161,7 @@ void doMove(Move const &m, Position &p)
 		p.setCastle(BLACK, p.getCastle(BLACK) - KINGSIDE);
 	
 	else if (color == WHITE && captured == ROOK && squareTo == A8 
-		&& (p.getCastle(BLACK) == KINGSIDE || p.getCastle(BLACK) == ALL))
+		&& (p.getCastle(BLACK) == QUEENSIDE || p.getCastle(BLACK) == ALL))
 		p.setCastle(BLACK, p.getCastle(BLACK) - QUEENSIDE);
 }
 

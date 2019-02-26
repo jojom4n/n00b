@@ -45,9 +45,9 @@ const char printPiece(PieceID const &ID);
 // movegen.cpp
 const std::vector<Move> moveGeneration(Position &p);
 const std::vector<Move> generateOnlyKing(Color const &c, Position const &p);
-const Bitboard pawnMoves(Position &p, Square const &from);
+const Bitboard pawnMoves(Position const &p, Square const &from);
 void castleMoves(Position const &p, Check const &isCheck);
-void enPassant(Position const &p, Square const &enPassant, Color const &c);
+void enPassant(Position &p, Square const &enPassant, Color const &c);
 const Check isChecking(Piece const &piece, Square const &squareTo, Position const &board);
 const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to);
 const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, MoveType const &type,
@@ -62,8 +62,8 @@ void undoMove(Move const &m, Position &p, Position const &backup);
 
 
 // perft.cpp
-template<bool Root> uint64_t perft(short depth, Position &p);
-// unsigned long long divide(short depth, Position &p);
+template<bool Root> uint64_t divide(short depth, Position &p);
+unsigned long long perft(short depth, Position &p);
 
 
 // evaluation.cpp
@@ -110,7 +110,7 @@ Piece operator++(Piece &p, int);
 #endif
 
 template<bool Root>
-inline uint64_t perft(short depth, Position &p)
+inline uint64_t divide(short depth, Position &p)
 {
 	const std::vector<Move> moveList = moveGeneration(p);
 	uint64_t cnt, nodes = 0;
@@ -124,7 +124,7 @@ inline uint64_t perft(short depth, Position &p)
 		else
 		{
 			doMove(m, copy);
-			cnt = leaf ? 1 : perft<false>(depth - 1, copy);
+			cnt = leaf ? 1 : divide<false>(depth - 1, copy);
 			nodes += cnt;
 			undoMove(m, copy, p);
 		}

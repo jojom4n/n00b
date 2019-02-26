@@ -15,7 +15,7 @@ const bool fenValidate(std::stringstream &fen)
 	while (fen >> word)
 		buffer.push_back(word); // extract from the input stream to a string vector
 	
-	if (!(buffer.size() == 8)) // is FEN complete?
+	if (buffer.size() < 6) // is FEN complete?
 		return false;
 								
 	/* Validate the position inside the FEN. To be valid, we must have 8 rows, 8 files and two kings.
@@ -121,7 +121,7 @@ const bool fenValidate(std::stringstream &fen)
 	else if (!(stringToSquareMap[buffer[5]]))
 		return false;
 
-	// check if half-move and move number are real digit
+	/* // check if half-move and move number are real digit
 	for (int i = 0; i < buffer[6].length(); i++) {
 		char c = ' ';
 		c = buffer[6][i];
@@ -134,7 +134,7 @@ const bool fenValidate(std::stringstream &fen)
 		c = buffer[7][i];
 		if (!isdigit(c))
 			return false;
-	}
+	} */
 
 	// if none of the above conditions occurs, then FEN is valid
 	return true;
@@ -268,12 +268,15 @@ void fenParser(std::stringstream &fen, Position &board)
 	else
 		board.setEnPassant(SQ_EMPTY);
 
-	board.setHalfMove(std::stoi(buffer[6], nullptr, 0)); // set half move
+	if (buffer.size() >= 7)
+		board.setHalfMove(std::stoi(buffer[6], nullptr, 0)); // set half move
+	else
+		board.setHalfMove(0);
 
-	board.setMoveNumber(std::stoi(buffer[7], nullptr, 0)); // set move number
+	if (buffer.size() >= 8)
+		board.setMoveNumber(std::stoi(buffer[7], nullptr, 0)); // set move number
+	else
+		board.setMoveNumber(1);
 
-	board.BlackEPmg_.clear();
-	board.WhiteEPmg_.clear();
-	   	 
 	displayBoard(board);
 }

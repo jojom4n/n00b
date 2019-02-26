@@ -168,7 +168,7 @@ const bool Position::isSquareAttackedBy(Color const &color, Square const &square
 	//PAWNS
 	enemy = getPieces(color, PAWN); // get pawn's bitboard
 	// does enemy pawn's attack mask...
-	(color == WHITE) ? mask = MoveTables.blackPawn(enemy, occ) : mask = MoveTables.whitePawn(enemy, occ);
+	(color == WHITE) ? mask = MoveTables.whitePawn(enemy, sq) : mask = MoveTables.blackPawn(enemy, sq);
 	if (mask &= sq) // ...intersect square?
 		return true;
 	

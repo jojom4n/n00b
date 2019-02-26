@@ -235,5 +235,5 @@ const Bitboard LookupTable::whitePawn(Bitboard const &pawn, Bitboard const &occu
 
 const Bitboard LookupTable::blackPawn(Bitboard const &pawn, Bitboard const &occupancy) const
 {
-	return (((pawn >> 7) & NOT_FILE_A) | (pawn >> 9) & NOT_FILE_H) & occupancy;
+	return (((pawn >> 7) & NOT_FILE_A) | ((pawn >> 9) & NOT_FILE_H)) & occupancy;
 }

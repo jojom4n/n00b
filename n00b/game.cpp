@@ -82,8 +82,19 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		short depth = stoi(inputStream.str().substr(6, 1));
 		if (depth > 0) {
 			auto t1 = Clock::now();
+			std::cout << perft(depth, board) << std::endl;
 			auto t2 = Clock::now();
-			std::cout << perft<true>(depth, board) << std::endl;
+			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
+		}
+		else
+			std::cout << "Invalid depth.\n";
+	}
+	else if (inputStream.str().substr(0, 6) == "divide" && numWords == 2) {
+		short depth = stoi(inputStream.str().substr(7, 1));
+		if (depth > 0) {
+			auto t1 = Clock::now();
+			std::cout << divide<true>(depth, board) << std::endl;
+			auto t2 = Clock::now();
 			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
 		}
 		else

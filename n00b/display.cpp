@@ -104,9 +104,9 @@ void displayMoveList(Position const &board, std::vector<Move> const &m) {
 	for (auto& elem : m)
 	{
 		Square squareFrom{}, squareTo{};
-		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 20));
-		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 14));
-		ushort promotedTo = ((C64(1) << 3) - 1) & (elem >> 1);
+		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 19));
+		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 13));
+		ushort promotedTo = ((C64(1) << 3) - 1) & (elem);
 
 		output += squareToStringMap[squareFrom];
 		output += squareToStringMap[squareTo];

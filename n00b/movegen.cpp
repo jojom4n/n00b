@@ -14,7 +14,6 @@ const std::vector<Move> moveGeneration(Position &p)
 	if (underCheck(sideToMove, p) > 1)
 		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
 
-	Check check{};
 	const Bitboard occupancy = p.getPosition();
 	const Bitboard ownPieces = p.getPosition(sideToMove);
 	
@@ -59,34 +58,27 @@ const std::vector<Move> moveGeneration(Position &p)
 				sq |= C64(1) << squareTo;
 				MoveType type = setType(piece, sq, p, squareFrom, squareTo);	
 				
-				if (!(type == PROMOTION)) // is the move a check to opponent king?
-					check = isChecking(piece, squareTo, p); 
-
 				Piece captured = p.idPiece(squareTo).piece;
 				
 				if (captured == KING) break; // captured can't be enemy king
 
 				if (type == CAPTURE) {
-					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0, check);
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
 					moveList.push_back(m);
 				}
 				else if (type == PROMOTION) { 
 					// compose one moves for each possible promotion
-					check = isChecking(KNIGHT, squareTo, p);
-					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT, check);
-					check = isChecking(QUEEN, squareTo, p);
-					Move m2 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN, check);
-					check = isChecking(ROOK, squareTo, p);
-					Move m3 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_ROOK, check);
-					check = isChecking(BISHOP, squareTo, p);
-					Move m4 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_BISHOP, check);
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT);
+					Move m2 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN);
+					Move m3 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_ROOK);
+					Move m4 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_BISHOP);
 					moveList.push_back(m);
 					moveList.push_back(m2);
 					moveList.push_back(m3);
 					moveList.push_back(m4);
 				}
 				else {
-					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0, check);
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
 					moveList.push_back(m);
 				}
 			} // end while (moves)
@@ -94,7 +86,7 @@ const std::vector<Move> moveGeneration(Position &p)
 	} // end for loop
 
 	if (!(underCheck(sideToMove, p))) // if King is not under check, calculate castles too
-		castleMoves(p, check);
+		castleMoves(p);
 
 	if (!(p.getEnPassant() == SQ_EMPTY))
 		enPassant(p, p.getEnPassant(), sideToMove);
@@ -119,11 +111,11 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 		Piece captured = p.idPiece(squareTo).piece;
 
 		if (type == CAPTURE) {
-			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0, NO_CHECK);
+			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0);
 			moveList.push_back(m);
 		}
 		else {
-			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0, NO_CHECK);
+			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0);
 			moveList.push_back(m);
 		}
 	}
@@ -156,7 +148,7 @@ const Bitboard pawnMoves(Position const &p, Square const &from)
 }
 
 
-void castleMoves(Position const &p, Check const &isCheck)
+void castleMoves(Position const &p)
 {
 	Move m{};
 	Color c = p.getTurn();
@@ -168,7 +160,7 @@ void castleMoves(Position const &p, Check const &isCheck)
 			&& (	!(p.isSquareAttackedBy(Color(!c), C8))	)   // C8 and D8 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), D8))	)	)
 		{  
-			m = composeMove(E8, C8, c, KING, CASTLE_Q, NO_PIECE, 0, isCheck);
+			m = composeMove(E8, C8, c, KING, CASTLE_Q, NO_PIECE, 0);
 			moveList.push_back(m);
 		}
 
@@ -177,7 +169,7 @@ void castleMoves(Position const &p, Check const &isCheck)
 			&& (	!(p.isSquareAttackedBy(Color(!c), C1))	)   // C1 and D1 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), D1))	)	)
 		{
-			m = composeMove(E1, C1, c, KING, CASTLE_Q, NO_PIECE, 0, isCheck);
+			m = composeMove(E1, C1, c, KING, CASTLE_Q, NO_PIECE, 0);
 			moveList.push_back(m);
 		}
 
@@ -187,7 +179,7 @@ void castleMoves(Position const &p, Check const &isCheck)
 			&& (	!(p.isSquareAttackedBy(Color(!c), F8))	)   // F8 and G8 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), G8))	)	)
 		{
-			m = composeMove(E8, G8, c, KING, CASTLE_K, NO_PIECE, 0, isCheck);
+			m = composeMove(E8, G8, c, KING, CASTLE_K, NO_PIECE, 0);
 			moveList.push_back(m);
 		}
 
@@ -196,7 +188,7 @@ void castleMoves(Position const &p, Check const &isCheck)
 			&& (	!(p.isSquareAttackedBy(Color(!c), F1))	)   // F1 and G1 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), G1))	)	)
 		{
-			m = composeMove(E1, G1, c, KING, CASTLE_K, NO_PIECE, 0, isCheck);
+			m = composeMove(E1, G1, c, KING, CASTLE_K, NO_PIECE, 0);
 			moveList.push_back(m);
 		}
 }
@@ -206,7 +198,6 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 {
 	Bitboard moves{};
 	Move m{};
-	Check isCheck{};
 
 	if (!(enPassant % 8) == FILE_A && !((enPassant % 8) == FILE_H))
 		switch (c) {
@@ -217,8 +208,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
 				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
-				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
 			
@@ -228,8 +218,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
 				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
-				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
 			// p.setEnPassant(SQ_EMPTY);
@@ -241,8 +230,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				Bitboard attacksToKing{}, occ = p.getPosition(), 
 					oppKing = p.getPieces(WHITE, KING);
 				attacksToKing|= MoveTables.blackPawn(C64(1) << enPassant, occ);
-				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
 			
@@ -252,8 +240,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
 				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
-				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
 			// p.setEnPassant(SQ_EMPTY);
@@ -269,8 +256,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
 				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
-				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 				// p.setEnPassant(SQ_EMPTY);
 			}
@@ -282,8 +268,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
 				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
-				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 				// p.setEnPassant(SQ_EMPTY);
 			}
@@ -299,8 +284,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 					Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
 					attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
-					(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-					m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+					m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 					moveList.push_back(m);
 					// p.setEnPassant(SQ_EMPTY);
 			}
@@ -312,47 +296,12 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
 				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
-				(attacksToKing &= oppKing) ? isCheck = CHECK : isCheck = NO_CHECK;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0, isCheck);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 				// p.setEnPassant(SQ_EMPTY);
 			}
 			break;
 		} // end switch	
-}
-
-
-const Check isChecking(Piece const &piece, Square const &sq, Position const &p)
-{
-	Bitboard opponentKing = p.getPieces(Color(!p.getTurn()), KING);
-	Bitboard attacksToKing{};
-	const Bitboard occ = p.getPosition();
-	const Bitboard own = p.getPosition(p.getTurn());
-
-	switch (piece) {
-	case QUEEN:
-		attacksToKing = MoveTables.bishop(sq, occ)
-			| MoveTables.rook(sq, occ);
-		break;
-	case ROOK:
-		attacksToKing = MoveTables.rook(sq, occ);
-		break;
-	case KNIGHT:
-		attacksToKing = MoveTables.knight[sq];
-		break;
-	case BISHOP:
-		attacksToKing = MoveTables.bishop(sq, occ);
-		break;
-	case PAWN:
-		(p.getTurn() == WHITE) ? attacksToKing |= MoveTables.whitePawn(C64(1) << sq, occ)
-			: attacksToKing |= MoveTables.blackPawn(C64(1) << sq, occ);
-		break;
-	}
-
-	if (attacksToKing &= opponentKing)
-		return CHECK;
-	else
-		return NO_CHECK;
 }
 
 
@@ -374,14 +323,14 @@ const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p,
 
 
 const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, 
-	MoveType const &type, Piece const &captured, ushort const &promoteTo, Check const &check)
+	MoveType const &type, Piece const &captured, ushort const &promoteTo)
 {
 	
 	/* combine from, to and type into a binary number
 	We use a 32-bit number (Move = uint32_t, see defs.h), composed in the following way:
 
-	000000   	000000		 000000		  0		 000	    000			     000			   000		0
-	 unused      from 		   to		Color	Piece	Type of move	Piece captured,    Promotion  Check?
+	0000000   	000000		 000000		  0		 000	    000			     000			   000		
+	 unused      from 		   to		Color	Piece	Type of move	Piece captured,    Promotion  
 																			if any			 to...
 	
 	*/
@@ -394,11 +343,6 @@ const Move composeMove(Square const &from, Square const &to, Color const &c, ush
 	move = (move << 3) | type;
 	move = (move << 3) | captured;
 	move = (move << 3) | promoteTo;
-	
-	if (check == 1)
-		move = (move << 1) | 1;
-	else
-		move = (move << 1) | 0;
 	
 	// update the list of moves with the new move
 	return move;
@@ -456,10 +400,11 @@ short underCheck(Color const &c, Position const &p)
 const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position const &p)
 {
 	Position copy = p; // do a copy of position, for undoing move purposes
+
 	
 	for (auto it = moveList.begin(); it != moveList.end(); ) // scroll through the moveList
 	{
-		Color c = Color(((C64(1) << 1) - 1) & (*it >> 13)); // who's moving?
+		Color c = Color(((C64(1) << 1) - 1) & (*it >> 12)); // who's moving?
 		doMove(*it, copy); // do the move
 		
 		if (underCheck(c, copy)) { // if move is not legal...

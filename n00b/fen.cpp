@@ -121,21 +121,6 @@ const bool fenValidate(std::stringstream &fen)
 	else if (!(stringToSquareMap[buffer[5]]))
 		return false;
 
-	/* // check if half-move and move number are real digit
-	for (int i = 0; i < buffer[6].length(); i++) {
-		char c = ' ';
-		c = buffer[6][i];
-		if (!isdigit(c))
-			return false;
-	}
-
-	for (int i = 0; i < buffer[7].length(); i++) {
-		char c = ' ';
-		c = buffer[7][i];
-		if (!isdigit(c))
-			return false;
-	} */
-
 	// if none of the above conditions occurs, then FEN is valid
 	return true;
 }

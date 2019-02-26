@@ -18,8 +18,8 @@ class Position
 	ushort halfMove_{ 0 }; // number of half-moves. Default to 0
 	bool checkmate_{ false }; // is the player checkmated?
 	std::array<ushort, 2> castle_{ALL, ALL}; // castling rights for each player. Default to all
-
-
+	
+	
 public:
 	Position();
 	~Position();
@@ -38,7 +38,7 @@ public:
 
 	constexpr ushort getHalfMove() const { return halfMove_; }
 	void setHalfMove(ushort const &half_move) { halfMove_ = half_move; }
-	
+
 	constexpr bool getCheckmate() const { return checkmate_; }
 	void setCheckmate(bool const &b) { checkmate_ = b; }
 

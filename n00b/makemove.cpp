@@ -5,14 +5,13 @@
 void doMove(Move const &m, Position &p)
 {
 	Square squareFrom{}, squareTo{};
-	ushort moveType = ((C64(1) << 3) - 1) & (m >> 7);
-	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 20));
-	squareTo = Square(((C64(1) << 6) - 1) & (m >> 14));
-	Color color = Color(((C64(1) << 1) - 1) & (m >> 13));
-	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 10));
-	Piece captured = Piece(((C64(1) << 3) - 1) & (m >> 4));
-	ushort promotedTo = ((C64(1) << 3) - 1) & (m >> 1);
-	bool check = ((C64(1) << 1) - 1) & (m);
+	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
+	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 19));
+	squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
+	Color color = Color(((C64(1) << 1) - 1) & (m >> 12));
+	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 9));
+	Piece captured = Piece(((C64(1) << 3) - 1) & (m >> 3));
+	ushort promotedTo = ((C64(1) << 3) - 1) & (m);
 
 	switch (moveType)
 	{
@@ -115,7 +114,7 @@ void doMove(Move const &m, Position &p)
 	if (!(moveType == EN_PASSANT) && !(p.getEnPassant() == SQ_EMPTY)) {
 		Color temp;
 		(p.getEnPassant() / 8 == RANK_3) ? temp = WHITE : temp = BLACK;
-		if (!(temp == color))
+		if (!(temp == color)) 
 			p.setEnPassant(SQ_EMPTY);
 	}
 

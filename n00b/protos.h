@@ -46,12 +46,11 @@ const char printPiece(PieceID const &ID);
 const std::vector<Move> moveGeneration(Position &p);
 const std::vector<Move> generateOnlyKing(Color const &c, Position const &p);
 const Bitboard pawnMoves(Position const &p, Square const &from);
-void castleMoves(Position const &p, Check const &isCheck);
+void castleMoves(Position const &p);
 void enPassant(Position &p, Square const &enPassant, Color const &c);
-const Check isChecking(Piece const &piece, Square const &squareTo, Position const &board);
 const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to);
 const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, MoveType const &type,
-	Piece const &captured, ushort const &promoteTo, Check const &check);
+	Piece const &captured, ushort const &promoteTo);
 short underCheck(Color const &c, Position const &p);
 const std::vector<Move> pruneIllegal(std::vector<Move> &moveList, Position const &p);
 
@@ -130,9 +129,9 @@ inline uint64_t divide(short depth, Position &p)
 		}
 		if (Root) {
 			Square squareFrom{}, squareTo{};
-			squareFrom = Square(((C64(1) << 6) - 1) & (m >> 20));
-			squareTo = Square(((C64(1) << 6) - 1) & (m >> 14));
-			ushort promotedTo = ((C64(1) << 3) - 1) & (m >> 1);
+			squareFrom = Square(((C64(1) << 6) - 1) & (m >> 19));
+			squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
+			ushort promotedTo = ((C64(1) << 3) - 1) & (m);
 			if (promotedTo)
 				switch (promotedTo) {
 				case PAWN_TO_QUEEN:

@@ -8,13 +8,16 @@ unsigned long long perft(short depth, Position &p)
 	std::vector<Move> moveList = moveGeneration(p);
 	Position copy = p;
 
-	if (depth == 1)
+	if (depth == 1) {
+		moveList = pruneIllegal(moveList, copy);
 		return moveList.size();
+	}
 
 	for (auto &elem : moveList)
 	{
 		doMove(elem, copy);
-		nodes += perft(depth - 1, copy);
+		if (!underCheck(Color(!copy.getTurn()), copy))
+			nodes += perft(depth - 1, copy);
 		undoMove(elem, copy, p);
 	}
 

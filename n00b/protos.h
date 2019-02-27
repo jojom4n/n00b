@@ -114,6 +114,7 @@ inline uint64_t divide(short depth, Position &p)
 	const std::vector<Move> moveList = moveGeneration(p);
 	uint64_t cnt, nodes = 0;
 	Position copy = p;
+	moveList = pruneIllegal(moveList, copy);
 	const bool leaf = (depth == 1);
 
 	for (const auto& m : moveList)

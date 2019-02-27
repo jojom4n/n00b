@@ -72,18 +72,38 @@ void Position::removePiece(Color const &color, Piece const &piece, Square const 
 }
 
 
-const PieceID Position::idPiece(Square const &square) const
+const PieceID Position::idPiece(Square const &square, Color const &color) const
 {
 	/* let us AND the bit set in the square (1ULL << square) with the main bitboards,
 	until we find the one containing that bit */
-
-	for (ushort x = 0; x < 2; x++)
-		for (ushort y = 0; y < 6; y++) {
-			if (board_[x][y] & (C64(1) << square))
+	switch (color)
+	{
+	case WHITE:
+		for (ushort y = 0; y < 6; y++)
+			if (board_[WHITE][y] & (C64(1) << square)) {
+				ushort x = WHITE;
 				return PieceID{ (Color)x, (Piece)y };
-		}
-
-	return { ALL_COLOR, NO_PIECE };  // no piece on square
+			}
+		break;
+	case BLACK:
+		for (ushort y = 0; y < 6; y++)
+			if (board_[BLACK][y] & (C64(1) << square)) {
+				ushort x = BLACK;
+				return PieceID{ (Color)x, (Piece)y };
+			}
+		break;
+	case ALL_COLOR:
+		for (ushort x = 0; x < 2; x++)
+			for (ushort y = 0; y < 6; y++) {
+				if (board_[x][y] & (C64(1) << square))
+					return PieceID{ (Color)x, (Piece)y };
+			}
+		break;
+	default:
+		return { ALL_COLOR, NO_PIECE };  // no piece on square
+		break;
+	}
+	
 }
 
 

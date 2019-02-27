@@ -59,7 +59,7 @@ public:
 	constexpr bool occupiedSquare(Square const &square) const 
 		{ return (allPieces_ & (C64(1) << square)) ? true : false; }
 
-	const PieceID idPiece(Square const &square) const;
+	const PieceID idPiece(Square const &square, Color const &color = ALL_COLOR) const;
 
 	const ushort count(Color const &color = ALL_COLOR) const;
 	const ushort countPieceType(Color const &color, Piece const &piece) const;

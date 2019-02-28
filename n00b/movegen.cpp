@@ -11,8 +11,8 @@ const std::vector<Move> moveGeneration(Position &p)
 	moveList.clear();
 	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
 	
-	if (underCheck(sideToMove, p) > 1)
-		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
+	/* if (underCheck(sideToMove, p) > 1)
+		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions */
 
 	const Bitboard occupancy = p.getPosition();
 	const Bitboard ownPieces = p.getPosition(sideToMove);
@@ -54,11 +54,9 @@ const std::vector<Move> moveGeneration(Position &p)
 			
 			while (moves) { // scan collected moves, determine their type and add them to list
 				Square squareTo = Square(bitscan_reset(moves));
-				Bitboard sq{};
-				sq |= C64(1) << squareTo;
-				MoveType type = setType(piece, sq, p, squareFrom, squareTo);	
-				
-				Piece captured = p.idPiece(squareTo).piece;
+				MoveType type = setType(piece, occupancy, sideToMove, squareFrom, squareTo);
+
+				Piece captured = p.idPiece(squareTo, Color(!(sideToMove))).piece;
 				
 				if (captured == KING) break; // captured can't be enemy king
 
@@ -105,10 +103,8 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 
 	while (moves) { // scan collected moves, determine their type and add them to list
 		Square squareTo = Square(bitscan_reset(moves));
-		Bitboard sq{};
-		sq |= C64(1) << squareTo;
-		MoveType type = setType(KING, sq, p, kingPos, squareTo);
-		Piece captured = p.idPiece(squareTo).piece;
+		MoveType type = setType(KING, occ, c, kingPos, squareTo);
+		Piece captured = p.idPiece(squareTo, Color(!p.getTurn())).piece;
 
 		if (type == CAPTURE) {
 			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0);
@@ -155,7 +151,7 @@ void castleMoves(Position const &p)
 	Bitboard occ = p.getPosition();
 
 	if (p.getCastle(c) == QUEENSIDE || p.getCastle(c) == ALL)
-		if (	(p.idPiece(A8).piece == ROOK && p.idPiece(E8).piece == KING) // rook and king in position
+		if (	(p.idPiece(A8, c).piece == ROOK && p.idPiece(E8, c).piece == KING) // rook and king in position
 			&& (	(MoveTables.rook(A8, occ) >> E8) & C64(1)	) // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), C8))	)   // C8 and D8 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), D8))	)	)
@@ -164,7 +160,7 @@ void castleMoves(Position const &p)
 			moveList.push_back(m);
 		}
 
-		else if (	(p.idPiece(A1).piece == ROOK && p.idPiece(E1).piece == KING)  // rook and king in position
+		else if (	(p.idPiece(A1, c).piece == ROOK && p.idPiece(E1, c).piece == KING)  // rook and king in position
 			&& (	(MoveTables.rook(A1, occ) >> E1) & C64(1)	)  // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), C1))	)   // C1 and D1 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), D1))	)	)
@@ -174,7 +170,7 @@ void castleMoves(Position const &p)
 		}
 
 	if (p.getCastle(c) == KINGSIDE || p.getCastle(c) == ALL)
-		if (	(p.idPiece(H8).piece == ROOK && p.idPiece(E8).piece == KING)  // rook and king in position
+		if (	(p.idPiece(H8, c).piece == ROOK && p.idPiece(E8, c).piece == KING)  // rook and king in position
 			&& (	(MoveTables.rook(H8, occ) >> E8) & C64(1)	)  // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), F8))	)   // F8 and G8 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), G8))	)	)
@@ -183,7 +179,7 @@ void castleMoves(Position const &p)
 			moveList.push_back(m);
 		}
 
-		else if (	(p.idPiece(H1).piece == ROOK && p.idPiece(E1).piece == KING) // rook and king in position
+		else if (	(p.idPiece(H1, c).piece == ROOK && p.idPiece(E1, c).piece == KING) // rook and king in position
 			&& (	(MoveTables.rook(H1, occ) >> E1) & C64(1)	)   // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), F1))	)   // F1 and G1 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), G1))	)	)
@@ -202,7 +198,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 	if (!(enPassant % 8) == FILE_A && !((enPassant % 8) == FILE_H))
 		switch (c) {
 		case WHITE: // is there a white pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant - 7));
+			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -212,7 +208,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				moveList.push_back(m);
 			}
 			
-			probablePawn = p.idPiece(Square(enPassant - 9));
+			probablePawn = p.idPiece(Square(enPassant - 9), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -224,7 +220,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 			// p.setEnPassant(SQ_EMPTY);
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
-			probablePawn = p.idPiece(Square(enPassant + 7));
+			probablePawn = p.idPiece(Square(enPassant + 7), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(), 
@@ -234,7 +230,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 				moveList.push_back(m);
 			}
 			
-			probablePawn = p.idPiece(Square(enPassant + 9));
+			probablePawn = p.idPiece(Square(enPassant + 9), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -250,7 +246,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 	if ((enPassant %8) == FILE_A)
 		switch (c) {
 		case WHITE: // is there a white pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant - 7));
+			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -262,7 +258,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
-			probablePawn = p.idPiece(Square(enPassant + 9));
+			probablePawn = p.idPiece(Square(enPassant + 9), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -278,7 +274,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 	if ((enPassant % 8 == FILE_H))
 		switch (c) {
 		case WHITE: // is there a white pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant - 9));
+			PieceID probablePawn = p.idPiece(Square(enPassant - 9), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 9);
 					Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -290,7 +286,7 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
-			probablePawn = p.idPiece(Square(enPassant + 7));
+			probablePawn = p.idPiece(Square(enPassant + 7), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -305,13 +301,12 @@ void enPassant(Position &p, Square const &enPassant, Color const &c)
 }
 
 
-const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to)
+const MoveType setType(Piece const &piece, Bitboard const &occ, Color const &c, Square const &from, Square const &to)
 {
-	Bitboard occ = p.getPosition();
 	MoveType type;
 	
-	if (	(piece == PAWN && p.getTurn() == WHITE && (from / 8) == RANK_7 && (to / 8) == RANK_8)	
-		||	(piece == PAWN && p.getTurn() == BLACK && (from / 8) == RANK_2 && (to / 8) == RANK_1)	)
+	if (	(piece == PAWN && c == WHITE && (from / 8) == RANK_7 && (to / 8) == RANK_8)	
+		||	(piece == PAWN && c == BLACK && (from / 8) == RANK_2 && (to / 8) == RANK_1)	)
 		type = PROMOTION; // is the move a pawn promotion?
 	else if ((occ >> to) & 1ULL)
 		type = CAPTURE; // if destination square is occupied by enemy...

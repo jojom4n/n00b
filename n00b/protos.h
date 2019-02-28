@@ -48,7 +48,7 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p);
 const Bitboard pawnMoves(Position const &p, Square const &from);
 void castleMoves(Position const &p);
 void enPassant(Position &p, Square const &enPassant, Color const &c);
-const MoveType setType(Piece const &piece, Bitboard const &m, Position const &p, Square const &from, Square const &to);
+const MoveType setType(Piece const &piece, Bitboard const &occ, Color const & c, Square const &from, Square const &to);
 const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, MoveType const &type,
 	Piece const &captured, ushort const &promoteTo);
 short underCheck(Color const &c, Position const &p);
@@ -111,7 +111,7 @@ Piece operator++(Piece &p, int);
 template<bool Root>
 inline uint64_t divide(short depth, Position &p)
 {
-	const std::vector<Move> moveList = moveGeneration(p);
+	std::vector<Move> moveList = moveGeneration(p);
 	uint64_t cnt, nodes = 0;
 	Position copy = p;
 	moveList = pruneIllegal(moveList, copy);

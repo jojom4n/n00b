@@ -99,11 +99,9 @@ const PieceID Position::idPiece(Square const &square, Color const &color) const
 					return PieceID{ (Color)x, (Piece)y };
 			}
 		break;
-	default:
-		return { ALL_COLOR, NO_PIECE };  // no piece on square
-		break;
 	}
 	
+	return { ALL_COLOR, NO_PIECE };  // no piece on square
 }
 
 

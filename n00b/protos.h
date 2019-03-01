@@ -65,6 +65,14 @@ template<bool Root> uint64_t divide(short depth, Position &p);
 unsigned long long perft(short depth, Position &p);
 
 
+// zobrist.cpp
+namespace Zobrist {
+	void init();
+	uint64_t fill(Position const &p);
+	uint64_t getKey(Color const& c, Piece const& p, Square const& sq);
+}
+
+
 // evaluation.cpp
 const short evaluate(Position const &pos);
 const short evMaterial(Position const &pos, Color const &color);
@@ -103,8 +111,7 @@ File operator--(File &f, int);
 Rank operator++(Rank &r, int);
 Rank operator--(Rank &r, int);
 Piece operator++(Piece &p, int);
-
-
+Color operator++(Color& c, int);
 
 #endif
 

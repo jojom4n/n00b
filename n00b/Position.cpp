@@ -53,6 +53,7 @@ void Position::resetPosition()
 {
 	board_.fill({});
 	whitePieces_ = C64(0), blackPieces_ = C64(0), allPieces_ = C64(0);
+	zobristHash_ = 0;
 }
 
 

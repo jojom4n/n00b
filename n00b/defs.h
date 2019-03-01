@@ -72,6 +72,8 @@ constexpr uint64_t NOT_FILE_GH = 0x3f3f3f3f3f3f3f3f;
 constexpr uint64_t BB_RANK4 = 0xff000000;
 constexpr uint64_t BB_RANK5 = 0x1095216660480;
 
+constexpr ushort PERFT_CACHE_SIZE = 1000;
+
 
 // for popcount() functions - see https://www.chessprogramming.org/Population_Count
 const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */

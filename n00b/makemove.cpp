@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Position.h"
+#include "protos.h"
 
 
 void doMove(Move const &m, Position &p)
@@ -18,6 +19,9 @@ void doMove(Move const &m, Position &p)
 	case QUIET:
 		p.removePiece(color, piece, squareFrom);
 		p.putPiece(color, piece, squareTo);
+
+		p.setZobrist(color, piece, squareFrom);
+		p.setZobrist(color, piece, squareTo);
 
 		if (	(piece == PAWN) && ((squareFrom / 8) == RANK_2) && ((squareTo / 8) == RANK_4)
 			|| (piece == PAWN) && ((squareFrom / 8) == RANK_7) && ((squareTo / 8) == RANK_5)	)

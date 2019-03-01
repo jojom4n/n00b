@@ -263,5 +263,6 @@ void fenParser(std::stringstream &fen, Position &board)
 	else
 		board.setMoveNumber(1);
 
+	board.setZobrist(Zobrist::fill(board));
 	displayBoard(board);
 }

@@ -18,7 +18,8 @@ class Position
 	ushort halfMove_{ 0 }; // number of half-moves. Default to 0
 	bool checkmate_{ false }; // is the player checkmated?
 	std::array<ushort, 2> castle_{ALL, ALL}; // castling rights for each player. Default to all
-	
+	uint64_t zobristHash_{};
+
 	
 public:
 	Position();
@@ -67,6 +68,10 @@ public:
 	const std::vector<Square> getPieceOnSquare(Color const &color, Piece const &piece) const;
 
 	const bool isSquareAttackedBy(Color const &color, Square const &square) const;
+
+	constexpr uint64_t getZobrist() const { return zobristHash_; }
+	void setZobrist(Color const& c, Piece const& p, Square const& sq)
+		{ zobristHash_ ^= Zobrist::getKey(c, p, sq); };
 };
 
 #endif

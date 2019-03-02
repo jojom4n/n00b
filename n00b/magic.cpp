@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "defs.h"
 #include "protos.h"
 
 const Bitboard MAGIC_ROOK[64] = {

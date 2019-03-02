@@ -1,6 +1,4 @@
 #include "pch.h"
-#include <iostream>
-#include "defs.h"
 #include "protos.h"
 
 struct Mask Masks;

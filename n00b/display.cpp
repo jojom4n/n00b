@@ -1,9 +1,7 @@
 #include "pch.h"
-#include <string>
 #include <iostream>
-#include <vector>
-#include "Position.h"
 #include "protos.h"
+#include "Position.h"
 
 
 extern std::map<std::string, Square> stringToSquareMap = {

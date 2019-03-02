@@ -1,14 +1,10 @@
 #include "pch.h"
 #include <iostream>
-#include <string>
 #include <sstream>
-#include "Position.h"
-#include "defs.h"
 #include "protos.h"
-
+#include "Position.h"
 
 std::string input = " ";
-
 
 void newGame()
 {	

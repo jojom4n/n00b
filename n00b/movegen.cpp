@@ -1,7 +1,6 @@
 #include "pch.h"
-#include "Position.h"
-#include "defs.h"
 #include "protos.h"
+#include "Position.h"
 
 extern struct LookupTable MoveTables;
 std::vector<Move> moveList{};

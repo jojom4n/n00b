@@ -1,8 +1,6 @@
 #include "pch.h"
-#include <iostream>
-#include "Position.h"
-#include "defs.h"
 #include "protos.h"
+#include "Position.h"
 
 extern struct LookupTable MoveTables;
 
@@ -46,6 +44,8 @@ void Position::setNew()
 
 	for (Square i = A7; i <= H7; i++)
 		putPiece(BLACK, PAWN, i);
+
+	setZobrist();
 }
 
 

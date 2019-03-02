@@ -1,7 +1,8 @@
 #include "pch.h"
+#include <sstream>
 #include "protos.h"
 #include "Position.h"
-#include <sstream>
+
 
 const bool fenValidate(std::stringstream &fen)
 {
@@ -243,8 +244,8 @@ void fenParser(std::stringstream &fen, Position &board)
 		}
 	}
 	
-	board.setCastle(WHITE, castle_white);
-	board.setCastle(BLACK, castle_black);
+	board.setCastle(WHITE, Castle(castle_white));
+	board.setCastle(BLACK, Castle(castle_black));
 
 	// En passant square
 	std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower); // lower-case the en-passant value, just in case
@@ -263,6 +264,6 @@ void fenParser(std::stringstream &fen, Position &board)
 	else
 		board.setMoveNumber(1);
 
-	board.setZobrist(Zobrist::fill(board));
+	board.setZobrist();
 	displayBoard(board);
 }

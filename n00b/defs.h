@@ -1,13 +1,10 @@
-#pragma once
 #ifndef DEFS_H
 #define DEFS_H
 
-#include <stdint.h>
+#include <map>
+#include <chrono>
 #include <string>
 #include <array>
-#include <map>
-#include <vector>
-#include <chrono>
 
 #define C64(constantuint64_t) constantuint64_t##ULL
 
@@ -72,8 +69,6 @@ constexpr uint64_t NOT_FILE_GH = 0x3f3f3f3f3f3f3f3f;
 constexpr uint64_t BB_RANK4 = 0xff000000;
 constexpr uint64_t BB_RANK5 = 0x1095216660480;
 
-constexpr ushort PERFT_CACHE_SIZE = 1000;
-
 
 // for popcount() functions - see https://www.chessprogramming.org/Population_Count
 const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
@@ -112,5 +107,13 @@ extern const ushort SHIFT_BISHOP[64];
 // see display.cpp
 extern std::map<std::string, Square> stringToSquareMap;
 extern std::map<Square, std::string> squareToStringMap;
+
+
+// see perft.cpp
+typedef struct {
+	uint64_t key;
+	ushort depth;
+	unsigned long long nodes;
+} perftCache;
 
 #endif

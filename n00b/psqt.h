@@ -1,5 +1,3 @@
-#pragma once
-
 constexpr short PSQT[6][64]
 {
 

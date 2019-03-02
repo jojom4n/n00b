@@ -1,12 +1,10 @@
-#pragma once
 #ifndef PROTOS_H
 #define PROTOS_H
 
-#include <string>
 #include "defs.h"
-#include "Position.h"
-#include "Evaluation.h"
+#include <vector>
 
+class Position;
 
 // attack.cpp
 void initAttacks();
@@ -61,16 +59,21 @@ void undoMove(Move const &m, Position &p, Position const &backup);
 
 
 // perft.cpp
-template<bool Root> uint64_t divide(short depth, Position &p);
 unsigned long long perft(short depth, Position &p);
+uint64_t cacheGen(Move const& m, Position const& p);
+
 
 
 // zobrist.cpp
 namespace Zobrist {
 	void init();
-	uint64_t fill(Position const &p);
+	uint64_t fill(Position const p);
 	uint64_t getKey(Color const& c, Piece const& p, Square const& sq);
-}
+	uint64_t getKey(Square const& sq);
+	uint64_t getKey(Color const& c);
+	uint64_t getKey(Color const& c, Castle const& castle);
+	uint64_t getKey(ushort depth);
+};
 
 
 // evaluation.cpp
@@ -113,7 +116,6 @@ Rank operator--(Rank &r, int);
 Piece operator++(Piece &p, int);
 Color operator++(Color& c, int);
 
-#endif
 
 template<bool Root>
 inline uint64_t divide(short depth, Position &p)
@@ -157,7 +159,9 @@ inline uint64_t divide(short depth, Position &p)
 				}
 			std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
 			std::cout << ": " << cnt << std::endl;
-		}
+			}
 	}
 	return nodes;
 }
+
+#endif

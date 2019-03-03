@@ -4,6 +4,80 @@
 #include "defs.h"
 #include "Position.h"
 
+constexpr int PERFT_CACHE_SIZE = 0x186A0;
+
+
+unsigned long long perft(short depth, Position& p)
+{
+	unsigned long long nodes{};
+	std::vector<Move> moveList = moveGeneration(p);
+	Position copy = p;
+	moveList = pruneIllegal(moveList, copy);
+
+	static std::array<perftCache, PERFT_CACHE_SIZE> cache;
+
+	if (depth <= 0 || moveList.size() == 0)
+		return 0;
+
+	for (auto& elem : moveList) {
+		unsigned long long partialNodes;
+		doMove(elem, copy);
+		partialNodes = perft(depth - 1, copy, cache);
+		nodes += partialNodes;
+		undoMove(elem, copy, p);
+	}
+
+	return nodes;
+}
+
+template<size_t PERFT_CACHE_SIZE>
+static unsigned long long perft(short depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
+{
+	unsigned long long nodes{};
+	std::vector<Move> moveList = moveGeneration(p);
+	Position copy = p;
+	moveList = pruneIllegal(moveList, copy);
+
+	if (depth == 0)
+		return 1;
+
+	if (depth > 1) {
+		if (cache[copy.getZobrist() % PERFT_CACHE_SIZE].key == copy.getZobrist() && cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth == depth) {
+			nodes = cache[copy.getZobrist() % PERFT_CACHE_SIZE].nodes;
+			// std::cout << "Zobrist!\n" << std::endl;
+		}
+
+		if (nodes > 0)
+			return nodes;
+	}
+
+	if (depth == 1 || moveList.size() == 0)
+		return moveList.size();
+
+	for (auto& elem : moveList) {
+		doMove(elem, copy);
+		nodes += perft(depth - 1, copy, cache);
+		undoMove(elem, copy, p);
+	}
+
+	if (depth > 1 && depth >= cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth) {
+			cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth = depth;
+			cache[copy.getZobrist() % PERFT_CACHE_SIZE].key = copy.getZobrist();
+			cache[copy.getZobrist() % PERFT_CACHE_SIZE].nodes = nodes;
+		}
+
+	return nodes;
+}
+
+
+/*
+
+
+
+
+
+
+
 
 unsigned long long perft(short depth, Position &p)
 {

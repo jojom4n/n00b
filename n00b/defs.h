@@ -108,4 +108,12 @@ extern const ushort SHIFT_BISHOP[64];
 extern std::map<std::string, Square> stringToSquareMap;
 extern std::map<Square, std::string> squareToStringMap;
 
+
+struct perftCache
+{
+	unsigned long long key;
+	ushort depth;
+	unsigned long long nodes;
+};
+
 #endif

@@ -7,7 +7,7 @@
 constexpr int PERFT_CACHE_SIZE = 0xF4240;
 
 
-unsigned long long perft(short depth, Position& p)
+unsigned long long perft(short depth, Position& p, bool init)
 {
 	unsigned long long nodes{};
 	std::vector<Move> moveList = moveGeneration(p);
@@ -26,8 +26,12 @@ unsigned long long perft(short depth, Position& p)
 		doMove(elem, copy);
 		partialNodes = perft(depth - 1, copy, cache);
 		nodes += partialNodes;
-		std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
-		std::cout << ": " << partialNodes << std::endl;
+		
+		if (!init) {
+			std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
+			std::cout << ": " << partialNodes << std::endl;
+		}
+
 		undoMove(elem, copy, p);
 	}
 
@@ -73,6 +77,18 @@ static unsigned long long perft(short depth, Position& p, std::array<perftCache,
 	return nodes;
 }
 
+
+void perftInit()
+{
+	unsigned long long tmpCache{};
+	Position perftCache;
+	perftCache.setNew();
+	tmpCache = perft(1, perftCache, true);
+	tmpCache = perft(2, perftCache, true);
+	tmpCache = perft(3, perftCache, true);
+	tmpCache = perft(4, perftCache, true);
+	tmpCache = perft(5, perftCache, true);
+}
 
 /*
 

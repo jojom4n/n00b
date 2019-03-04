@@ -46,12 +46,11 @@ static unsigned long long perft(short depth, Position& p, std::array<perftCache,
 		return 1;
 
 	if (depth > 1) {
-		if (cache[copy.getZobrist() % PERFT_CACHE_SIZE].key == copy.getZobrist() 
-			&& cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth == depth) {
-			nodes = cache[copy.getZobrist() % PERFT_CACHE_SIZE].nodes;
+		if (cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key 
+			== (copy.getZobrist() ^ Zobrist::getKey(depth)))
+			nodes = cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes;
 			// std::cout << "Zobrist!\n" << std::endl;
-		}
-
+		
 		if (nodes > 0)
 			return nodes;
 	}
@@ -65,10 +64,10 @@ static unsigned long long perft(short depth, Position& p, std::array<perftCache,
 		undoMove(elem, copy, p);
 	}
 
-	if (depth > 1 && depth >= cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth) {
-			cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth = depth;
-			cache[copy.getZobrist() % PERFT_CACHE_SIZE].key = copy.getZobrist();
-			cache[copy.getZobrist() % PERFT_CACHE_SIZE].nodes = nodes;
+	if (depth > 1) {
+			// cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth = depth;
+			cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key = copy.getZobrist() ^ Zobrist::getKey(depth);
+			cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes = nodes;
 		}
 
 	return nodes;

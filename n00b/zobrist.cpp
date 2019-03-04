@@ -6,8 +6,8 @@
 constexpr uint64_t maxU64 = 0xFFFFFFFFFFFFFFFF;
 uint64_t zobristKeys[2][6][64];
 uint64_t zobristCastle[2][4];
-uint64_t zobristEnPassant[64];
-uint64_t zobristBlackToMove;
+uint64_t zobristEnPassant[8];
+uint64_t zobristSideToMove[2];
 uint64_t zobristDepth[10];
 
 
@@ -27,10 +27,14 @@ namespace Zobrist {
 		for (ushort i = 0; i < 4; i++)
 			zobristCastle[WHITE][i] = randomNumbers(gen);
 
-		for (ushort i = 0; i < 64; i++)
+		for (ushort i = 0; i < 4; i++)
+			zobristCastle[BLACK][i] = randomNumbers(gen);
+
+		for (ushort i = 0; i < 8; i++)
 			zobristEnPassant[i] = randomNumbers(gen);
 
-		zobristBlackToMove = randomNumbers(gen);
+		for (ushort i = 0; i < 2; i++)
+			zobristSideToMove[i] = randomNumbers(gen);
 
 		for (ushort i = 0; i < 10; i++)
 			zobristDepth[i] = randomNumbers(gen);
@@ -55,10 +59,10 @@ namespace Zobrist {
 			result ^= zobristCastle[WHITE][p.getCastle(WHITE)];
 			result ^= zobristCastle[BLACK][p.getCastle(BLACK)];
 
-			result ^= zobristEnPassant[p.getEnPassant()];
+			if (p.getEnPassant() != SQ_EMPTY) 
+				result ^= zobristEnPassant[p.getEnPassant() % 8];
 
-			if (p.getTurn() == BLACK)
-				result ^= zobristBlackToMove;
+			result ^= zobristSideToMove[p.getTurn()];
 
 		}  // end main for
 
@@ -80,7 +84,7 @@ namespace Zobrist {
 
 	uint64_t getKey(Color const& c) // for side to move
 	{
-		return zobristBlackToMove;
+		return zobristSideToMove[c];
 	}
 
 

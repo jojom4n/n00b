@@ -4,7 +4,7 @@
 #include "defs.h"
 #include "Position.h"
 
-constexpr int PERFT_CACHE_SIZE = 0x186A0;
+constexpr int PERFT_CACHE_SIZE = 0xF4240;
 
 
 unsigned long long perft(short depth, Position& p)
@@ -21,9 +21,13 @@ unsigned long long perft(short depth, Position& p)
 
 	for (auto& elem : moveList) {
 		unsigned long long partialNodes;
+		Square squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 19));
+		Square squareTo = Square(((C64(1) << 6) - 1) & (elem >> 13));
 		doMove(elem, copy);
 		partialNodes = perft(depth - 1, copy, cache);
 		nodes += partialNodes;
+		std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
+		std::cout << ": " << partialNodes << std::endl;
 		undoMove(elem, copy, p);
 	}
 
@@ -42,7 +46,8 @@ static unsigned long long perft(short depth, Position& p, std::array<perftCache,
 		return 1;
 
 	if (depth > 1) {
-		if (cache[copy.getZobrist() % PERFT_CACHE_SIZE].key == copy.getZobrist() && cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth == depth) {
+		if (cache[copy.getZobrist() % PERFT_CACHE_SIZE].key == copy.getZobrist() 
+			&& cache[copy.getZobrist() % PERFT_CACHE_SIZE].depth == depth) {
 			nodes = cache[copy.getZobrist() % PERFT_CACHE_SIZE].nodes;
 			// std::cout << "Zobrist!\n" << std::endl;
 		}

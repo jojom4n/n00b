@@ -45,6 +45,13 @@ void Position::setNew()
 	for (Square i = A7; i <= H7; i++)
 		putPiece(BLACK, PAWN, i);
 
+	enPassantSquare_ = SQ_EMPTY;
+	turn_ = WHITE;
+	moveNumber_ = 1;
+	halfMove_ = 0;
+	castle_[WHITE] = ALL;
+	castle_[BLACK] = ALL;
+
 	setZobrist();
 }
 

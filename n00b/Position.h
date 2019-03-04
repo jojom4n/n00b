@@ -10,12 +10,12 @@ class Position
 {
 	std::array<std::array<Bitboard, 6>, 2> board_{};
 	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
-	Square enPassantSquare_{ SQ_EMPTY };
-	Color turn_{ WHITE }; // who has the move?
-	ushort moveNumber_{ 1 }; // number of moves. Default to 1
-	ushort halfMove_{ 0 }; // number of half-moves. Default to 0
+	Square enPassantSquare_{};
+	Color turn_{}; // who has the move?
+	ushort moveNumber_{}; // number of moves. Default to 1
+	ushort halfMove_{}; // number of half-moves. Default to 0
 	bool checkmate_{ false }; // is the player checkmated?
-	std::array<Castle, 2> castle_{ ALL, ALL }; // castling rights for each player. Default to all
+	std::array<Castle, 2> castle_{}; // castling rights for each player. Default to all
 	uint64_t zobristHash_{};
 
 

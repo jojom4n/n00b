@@ -27,10 +27,12 @@ void doMove(Move const &m, Position &p)
 			|| (piece == PAWN) && ((squareFrom / 8) == RANK_7) && ((squareTo / 8) == RANK_5)) {
 
 			if (color == WHITE) {
+				p.updateZobrist(p.getEnPassant());
 				p.setEnPassant(Square(squareTo - 8));
 				p.updateZobrist(p.getEnPassant());
 			}
 			else {
+				p.updateZobrist(p.getEnPassant());
 				p.setEnPassant(Square(squareTo + 8));
 				p.updateZobrist(p.getEnPassant());
 			}
@@ -41,10 +43,9 @@ void doMove(Move const &m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(p.getHalfMove() + 1);
+		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
-		
-		if (p.getTurn() == BLACK)
-			p.updateZobrist(BLACK);
+		p.updateZobrist(p.getTurn());
 
 		break;
 	case CAPTURE:
@@ -60,27 +61,23 @@ void doMove(Move const &m, Position &p)
 			p.setMoveNumber(p.getMoveNumber() + 1);
 
 		p.setHalfMove(0);
+		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
-		
-		if (p.getTurn() == BLACK)
-			p.updateZobrist(BLACK);
+		p.updateZobrist(p.getTurn());
 
 		break;
 	case PROMOTION:
 		p.removePiece(color, piece, squareFrom);
-
 		p.updateZobrist(color, piece, squareFrom);
 		
 		if (!(captured == NO_PIECE)) {
 			p.removePiece(Color(!color), captured, squareTo);
 			p.setHalfMove(0);
-
 			p.updateZobrist(Color(!color), captured, squareTo);
 		}
 		else
 			p.setHalfMove(p.getHalfMove() + 1);
 			
-
 		switch (promotedTo) {
 		case PAWN_TO_KNIGHT:
 			p.putPiece(color, KNIGHT, squareTo);
@@ -100,15 +97,13 @@ void doMove(Move const &m, Position &p)
 			break;
 		}	
 
+		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
-		
-		if (p.getTurn() == BLACK)
-			p.updateZobrist(BLACK);
+		p.updateZobrist(p.getTurn());
 
 		break;
 	case CASTLE_Q: {
 		p.removePiece(color, piece, squareFrom);
-
 		p.updateZobrist(color, piece, squareFrom);
 
 		if (color == WHITE) {
@@ -137,13 +132,13 @@ void doMove(Move const &m, Position &p)
 
 		p.setHalfMove(p.getHalfMove() + 1);
 
+		p.updateZobrist(color, p.getCastle(color));
 		p.setCastle(color, NONE);
 		p.updateZobrist(color, NONE);
 		
+		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
-
-		if (p.getTurn() == BLACK)
-			p.updateZobrist(BLACK);
+		p.updateZobrist(p.getTurn());
 
 		break;	}
 	case CASTLE_K: {
@@ -176,13 +171,13 @@ void doMove(Move const &m, Position &p)
 
 		p.setHalfMove(p.getHalfMove() + 1);
 		
+		p.updateZobrist(color, p.getCastle(color));
 		p.setCastle(color, NONE);
 		p.updateZobrist(color, NONE);
 		
+		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
-
-		if (p.getTurn() == BLACK)
-			p.updateZobrist(BLACK);
+		p.updateZobrist(p.getTurn());
 
 		break; }
 	case EN_PASSANT:
@@ -206,13 +201,13 @@ void doMove(Move const &m, Position &p)
 
 		p.setHalfMove(0);
 
+		p.updateZobrist(p.getEnPassant());
 		p.setEnPassant(SQ_EMPTY);
 		p.updateZobrist(SQ_EMPTY);
 
+		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
-
-		if (p.getTurn() == BLACK)
-			p.updateZobrist(BLACK);
+		p.updateZobrist(p.getTurn());
 
 		break;
 	}
@@ -222,6 +217,7 @@ void doMove(Move const &m, Position &p)
 		(p.getEnPassant() / 8 == RANK_3) ? temp = WHITE : temp = BLACK;
 		
 		if (!(temp == color)) {
+			p.updateZobrist(p.getEnPassant());
 			p.setEnPassant(SQ_EMPTY);
 			p.updateZobrist(SQ_EMPTY);
 		}
@@ -230,6 +226,7 @@ void doMove(Move const &m, Position &p)
 
 	// if King moves, no more castle
 	if (!(moveType == CASTLE_Q) && !(moveType == CASTLE_K) && (piece == KING)) {
+		p.updateZobrist(color, p.getCastle(color));
 		p.setCastle(color, NONE);
 		p.updateZobrist(color, NONE);
 	}
@@ -240,12 +237,14 @@ void doMove(Move const &m, Position &p)
 	case WHITE:
 		if (!(moveType == CASTLE_K) && piece == ROOK && squareFrom == H1
 			&& (p.getCastle(WHITE) == KINGSIDE || p.getCastle(WHITE) == ALL)) {
+			p.updateZobrist(WHITE, p.getCastle(WHITE));
 			p.setCastle(WHITE, Castle(p.getCastle(WHITE) - KINGSIDE));
 			p.updateZobrist(WHITE, p.getCastle(WHITE));
 		}
 
 		if (!(moveType == CASTLE_Q) && piece == ROOK && squareFrom == A1
 			&& (p.getCastle(WHITE) == QUEENSIDE || p.getCastle(WHITE) == ALL)) {
+			p.updateZobrist(WHITE, p.getCastle(WHITE));
 			p.setCastle(WHITE, Castle(p.getCastle(WHITE) - QUEENSIDE));
 			p.updateZobrist(WHITE, p.getCastle(WHITE));
 		}
@@ -254,12 +253,14 @@ void doMove(Move const &m, Position &p)
 	case BLACK:
 		if (!(moveType == CASTLE_K) && piece == ROOK && squareFrom == H8
 			&& (p.getCastle(BLACK) == KINGSIDE || p.getCastle(BLACK) == ALL)) {
+			p.updateZobrist(BLACK, p.getCastle(BLACK));
 			p.setCastle(BLACK, Castle(p.getCastle(BLACK) - KINGSIDE));
 			p.updateZobrist(BLACK, p.getCastle(BLACK));
 		}
 
 		if (!(moveType == CASTLE_Q) && piece == ROOK && squareFrom == A8
 			&& (p.getCastle(BLACK) == QUEENSIDE || p.getCastle(BLACK) == ALL)) {
+			p.updateZobrist(BLACK, p.getCastle(BLACK));
 			p.setCastle(BLACK, Castle(p.getCastle(BLACK) - QUEENSIDE));
 			p.updateZobrist(BLACK, p.getCastle(BLACK));
 		}
@@ -270,24 +271,28 @@ void doMove(Move const &m, Position &p)
 	// if Rook gets captured, no more castle, if previously possible
 	if (color == BLACK && captured == ROOK && squareTo == H1
 		&& (p.getCastle(WHITE) == KINGSIDE || p.getCastle(WHITE) == ALL)) {
+		p.updateZobrist(WHITE, p.getCastle(WHITE));
 		p.setCastle(WHITE, Castle(p.getCastle(WHITE) - KINGSIDE));
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
 	}
 	
 	else if (color == BLACK && captured == ROOK && squareTo == A1
 		&& (p.getCastle(WHITE) == QUEENSIDE || p.getCastle(WHITE) == ALL)) {
+		p.updateZobrist(WHITE, p.getCastle(WHITE));
 		p.setCastle(WHITE, Castle(p.getCastle(WHITE) - QUEENSIDE));
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
 	}
 	
 	else if (color == WHITE && captured == ROOK && squareTo == H8
 		&& (p.getCastle(BLACK) == KINGSIDE || p.getCastle(BLACK) == ALL)) {
+		p.updateZobrist(BLACK, p.getCastle(BLACK));
 		p.setCastle(BLACK, Castle(p.getCastle(BLACK) - KINGSIDE));
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
 	}
 	
 	else if (color == WHITE && captured == ROOK && squareTo == A8
 		&& (p.getCastle(BLACK) == QUEENSIDE || p.getCastle(BLACK) == ALL)) {
+		p.updateZobrist(BLACK, p.getCastle(BLACK));
 		p.setCastle(BLACK, Castle(p.getCastle(BLACK) - QUEENSIDE));
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
 	}

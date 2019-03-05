@@ -112,7 +112,6 @@ extern std::map<Square, std::string> squareToStringMap;
 struct perftCache
 {
 	unsigned long long key;
-	ushort depth;
 	unsigned long long nodes;
 };
 

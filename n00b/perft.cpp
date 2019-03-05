@@ -4,8 +4,7 @@
 #include "defs.h"
 #include "Position.h"
 
-constexpr int PERFT_CACHE_SIZE = 0xF4240;
-
+constexpr unsigned long long PERFT_CACHE_SIZE = 0xF4240;
 
 unsigned long long perft(short depth, Position& p, bool init)
 {

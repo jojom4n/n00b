@@ -16,7 +16,7 @@ const bool fenValidate(std::stringstream &fen)
 	while (fen >> word)
 		buffer.push_back(word); // extract from the input stream to a string vector
 	
-	if (buffer.size() < 6) // is FEN complete?
+	if (buffer.size() < 5) // is FEN complete?
 		return false;
 								
 	/* Validate the position inside the FEN. To be valid, we must have 8 rows, 8 files and two kings.
@@ -115,12 +115,11 @@ const bool fenValidate(std::stringstream &fen)
 	}
 
 	// now verify en-passant in FEN. It must be '-' or a square
-	if (buffer[5].length() == 1) {
-		if (!(buffer[5] == "-"))
+	if (buffer.size() > 5) {
+		if (buffer[5].length() == 1 
+			&& (	!(buffer[5] == "-") || !(stringToSquareMap[buffer[5]]) ))
 			return false;
 	}
-	else if (!(stringToSquareMap[buffer[5]]))
-		return false;
 
 	// if none of the above conditions occurs, then FEN is valid
 	return true;
@@ -248,18 +247,20 @@ void fenParser(std::stringstream &fen, Position &board)
 	board.setCastle(BLACK, Castle(castle_black));
 
 	// En passant square
-	std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower); // lower-case the en-passant value, just in case
-	if (!(stringToSquareMap.find(buffer[5]) == stringToSquareMap.end())) // is there a valid value, corresponding to map?
-		board.setEnPassant(stringToSquareMap[buffer[5]]);
-	else
-		board.setEnPassant(SQ_EMPTY);
+	if (buffer.size() > 5) {
+		std::transform(buffer[5].begin(), buffer[5].end(), buffer[5].begin(), ::tolower); // lower-case the en-passant value, just in case
+		if (!(stringToSquareMap.find(buffer[5]) == stringToSquareMap.end())) // is there a valid value, corresponding to map?
+			board.setEnPassant(stringToSquareMap[buffer[5]]);
+		else
+			board.setEnPassant(SQ_EMPTY);
+	}
 
-	if (buffer.size() >= 7)
+	if (buffer.size() > 6)
 		board.setHalfMove(std::stoi(buffer[6], nullptr, 0)); // set half move
 	else
 		board.setHalfMove(0);
 
-	if (buffer.size() >= 8)
+	if (buffer.size() > 7)
 		board.setMoveNumber(std::stoi(buffer[7], nullptr, 0)); // set move number
 	else
 		board.setMoveNumber(1);

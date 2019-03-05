@@ -59,8 +59,6 @@ void undoMove(Move const &m, Position &p, Position const &backup);
 
 
 // perft.cpp
-/* unsigned long long perft(short depth, Position &p);
-uint64_t cacheGen(Move const& m, Position const& p); */
 unsigned long long perft(short depth, Position& p, bool init = false);
 template<size_t PERFT_CACHE_SIZE>
 static unsigned long long perft(short depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache);

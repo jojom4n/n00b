@@ -9,6 +9,7 @@ const std::map <Piece, ushort> pieceValue_
 
 const short evaluate(Position const &pos)
 {
+	
 	short scoreW{}, scoreB{};
 	scoreW = evMaterial(pos, WHITE) + evPSQT(pos, WHITE);
 	scoreB = evMaterial(pos, BLACK) + evPSQT(pos, BLACK);

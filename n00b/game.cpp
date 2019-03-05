@@ -75,7 +75,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		}	
 	}
 	else if (inputStream.str().substr(0, 5) == "perft" && numWords == 2) {
-		short depth = stoi(inputStream.str().substr(6, 1));
+		short depth = stoi(inputStream.str().substr(6));
 		if (depth > 0) {
 			auto t1 = Clock::now();
 			std::cout << perft(depth, board) << std::endl;

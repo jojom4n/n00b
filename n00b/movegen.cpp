@@ -10,8 +10,8 @@ const std::vector<Move> moveGeneration(Position &p)
 	moveList.clear();
 	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
 	
-	/* if (underCheck(sideToMove, p) > 1)
-		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions */
+	if (underCheck(sideToMove, p) > 1)
+		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
 
 	const Bitboard occupancy = p.getPosition();
 	const Bitboard ownPieces = p.getPosition(sideToMove);
@@ -88,7 +88,6 @@ const std::vector<Move> moveGeneration(Position &p)
 	if (!(p.getEnPassant() == SQ_EMPTY))
 		enPassant(p, p.getEnPassant(), sideToMove);
 
-	// moveList = pruneIllegal(moveList, p); // prune the invalid moves from moveList
 	return moveList;
 }
 
@@ -115,7 +114,6 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 		}
 	}
 
-	// moveList = pruneIllegal(moveList, p);
 	return moveList;
 }
 

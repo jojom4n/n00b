@@ -49,7 +49,8 @@ public:
 
 	void putPiece(Color const& color, Piece const& piece, Square const& square);
 	void removePiece(Color const& color, Piece const& piece, Square const& square);
-
+	void update(Color const& color);
+		
 	constexpr Bitboard getPosition() const { return allPieces_; }
 	constexpr Bitboard getPosition(Color const& color) const
 	{

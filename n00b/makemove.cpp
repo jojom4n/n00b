@@ -2,6 +2,7 @@
 #include "protos.h"
 #include "Position.h"
 
+extern struct LookupTable MoveTables;
 
 void doMove(Move const &m, Position &p)
 {
@@ -24,20 +25,26 @@ void doMove(Move const &m, Position &p)
 		p.updateZobrist(color, piece, squareTo);
 
 		if ((piece == PAWN) && ((squareFrom / 8) == RANK_2) && ((squareTo / 8) == RANK_4)
-			|| (piece == PAWN) && ((squareFrom / 8) == RANK_7) && ((squareTo / 8) == RANK_5)) {
-
-			if (color == WHITE) {
-				p.updateZobrist(p.getEnPassant());
-				p.setEnPassant(Square(squareTo - 8));
-				p.updateZobrist(p.getEnPassant());
+			|| (piece == PAWN) && ((squareFrom / 8) == RANK_7) && ((squareTo / 8) == RANK_5))
+			switch (color)
+			{
+			case WHITE: {
+				Bitboard ep = MoveTables.blackPawn(p.getPieces(BLACK, PAWN), C64(1) << (squareTo - 8));
+				if (ep) {
+					p.updateZobrist(p.getEnPassant());
+					p.setEnPassant(Square(squareTo - 8));
+					p.updateZobrist(p.getEnPassant());
+				}
+				break; }
+			case BLACK: {
+				Bitboard ep = MoveTables.whitePawn(p.getPieces(WHITE, PAWN), C64(1) << (squareTo + 8));
+				if (ep) {
+					p.updateZobrist(p.getEnPassant());
+					p.setEnPassant(Square(squareTo + 8));
+					p.updateZobrist(p.getEnPassant());
+				}
+				break; }
 			}
-			else {
-				p.updateZobrist(p.getEnPassant());
-				p.setEnPassant(Square(squareTo + 8));
-				p.updateZobrist(p.getEnPassant());
-			}
-		
-		}
 
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() + 1);

@@ -7,46 +7,48 @@ const std::map <Piece, ushort> pieceValue_
 { {PAWN, 100}, {KNIGHT, 300}, {BISHOP, 320}, {ROOK, 500}, {QUEEN, 900}, {KING, 2000} };
 
 
-const short evaluate(Position const &pos)
+const short evaluate(Position const &p)
 {
 	
-	short scoreW{}, scoreB{};
-	scoreW = evMaterial(pos, WHITE) + evPSQT(pos, WHITE);
-	scoreB = evMaterial(pos, BLACK) + evPSQT(pos, BLACK);
-	
-	return (scoreW - scoreB);
+	return evMaterial(p) + evPSQT(p);
 }
 
 
-const short evMaterial (Position const &pos, Color const &color)
+const ushort evMaterial (Position const &p)
 {
-	ushort numRook{}, numBishop{}, numKnight{}, numQueen{}, numPawn{};
+	std::array<ushort, 2> materialScore{};
 
-	numRook = pos.countPieceType(color, ROOK);
-	numBishop = pos.countPieceType(color, BISHOP);
-	numKnight = pos.countPieceType(color, KNIGHT);
-	numQueen = pos.countPieceType(color, QUEEN);
-	numPawn = pos.countPieceType(color, PAWN);
-	
-	short materialScore = pieceValue_.at(ROOK) * numRook
-		+ pieceValue_.at(BISHOP) * numBishop
-		+ pieceValue_.at(KNIGHT) * numKnight
-		+ pieceValue_.at(QUEEN) * numQueen
-		+ pieceValue_.at(PAWN) * numPawn;
-	
-	return materialScore;	
-}
+	for (Color c = BLACK; c <= WHITE; c++) {
+		ushort numRook{}, numBishop{}, numKnight{}, numQueen{}, numPawn{};
+		numRook = p.countPieceType(c, ROOK);
+		numBishop = p.countPieceType(c, BISHOP);
+		numKnight = p.countPieceType(c, KNIGHT);
+		numQueen = p.countPieceType(c, QUEEN);
+		numPawn = p.countPieceType(c, PAWN);
 
-
-const short evPSQT(Position const &p, Color const &color)
-{
-	short scorePSQT{};
-
- 	for (int i = 0; i < 6; i++)
-	{
-		for (auto &square : p.getPieceOnSquare(color, Piece(i)))
-			scorePSQT += PSQT[i][ushort(square)];
+		materialScore[c] = pieceValue_.at(ROOK) * numRook
+			+ pieceValue_.at(BISHOP) * numBishop
+			+ pieceValue_.at(KNIGHT) * numKnight
+			+ pieceValue_.at(QUEEN) * numQueen
+			+ pieceValue_.at(PAWN) * numPawn;
 	}
 
-	return scorePSQT;
+	return materialScore[WHITE] - materialScore[BLACK];	
+}
+
+
+const short evPSQT(Position const &p)
+{
+	std::array<short, 2> scorePSQT{};
+
+	for (Color c = BLACK; c <= WHITE; c++) {
+		for (Piece piece = KING; piece <= PAWN; piece++)
+		{
+			for (auto& sq : p.getPieceOnSquare(c, piece))
+				(c == BLACK) ? scorePSQT[c] += PSQT[piece][ushort(sq)]
+				: scorePSQT[c] += PSQT[piece][ushort(64 - sq)];
+		}
+	}
+ 	
+	return scorePSQT[WHITE] - scorePSQT[BLACK];
 }

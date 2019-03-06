@@ -32,13 +32,13 @@ void readCommand(std::stringstream &inputStream, Position &board)
 
 	while (inputStream >> input) numWords++; // count the words in the input stream
 	
-	if (inputStream.str().substr(0, 12) == "fen position")
+	if (inputStream.str().substr(0, 12) == "position fen")
 	
 		if (numWords >= 3 && fenValidate(inputStream))
 			fenParser(inputStream, board);
 		else std::cout << "Sorry, no FEN or invalid FEN position.\n";
 	
-	else if (inputStream.str().substr(0, 8) == "movelist" && numWords == 1) {
+	else if (inputStream.str().substr(0,8) == "movelist" && numWords == 1) {
 		std::vector<Move> moveList;
 		moveList = moveGeneration(board);
 		if (moveList.size() > 0) {
@@ -63,9 +63,10 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	}
 	
 	else if (inputStream.str().substr(0, 6) == "search" && numWords == 1) {
-		Move m = calculateBestMove(board, 3);
+		Move m = calculateBestMove(board, 3, true);
 		if (m) {
 			doMove(m, board);
+			displayMove(board, m);
 			displayBoard(board);
 		}
 		else

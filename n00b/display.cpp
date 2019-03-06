@@ -132,6 +132,38 @@ void displayMoveList(Position const &board, std::vector<Move> const &m) {
 }
 
 
+void displayMove(Position const& board, Move const& m) {
+	std::cout << "My move: ";
+	std::string output = "";
+
+	Square squareFrom{}, squareTo{};
+	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 19));
+	squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
+	ushort promotedTo = ((C64(1) << 3) - 1) & (m);
+
+	output += squareToStringMap[squareFrom];
+	output += squareToStringMap[squareTo];
+
+	if (promotedTo)
+		switch (promotedTo) {
+		case PAWN_TO_QUEEN:
+			output += "q";
+			break;
+		case PAWN_TO_KNIGHT:
+			output += "n";
+			break;
+		case PAWN_TO_ROOK:
+			output += "r";
+			break;
+		case PAWN_TO_BISHOP:
+			output += "b";
+			break;
+		}
+
+	std::cout << "\n" << output;
+}
+
+
 const char printPiece (PieceID const &ID)
 {
 	switch (ID.piece)

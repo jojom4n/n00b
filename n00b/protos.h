@@ -37,6 +37,7 @@ void fenParser(std::stringstream &fen, Position &board);
 //display.cpp
 void displayBoard(Position const &board);
 void displayMoveList(Position const &board, std::vector<Move> const &m);
+void displayMove(Position const& board, Move const& m);
 const char printPiece(PieceID const &ID);
 
 
@@ -83,8 +84,9 @@ const ushort evMaterial(Position const& p);
 const short evPSQT(Position const& p);
 
 // search.cpp
-
-const Move calculateBestMove(Position const &p, short depth);
+const Move calculateBestMove(Position const& p, short depth, bool maxim);
+const int alphaBeta(Position const& p, short depth, int  alpha, int beta, bool maxim);
+// const Move calculateBestMove(Position const &p, short depth);
 
 
 // bitscan.cpp

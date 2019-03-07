@@ -45,8 +45,12 @@ const short evPSQT(Position const &p)
 		for (Piece piece = KING; piece <= PAWN; piece++)
 		{
 			for (auto& sq : p.getPieceOnSquare(c, piece))
-				(c == BLACK) ? scorePSQT[c] += PSQT[piece][ushort(sq)]
-				: scorePSQT[c] += PSQT[piece][ushort(64 - sq)];
+				if (c == WHITE)
+					scorePSQT[c] += PSQT[piece][ushort(sq)];
+				else {
+					int index = (sq + 56) - ((sq / 8) * 16);
+					scorePSQT[c] += PSQT[piece][index];
+				}
 		}
 	}
  	

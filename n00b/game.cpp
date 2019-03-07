@@ -29,53 +29,65 @@ void newGame()
 void readCommand(std::stringstream &inputStream, Position &board)
 {
 	int numWords = 0;
-
+	
 	while (inputStream >> input) numWords++; // count the words in the input stream
-	
-	if (inputStream.str().substr(0, 12) == "position fen")
-	
+
+	if (inputStream.str().substr(0,12) == "position fen" && inputStream.str().substr(12,1) == " ")
 		if (numWords >= 3 && fenValidate(inputStream))
 			fenParser(inputStream, board);
 		else std::cout << "Sorry, no FEN or invalid FEN position.\n";
 	
-	else if (inputStream.str().substr(0,8) == "movelist" && numWords == 1) {
+	else if (inputStream.str().substr(0) == "movelist") {
 		std::vector<Move> moveList;
 		moveList = moveGeneration(board);
+		moveList = pruneIllegal(moveList, board);
 		if (moveList.size() > 0) {
 			displayMoveList(board, moveList);
 		}
-		else
+		else if (moveList.size() == 0 && !underCheck(board.getTurn(), board))
+		{
+			std::cout << "It's STALEMATE!" << std::endl;
+		}
+		else if (moveList.size() == 0 && underCheck(board.getTurn(), board))
 		{
 			board.setCheckmate(true);
 			std::cout << "It's CHECKMATE!" << std::endl;
 		}
 	}
 
-	else if ((inputStream.str().substr(0, 12) == "display" && numWords == 1))
+	else if ((inputStream.str().substr(0) == "display"))
 		displayBoard(board);
 	
-	else if (inputStream.str().substr(0, 4) == "quit" && numWords == 1)
+	else if (inputStream.str().substr(0) == "quit")
 		return;
 	
-	else if (inputStream.str().substr(0, 3) == "new" && numWords == 1) {
+	else if (inputStream.str().substr(0) == "new") {
 		delete &board;
 		newGame();
 	}
 	
-	else if (inputStream.str().substr(0, 6) == "search" && numWords == 1) {
-		Move m = calculateBestMove(board, 3, true);
+	else if (inputStream.str().substr(0, 6) == "search" && inputStream.str().substr(6,1) == " "
+		&& numWords == 2) {
+		short depth = stoi(inputStream.str().substr(7));
+
+		Move m = calculateBestMove(board, depth, true);
 		if (m) {
 			doMove(m, board);
-			displayMove(board, m);
 			displayBoard(board);
+			displayMove(board, m);
 		}
-		else
+		else if (!m && !underCheck(board.getTurn(), board))
+		{
+			std::cout << "It's STALEMATE!" << std::endl;
+		}	
+		else if (!m && underCheck(board.getTurn(), board))
 		{
 			board.setCheckmate(true);
 			std::cout << "It's CHECKMATE!" << std::endl;
-		}	
+		}
 	}
-	else if (inputStream.str().substr(0, 5) == "perft" && numWords == 2) {
+	else if (inputStream.str().substr(0, 5) == "perft" && inputStream.str().substr(5, 1) == " "
+		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(6));
 		if (depth > 0) {
 			auto t1 = Clock::now();
@@ -86,8 +98,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		else
 			std::cout << "Invalid depth.\n";
 	}
-	else if (inputStream.str().substr(0, 6) == "divide" && numWords == 2) {
-		short depth = stoi(inputStream.str().substr(7, 1));
+	else if (inputStream.str().substr(0, 6) == "divide" && inputStream.str().substr(6, 1) == " " 
+		&& numWords == 2) {
+		short depth = stoi(inputStream.str().substr(7));
 		if (depth > 0) {
 			auto t1 = Clock::now();
 			std::cout << divide<true>(depth, board) << std::endl;

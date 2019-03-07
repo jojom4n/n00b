@@ -66,6 +66,7 @@ const int alphaBeta(Position const& p, short depth, int  alpha, int beta, bool m
 				return bestValue;
 		}
 
+		//std::cout << bestValue << "\t\n";
 		return bestValue;
 	}
 	else {
@@ -80,6 +81,8 @@ const int alphaBeta(Position const& p, short depth, int  alpha, int beta, bool m
 			if (beta <= alpha)
 				return bestValue;
 		}
+
+		// std::cout << bestValue << "\t\n";
 		return bestValue;
 	}
 }

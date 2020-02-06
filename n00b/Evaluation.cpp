@@ -9,8 +9,10 @@ const std::map <Piece, ushort> pieceValue_
 
 const short evaluate(Position const &p)
 {
-	
-	return evMaterial(p) + evPSQT(p);
+	short whoToMove{};
+	(p.getTurn() == WHITE) ? whoToMove = 1 : whoToMove = -1;
+
+	return (evMaterial(p) + evPSQT(p)) * whoToMove;
 }
 
 
@@ -33,7 +35,7 @@ const ushort evMaterial (Position const &p)
 			+ pieceValue_.at(PAWN) * numPawn;
 	}
 
-	return materialScore[WHITE] - materialScore[BLACK];	
+	return materialScore[p.getTurn()] - materialScore[!p.getTurn()];	
 }
 
 
@@ -44,15 +46,12 @@ const short evPSQT(Position const &p)
 	for (Color c = BLACK; c <= WHITE; c++) {
 		for (Piece piece = KING; piece <= PAWN; piece++)
 		{
-			for (auto& sq : p.getPieceOnSquare(c, piece))
-				if (c == WHITE)
-					scorePSQT[c] += PSQT[piece][ushort(sq)];
-				else {
-					int index = (sq + 56) - ((sq / 8) * 16);
-					scorePSQT[c] += PSQT[piece][index];
-				}
+			for (auto& sq : p.getPieceOnSquare(c, piece)) {
+				scorePSQT[WHITE] += PSQT[piece][ushort(sq)];
+				ushort index = (sq + 56) - ((sq / 8) * 16);
+				scorePSQT[BLACK] += PSQT[piece][index];
+			}
 		}
 	}
- 	
-	return scorePSQT[WHITE] - scorePSQT[BLACK];
+	return scorePSQT[p.getTurn()] - scorePSQT[!p.getTurn()];
 }

@@ -12,26 +12,32 @@ const Move calculateBestMove(Position const& p, short depth, bool maxim)
 	std::vector<Move> moveList = moveGeneration(copy);
 	Move bestMove{};
 	short bestValue = -9999;
+	short iterativeDepth{};
 
-	for (auto& m : moveList) {
-		int value{};
-		doMove(m, copy);
-		if (underCheck(turn, copy) == 0) {
-			value = alphaBeta(copy, depth - 1, -10000, 10000, !maxim);
-		}
-		else
-		{
+	for (ushort iterativeDepth = 1; iterativeDepth <= depth; iterativeDepth++) {
+		for (auto& m : moveList) {
+			int value{};
+			doMove(m, copy);
+			
+			if (underCheck(turn, copy) == 0) {
+				value = alphaBeta(copy, depth - 1, -10000, 10000, !maxim);
+			}
+			else
+			{
+				undoMove(m, copy, p);
+				continue;
+			}
+			
 			undoMove(m, copy, p);
-			continue;
-		}
-		undoMove(m, copy, p);
 
-		if (value >= bestValue) {
-			bestValue = value;
-			bestMove = m;
+			if (value >= bestValue) {
+				bestValue = value;
+				bestMove = m;
+			}
 		}
+		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestMove);
+		std::rotate(moveList.begin(), it, it + 1);
 	}
-
 	return bestMove;
 }
 

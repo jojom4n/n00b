@@ -120,6 +120,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		short depth = stoi(inputStream.str().substr(7));
 
 		Move m = calculateBestMove(board, depth, true);
+
 		if (m) {
 			doMove(m, board);
 			displayBoard(board);

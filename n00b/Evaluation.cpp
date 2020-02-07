@@ -35,7 +35,7 @@ const ushort evMaterial (Position const &p)
 			+ pieceValue_.at(PAWN) * numPawn;
 	}
 
-	return materialScore[p.getTurn()] - materialScore[!p.getTurn()];	
+	return materialScore[WHITE] - materialScore[BLACK];	
 }
 
 
@@ -47,11 +47,16 @@ const short evPSQT(Position const &p)
 		for (Piece piece = KING; piece <= PAWN; piece++)
 		{
 			for (auto& sq : p.getPieceOnSquare(c, piece)) {
-				scorePSQT[WHITE] += PSQT[piece][ushort(sq)];
-				ushort index = (sq + 56) - ((sq / 8) * 16);
-				scorePSQT[BLACK] += PSQT[piece][index];
+				
+				if (c == WHITE) 
+					scorePSQT[WHITE] += PSQT[piece][ushort(sq)];
+				else {
+					ushort index = (sq + 56) - ((sq / 8) * 16);
+					scorePSQT[BLACK] += PSQT[piece][index];
+				}
+
 			}
 		}
 	}
-	return scorePSQT[p.getTurn()] - scorePSQT[!p.getTurn()];
+	return scorePSQT[WHITE] - scorePSQT[BLACK];
 }

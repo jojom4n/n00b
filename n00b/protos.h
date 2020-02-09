@@ -89,8 +89,7 @@ const short evPSQT(Position const& p);
 
 // search.cpp
 const Move searchRoot(Position const& p, short depth);
-const short negamax(Position const& p, short depth);
-
+const short negamaxAB(Position const& p, short depth, long& nodes, short alpha, short beta);
 
 // bitscan.cpp
 #if defined(__GNUC__)  // GCC, Clang, ICC

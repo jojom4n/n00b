@@ -7,6 +7,7 @@
 
 const Move searchRoot(Position const& p, short depth) 
 {
+	long nodes{};
 	short bestScore = -(std::numeric_limits<short>::max());
 	Position copy = p;
 	Move bestMove{};
@@ -17,7 +18,7 @@ const Move searchRoot(Position const& p, short depth)
 	for (auto& m : moveList) {
 		short score{};
 		doMove(m, copy);
-		score = -negamax(copy, depth - 1);
+		score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA);
 
 		if (score >= bestScore) {
 			bestScore = score;
@@ -25,13 +26,16 @@ const Move searchRoot(Position const& p, short depth)
 		}
 
 		undoMove(m, copy, p);
+		nodes++;
+
 	}
 
+	std::cout << "Nodes traversed: " << nodes << std::endl;
 	return bestMove;
 }
 
 
-const short negamax(Position const& p, short depth)
+const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta)
 {
 	if (depth == 0)
 		return evaluate(p);
@@ -45,12 +49,19 @@ const short negamax(Position const& p, short depth)
 	for (auto& m : moveList) {
 		short score{};
 		doMove(m, copy);
-		score = -negamax(copy, depth - 1);
+		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha);
 
 		if (score > bestScore) 
 			bestScore = score;
 		
+		if (score > alpha)
+			alpha = score;
+
 		undoMove(m, copy, p);
+		nodes++;
+
+		if (alpha >= beta)
+			return alpha;
 	}
 	
 	return bestScore;

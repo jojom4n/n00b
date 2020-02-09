@@ -11,6 +11,9 @@
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
 
+#define ALPHA -(std::numeric_limits<short>::max())
+#define BETA std::numeric_limits<short>::max()
+
 using Clock = std::chrono::high_resolution_clock;
 using ushort = unsigned short;
 using Bitboard = uint64_t;

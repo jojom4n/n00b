@@ -119,7 +119,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
 
-		Move m = RootNegaMax(board, depth);
+		Move m = searchRoot(board, depth);
 
 		if (m) {
 			doMove(m, board);

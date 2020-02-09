@@ -88,8 +88,8 @@ const short evMaterial(Position const& p);
 const short evPSQT(Position const& p);
 
 // search.cpp
-const Move RootNegaMax(Position const& p, short depth);
-const short NegaMax(Position const& p, short depth);
+const Move searchRoot(Position const& p, short depth);
+const short negamax(Position const& p, short depth);
 
 
 // bitscan.cpp

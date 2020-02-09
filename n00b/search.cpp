@@ -5,7 +5,7 @@
 #include "protos.h"
 #include "Position.h"
 
-const Move RootNegaMax(Position const& p, short depth) 
+const Move searchRoot(Position const& p, short depth) 
 {
 	short bestScore = -(std::numeric_limits<short>::max());
 	Position copy = p;
@@ -17,7 +17,7 @@ const Move RootNegaMax(Position const& p, short depth)
 	for (auto& m : moveList) {
 		short score{};
 		doMove(m, copy);
-		score = -NegaMax(copy, depth - 1);
+		score = -negamax(copy, depth - 1);
 
 		if (score >= bestScore) {
 			bestScore = score;
@@ -31,7 +31,7 @@ const Move RootNegaMax(Position const& p, short depth)
 }
 
 
-const short NegaMax(Position const& p, short depth)
+const short negamax(Position const& p, short depth)
 {
 	if (depth == 0)
 		return evaluate(p);
@@ -45,7 +45,7 @@ const short NegaMax(Position const& p, short depth)
 	for (auto& m : moveList) {
 		short score{};
 		doMove(m, copy);
-		score = -NegaMax(copy, depth - 1);
+		score = -negamax(copy, depth - 1);
 
 		if (score > bestScore) 
 			bestScore = score;

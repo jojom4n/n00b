@@ -84,13 +84,12 @@ namespace Zobrist {
 
 // evaluation.cpp
 const short evaluate(Position const &p);
-const ushort evMaterial(Position const& p);
+const short evMaterial(Position const& p);
 const short evPSQT(Position const& p);
 
 // search.cpp
-const Move calculateBestMove(Position const& p, short depth, bool maxim);
-const int alphaBeta(Position const& p, short depth, int  alpha, int beta, bool maxim);
-// const Move calculateBestMove(Position const &p, short depth);
+const Move RootNegaMax(Position const& p, short depth);
+const short NegaMax(Position const& p, short depth);
 
 
 // bitscan.cpp

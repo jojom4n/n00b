@@ -1,9 +1,65 @@
 #include "pch.h"
 #include <iostream>
 #include <algorithm>
+#include <limits>
 #include "protos.h"
 #include "Position.h"
 
+const Move RootNegaMax(Position const& p, short depth) 
+{
+	short bestScore = -(std::numeric_limits<short>::max());
+	Position copy = p;
+	Move bestMove{};
+	
+	std::vector<Move> moveList = moveGeneration(copy);
+	moveList = pruneIllegal(moveList, copy);
+
+	for (auto& m : moveList) {
+		short score{};
+		doMove(m, copy);
+		score = -NegaMax(copy, depth - 1);
+
+		if (score >= bestScore) {
+			bestScore = score;
+			bestMove = m;
+		}
+
+		undoMove(m, copy, p);
+	}
+
+	return bestMove;
+}
+
+
+const short NegaMax(Position const& p, short depth)
+{
+	if (depth == 0)
+		return evaluate(p);
+
+	short bestScore = -(std::numeric_limits<short>::max());
+	Position copy = p;
+	
+	std::vector<Move> moveList = moveGeneration(copy);
+	moveList = pruneIllegal(moveList, copy);
+
+	for (auto& m : moveList) {
+		short score{};
+		doMove(m, copy);
+		score = -NegaMax(copy, depth - 1);
+
+		if (score > bestScore) 
+			bestScore = score;
+		
+		undoMove(m, copy, p);
+	}
+	
+	return bestScore;
+}
+
+
+
+
+/* 
 const Move calculateBestMove(Position const& p, short depth, bool maxim) 
 {
 
@@ -49,7 +105,7 @@ const int alphaBeta(Position const& p, short depth, int  alpha, int beta, bool m
 	std::vector<Move> moveList = moveGeneration(copy);
 
 	if (depth == 0) {
-		return -evaluate(p);
+		return evaluate(p);
 	}
 
 	if (maxim) {
@@ -91,4 +147,4 @@ const int alphaBeta(Position const& p, short depth, int  alpha, int beta, bool m
 		// std::cout << bestValue << "\t\n";
 		return bestValue;
 	}
-}
+} */

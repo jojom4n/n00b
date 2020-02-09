@@ -119,7 +119,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
 
-		Move m = calculateBestMove(board, depth, true);
+		Move m = RootNegaMax(board, depth);
 
 		if (m) {
 			doMove(m, board);
@@ -136,6 +136,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 			std::cout << "It's CHECKMATE!" << std::endl;
 		}
 	}
+
 	else if (inputStream.str().substr(0, 5) == "perft" && inputStream.str().substr(5, 1) == " "
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(6));
@@ -148,6 +149,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		else
 			std::cout << "Invalid depth.\n";
 	}
+
 	else if (inputStream.str().substr(0, 6) == "divide" && inputStream.str().substr(6, 1) == " " 
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
@@ -160,6 +162,12 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		else
 			std::cout << "Invalid depth.\n";
 	}
+
+	else if ((inputStream.str().substr(0) == "eval")) {
+		std::cout << "Material evaluation is: " << evMaterial(board) << std::endl;
+		std::cout << "PSQT evaluation is: " << evPSQT(board);
+	}
+	
 	else
 		std::cout << "Invalid command.\n";
 }

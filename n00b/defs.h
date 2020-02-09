@@ -109,8 +109,7 @@ extern std::map<std::string, Square> stringToSquareMap;
 extern std::map<Square, std::string> squareToStringMap;
 
 
-struct perftCache
-{
+struct perftCache {
 	unsigned long long key;
 	unsigned long long nodes;
 };

@@ -140,8 +140,8 @@ void doMove(Move const &m, Position &p)
 		p.setHalfMove(p.getHalfMove() + 1);
 
 		p.updateZobrist(color, p.getCastle(color));
-		p.setCastle(color, NONE);
-		p.updateZobrist(color, NONE);
+		p.setCastle(color, Castle::NONE);
+		p.updateZobrist(color, Castle::NONE);
 		
 		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
@@ -179,8 +179,8 @@ void doMove(Move const &m, Position &p)
 		p.setHalfMove(p.getHalfMove() + 1);
 		
 		p.updateZobrist(color, p.getCastle(color));
-		p.setCastle(color, NONE);
-		p.updateZobrist(color, NONE);
+		p.setCastle(color, Castle::NONE);
+		p.updateZobrist(color, Castle::NONE);
 		
 		p.updateZobrist(p.getTurn());
 		p.setTurn(Color(!color));
@@ -234,8 +234,8 @@ void doMove(Move const &m, Position &p)
 	// if King moves, no more castle
 	if (!(moveType == CASTLE_Q) && !(moveType == CASTLE_K) && (piece == KING)) {
 		p.updateZobrist(color, p.getCastle(color));
-		p.setCastle(color, NONE);
-		p.updateZobrist(color, NONE);
+		p.setCastle(color, Castle::NONE);
+		p.updateZobrist(color, Castle::NONE);
 	}
 
 	// if Rook moves, no more castle on that side
@@ -243,32 +243,32 @@ void doMove(Move const &m, Position &p)
 	{
 	case WHITE:
 		if (!(moveType == CASTLE_K) && piece == ROOK && squareFrom == H1
-			&& (p.getCastle(WHITE) == KINGSIDE || p.getCastle(WHITE) == ALL)) {
+			&& (p.getCastle(WHITE) == Castle::KINGSIDE || p.getCastle(WHITE) == Castle::ALL)) {
 			p.updateZobrist(WHITE, p.getCastle(WHITE));
-			p.setCastle(WHITE, Castle(p.getCastle(WHITE) - KINGSIDE));
+			p.setCastle(WHITE, Castle(static_cast<ushort>(p.getCastle(WHITE)) - static_cast<ushort>(Castle::KINGSIDE)));
 			p.updateZobrist(WHITE, p.getCastle(WHITE));
 		}
 
 		if (!(moveType == CASTLE_Q) && piece == ROOK && squareFrom == A1
-			&& (p.getCastle(WHITE) == QUEENSIDE || p.getCastle(WHITE) == ALL)) {
+			&& (p.getCastle(WHITE) == Castle::QUEENSIDE || p.getCastle(WHITE) == Castle::ALL)) {
 			p.updateZobrist(WHITE, p.getCastle(WHITE));
-			p.setCastle(WHITE, Castle(p.getCastle(WHITE) - QUEENSIDE));
+			p.setCastle(WHITE, Castle(static_cast<ushort>(p.getCastle(WHITE)) - static_cast<ushort>(Castle::QUEENSIDE)));
 			p.updateZobrist(WHITE, p.getCastle(WHITE));
 		}
 
 		break;
 	case BLACK:
 		if (!(moveType == CASTLE_K) && piece == ROOK && squareFrom == H8
-			&& (p.getCastle(BLACK) == KINGSIDE || p.getCastle(BLACK) == ALL)) {
+			&& (p.getCastle(BLACK) == Castle::KINGSIDE || p.getCastle(BLACK) == Castle::ALL)) {
 			p.updateZobrist(BLACK, p.getCastle(BLACK));
-			p.setCastle(BLACK, Castle(p.getCastle(BLACK) - KINGSIDE));
+			p.setCastle(BLACK, Castle(static_cast<ushort>(p.getCastle(BLACK)) - static_cast<ushort>(Castle::KINGSIDE)));
 			p.updateZobrist(BLACK, p.getCastle(BLACK));
 		}
 
 		if (!(moveType == CASTLE_Q) && piece == ROOK && squareFrom == A8
-			&& (p.getCastle(BLACK) == QUEENSIDE || p.getCastle(BLACK) == ALL)) {
+			&& (p.getCastle(BLACK) == Castle::QUEENSIDE || p.getCastle(BLACK) == Castle::ALL)) {
 			p.updateZobrist(BLACK, p.getCastle(BLACK));
-			p.setCastle(BLACK, Castle(p.getCastle(BLACK) - QUEENSIDE));
+			p.setCastle(BLACK, Castle(static_cast<ushort>(p.getCastle(BLACK)) - static_cast<ushort>(Castle::QUEENSIDE)));
 			p.updateZobrist(BLACK, p.getCastle(BLACK));
 		}
 
@@ -277,30 +277,30 @@ void doMove(Move const &m, Position &p)
 
 	// if Rook gets captured, no more castle, if previously possible
 	if (color == BLACK && captured == ROOK && squareTo == H1
-		&& (p.getCastle(WHITE) == KINGSIDE || p.getCastle(WHITE) == ALL)) {
+		&& (p.getCastle(WHITE) == Castle::KINGSIDE || p.getCastle(WHITE) == Castle::ALL)) {
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
-		p.setCastle(WHITE, Castle(p.getCastle(WHITE) - KINGSIDE));
+		p.setCastle(WHITE, Castle(static_cast<ushort>(p.getCastle(WHITE)) - static_cast<ushort>(Castle::KINGSIDE)));
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
 	}
 	
 	else if (color == BLACK && captured == ROOK && squareTo == A1
-		&& (p.getCastle(WHITE) == QUEENSIDE || p.getCastle(WHITE) == ALL)) {
+		&& (p.getCastle(WHITE) == Castle::QUEENSIDE || p.getCastle(WHITE) == Castle::ALL)) {
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
-		p.setCastle(WHITE, Castle(p.getCastle(WHITE) - QUEENSIDE));
+		p.setCastle(WHITE, Castle(static_cast<ushort>(p.getCastle(WHITE)) - static_cast<ushort>(Castle::QUEENSIDE)));
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
 	}
 	
 	else if (color == WHITE && captured == ROOK && squareTo == H8
-		&& (p.getCastle(BLACK) == KINGSIDE || p.getCastle(BLACK) == ALL)) {
+		&& (p.getCastle(BLACK) == Castle::KINGSIDE || p.getCastle(BLACK) == Castle::ALL)) {
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
-		p.setCastle(BLACK, Castle(p.getCastle(BLACK) - KINGSIDE));
+		p.setCastle(BLACK, Castle(static_cast<ushort>(p.getCastle(BLACK)) - static_cast<ushort>(Castle::KINGSIDE)));
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
 	}
 	
 	else if (color == WHITE && captured == ROOK && squareTo == A8
-		&& (p.getCastle(BLACK) == QUEENSIDE || p.getCastle(BLACK) == ALL)) {
+		&& (p.getCastle(BLACK) == Castle::QUEENSIDE || p.getCastle(BLACK) == Castle::ALL)) {
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
-		p.setCastle(BLACK, Castle(p.getCastle(BLACK) - QUEENSIDE));
+		p.setCastle(BLACK, Castle(static_cast<ushort>(p.getCastle(BLACK)) - static_cast<ushort>(Castle::QUEENSIDE)));
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
 	}
 }

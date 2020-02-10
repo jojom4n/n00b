@@ -56,8 +56,8 @@ namespace Zobrist {
 
 			} // end nested for
 
-			result ^= zobristCastle[WHITE][p.getCastle(WHITE)];
-			result ^= zobristCastle[BLACK][p.getCastle(BLACK)];
+			result ^= zobristCastle[WHITE][static_cast<ushort>(p.getCastle(WHITE))];
+			result ^= zobristCastle[BLACK][static_cast<ushort>(p.getCastle(BLACK))];
 
 			if (p.getEnPassant() != SQ_EMPTY) 
 				result ^= zobristEnPassant[p.getEnPassant() % 8];
@@ -90,7 +90,7 @@ namespace Zobrist {
 
 	uint64_t getKey(Color const& c, Castle const& castle) // for castle
 	{
-		return zobristCastle[c][castle];
+		return zobristCastle[c][static_cast<ushort>(castle)];
 	}
 
 	uint64_t getKey(ushort depth)

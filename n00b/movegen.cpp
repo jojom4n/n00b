@@ -147,7 +147,7 @@ void castleMoves(Position const &p)
 	Color c = p.getTurn();
 	Bitboard occ = p.getPosition();
 
-	if (p.getCastle(c) == QUEENSIDE || p.getCastle(c) == ALL)
+	if (p.getCastle(c) == Castle::QUEENSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(A8, c).piece == ROOK && p.idPiece(E8, c).piece == KING) // rook and king in position
 			&& (	(MoveTables.rook(A8, occ) >> E8) & C64(1)	) // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), C8))	)   // C8 and D8 must not be under attack
@@ -166,7 +166,7 @@ void castleMoves(Position const &p)
 			moveList.push_back(m);
 		}
 
-	if (p.getCastle(c) == KINGSIDE || p.getCastle(c) == ALL)
+	if (p.getCastle(c) == Castle::KINGSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(H8, c).piece == ROOK && p.idPiece(E8, c).piece == KING)  // rook and king in position
 			&& (	(MoveTables.rook(H8, occ) >> E8) & C64(1)	)  // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), F8))	)   // F8 and G8 must not be under attack

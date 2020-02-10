@@ -30,8 +30,8 @@ extern std::map<Square, std::string> squareToStringMap = {
 };
 
 
-std::map<ushort, std::string> castleMap = {
-	{ KINGSIDE,"K-" }, { QUEENSIDE,"-Q" }, { ALL,"KQ" }, { NONE,"--" }
+std::map<Castle, std::string> castleMap = {
+	{ Castle::KINGSIDE,"K-" }, { Castle::QUEENSIDE,"-Q" }, { Castle::ALL,"KQ" }, { Castle::NONE,"--" }
 };
 
 

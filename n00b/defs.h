@@ -44,7 +44,7 @@ enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE_K, 
 
 enum {PAWN_TO_QUEEN = 1, PAWN_TO_KNIGHT, PAWN_TO_ROOK, PAWN_TO_BISHOP};
 
-enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
+enum class Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
 
 enum File : const short { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER };
 

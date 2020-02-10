@@ -49,8 +49,8 @@ void Position::setNew()
 	turn_ = WHITE;
 	moveNumber_ = 1;
 	halfMove_ = 0;
-	castle_[WHITE] = ALL;
-	castle_[BLACK] = ALL;
+	castle_[WHITE] = Castle::ALL;
+	castle_[BLACK] = Castle::ALL;
 
 	setZobrist();
 }

@@ -8,7 +8,7 @@
 const Move searchRoot(Position const& p, short depth) 
 {
 	long nodes{};
-	short bestScore = -(std::numeric_limits<short>::max());
+	short bestScore = -SHRT_INFINITY;
 	Position copy = p;
 	Move bestMove{};
 	
@@ -31,6 +31,7 @@ const Move searchRoot(Position const& p, short depth)
 	}
 
 	std::cout << "Nodes traversed: " << nodes << std::endl;
+	std::cout << "Best score: " << bestScore << std::endl;
 	return bestMove;
 }
 
@@ -38,11 +39,10 @@ const Move searchRoot(Position const& p, short depth)
 const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta)
 {
 	if (depth == 0)
-		return evaluate(p);
+		return quiescence(p, ALPHA, BETA);
 
-	short bestScore = -(std::numeric_limits<short>::max());
 	Position copy = p;
-	
+	short bestScore = -SHRT_INFINITY;	
 	std::vector<Move> moveList = moveGeneration(copy);
 	moveList = pruneIllegal(moveList, copy);
 
@@ -68,7 +68,40 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 }
 
 
+const short quiescence(Position const& p, short alpha, short beta)
+{
+	short stand_pat = evaluate(p);
 
+	if (stand_pat >= beta)
+		return beta;
+
+	if (alpha < stand_pat)
+		alpha = stand_pat;
+
+	Position copy = p;
+	std::vector<Move> moveList = moveGeneration(copy);
+	moveList = pruneIllegal(moveList, copy);
+
+	for (auto& m : moveList) {
+		
+		short score{};
+		ushort moveType = ((C64(1) << 3) - 1) & (m >> 6); //check if move is a capture
+		
+		if (moveType == CAPTURE) {
+			doMove(m, copy);
+			score = -quiescence(copy, -beta, -alpha);
+			undoMove(m, copy, p);
+
+			if (score >= beta)
+				return beta;
+
+			if (score > alpha)
+				alpha = score;
+		}
+	}
+
+	return alpha;
+}
 
 /* 
 const Move calculateBestMove(Position const& p, short depth, bool maxim) 

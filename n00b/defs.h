@@ -11,8 +11,10 @@
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
 
-#define ALPHA -(std::numeric_limits<short>::max())
-#define BETA std::numeric_limits<short>::max()
+#define SHRT_INFINITY std::numeric_limits<short>::max()
+#define ALPHA -SHRT_INFINITY
+#define BETA SHRT_INFINITY
+
 
 using Clock = std::chrono::high_resolution_clock;
 using ushort = unsigned short;

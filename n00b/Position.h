@@ -12,8 +12,8 @@ class Position
 	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
 	Square enPassantSquare_{};
 	Color turn_{}; // who has the move?
-	ushort moveNumber_{}; // number of moves. Default to 1
-	ushort halfMove_{}; // number of half-moves. Default to 0
+	ushort moveNumber_{}; // number of moves. Default to 1 (see Position.cpp)
+	ushort halfMove_{}; // number of half-moves. Default to 0 (see Position.cpp)
 	bool checkmate_{ false }; // is the player checkmated?
 	std::array<Castle, 2> castle_{}; // castling rights for each player. Default to all
 	uint64_t zobristHash_{};
@@ -42,7 +42,7 @@ public:
 	void setCheckmate(bool const& b) { checkmate_ = b; }
 
 	constexpr Castle getCastle(Color const& color) const { return castle_[color]; }
-	void setCastle(Color const& color, enum Castle const& castle)
+	void setCastle(Color const& color, Castle const& castle)
 	{
 		(color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle;
 	}

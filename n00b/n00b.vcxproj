@@ -158,6 +158,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="divide.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="pch.h" />

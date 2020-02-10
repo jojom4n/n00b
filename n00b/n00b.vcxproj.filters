@@ -66,6 +66,9 @@
     <ClInclude Include="psqt.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="divide.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="File di intestazione">

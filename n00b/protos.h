@@ -30,7 +30,6 @@ void bishopMagic();
 // game.cpp
 void newGame();
 void readCommand(std::stringstream &inputStream, Position &board);
-uint64_t divide(short depth, Position& p);
 
 
 // fen.cpp
@@ -65,8 +64,10 @@ void undoMove(Move const &m, Position &p, Position const &backup);
 
 // perft.cpp
 unsigned long long perft(short depth, Position& p, bool init = false);
+
 template<size_t PERFT_CACHE_SIZE>
 static unsigned long long perft(short depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache);
+
 void perftInit();
 
 

@@ -39,7 +39,7 @@ const Move searchRoot(Position const& p, short depth)
 const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta)
 {
 	if (depth == 0)
-		return quiescence(p, ALPHA, BETA);
+		return quiescence(p, alpha, beta);
 
 	Position copy = p;
 	short bestScore = -SHRT_INFINITY;	

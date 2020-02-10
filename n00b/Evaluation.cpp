@@ -4,7 +4,7 @@
 #include "Position.h"
 
 const std::map <Piece, ushort> pieceValue_
-{ {PAWN, 100}, {KNIGHT, 300}, {BISHOP, 320}, {ROOK, 500}, {QUEEN, 900}, {KING, SHRT_INFINITY} };
+{ {PAWN, 100}, {KNIGHT, 300}, {BISHOP, 320}, {ROOK, 500}, {QUEEN, 900}, {KING, 5000} };
 
 
 const short evaluate(Position const &p)

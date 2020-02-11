@@ -45,16 +45,17 @@ const char printPiece(PieceID const &ID);
 
 
 // movegen.cpp
-const std::vector<Move> moveGeneration(Position &p);
+const std::vector<Move> moveGeneration(Position const &p);
 const std::vector<Move> generateOnlyKing(Color const &c, Position const &p);
 const Bitboard pawnMoves(Position const &p, Square const &from);
-void castleMoves(Position const &p);
-void enPassant(Position &p, Square const &enPassant, Color const &c);
+void castleMoves(Position const &p, std::vector<Move>& moveList);
+void enPassant(Position const &p, Square const &enPassant, Color const &c, std::vector<Move>& moveList);
 const MoveType setType(Piece const &piece, Bitboard const &occ, Color const & c, Square const &from, Square const &to);
 const Move composeMove(Square const &from, Square const &to, Color const &c, ushort const &p, MoveType const &type,
 	Piece const &captured, ushort const &promoteTo);
 short underCheck(Color const &c, Position const &p);
 const std::vector<Move> pruneIllegal(std::vector<Move> &moveList, Position const &p);
+const std::vector<Move> moveGenQS(Position const& p);
 
 
 // makemove.cpp
@@ -90,7 +91,7 @@ const short evPSQT(Position const& p);
 
 
 // search.cpp
-const Move searchRoot(Position const& p, short depth, short &bestScore, long& nodes, PV &pv);
+const Move searchRoot(Position const& p, short depth, short& bestScore, long& nodes, PV& pv);
 const short negamaxAB(Position const& p, short depth, long& nodes, short alpha, short beta, PV &pv);
 const short quiescence(Position const& p, short alpha, short beta);
 

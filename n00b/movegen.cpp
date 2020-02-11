@@ -3,15 +3,16 @@
 #include "Position.h"
 
 extern struct LookupTable MoveTables;
-std::vector<Move> moveList{};
 
-const std::vector<Move> moveGeneration(Position &p)
+const std::vector<Move> moveGeneration(Position const &p)
 {
-	moveList.clear();
+	std::vector<Move> moveList{};
+	// moveList.clear();
 	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
 	
-	if (underCheck(sideToMove, p) > 1)
-		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
+	if (underCheck(sideToMove, p) > 1) {
+		return moveList = generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
+	}
 
 	const Bitboard occupancy = p.getPosition();
 	const Bitboard ownPieces = p.getPosition(sideToMove);
@@ -83,10 +84,10 @@ const std::vector<Move> moveGeneration(Position &p)
 	} // end for loop
 
 	if (!(underCheck(sideToMove, p))) // if King is not under check, calculate castles too
-		castleMoves(p);
+		castleMoves(p, moveList);
 
 	if (!(p.getEnPassant() == SQ_EMPTY))
-		enPassant(p, p.getEnPassant(), sideToMove);
+		enPassant(p, p.getEnPassant(), sideToMove, moveList);
 
 	return moveList;
 }
@@ -94,6 +95,7 @@ const std::vector<Move> moveGeneration(Position &p)
 
 const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 {
+	std::vector<Move> moveList{};
 	const Bitboard occ = p.getPosition(), ownPieces = p.getPosition(c);
 	Bitboard moves{};
 	Square kingPos = p.getPieceOnSquare(c, KING)[0];
@@ -141,7 +143,7 @@ const Bitboard pawnMoves(Position const &p, Square const &from)
 }
 
 
-void castleMoves(Position const &p)
+void castleMoves(Position const &p, std::vector<Move> &moveList)
 {
 	Move m{};
 	Color c = p.getTurn();
@@ -187,7 +189,7 @@ void castleMoves(Position const &p)
 }
 
 
-void enPassant(Position &p, Square const &enPassant, Color const &c)
+void enPassant(Position const &p, Square const &enPassant, Color const &c, std::vector<Move>& moveList)
 {
 	Bitboard moves{};
 	Move m{};
@@ -408,6 +410,92 @@ const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position cons
 			it++; // ...retain the move, because it's valid, and check next one
 		} // end if
 	} // end for
+
+	return moveList;
+}
+
+
+const std::vector<Move> moveGenQS(Position const& p)
+{
+	std::vector<Move> moveList{};
+
+	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
+
+	if (underCheck(sideToMove, p) > 1)
+		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
+
+	const Bitboard occupancy = p.getPosition();
+	const Bitboard ownPieces = p.getPosition(sideToMove);
+
+	for (Piece piece = KING; piece <= PAWN; piece++) {
+		Bitboard bb = p.getPieces(sideToMove, piece);
+
+		while (bb) { // loop until the bitboard has a piece on it
+			Square squareFrom = Square(bitscan_reset(bb)); // find the square(s) with the particular piece;
+			Bitboard moves{}, promo_moves{};
+
+			// get move bitboard for the piece, given its square
+			switch (piece) {
+			case KING:
+				moves = MoveTables.king[squareFrom];
+				break;
+			case QUEEN:
+				moves = MoveTables.bishop(squareFrom, occupancy)
+					| MoveTables.rook(squareFrom, occupancy);
+				break;
+			case ROOK:
+				moves = MoveTables.rook(squareFrom, occupancy);
+				break;
+			case KNIGHT:
+				moves = MoveTables.knight[squareFrom];
+				break;
+			case BISHOP:
+				moves = MoveTables.bishop(squareFrom, occupancy);
+				break;
+			case PAWN:
+				/* For pawns, it's a bit more complicated, because they have no lookup tables.
+				For readibility, better pass the params to an appropriate function */
+				promo_moves = pawnMoves(p, squareFrom);
+				moves = promo_moves;
+				break;
+			}
+
+			//let's add promotions to queen to movelist first
+			if (promo_moves)
+				promo_moves &= ~occupancy;
+
+			while (promo_moves) {
+				Square squareTo = Square(bitscan_reset(promo_moves));
+				Piece captured = p.idPiece(squareTo, Color(!sideToMove)).piece;
+				MoveType type = setType(piece, occupancy, sideToMove, squareFrom, squareTo);
+
+				if (type == PROMOTION) {
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN);
+					moveList.push_back(m);
+				}
+
+			}
+
+			// now let's add captures to movelist
+			if (moves) {
+				moves &= occupancy; // select only bits corresponding to captures
+				
+				if (!(piece == PAWN)) 
+					moves &= ~ownPieces; // exclude own pieces from moves
+			}	
+
+			while (moves) { // scan collected captures and add them to list
+				Square squareTo = Square(bitscan_reset(moves));
+				Piece captured = p.idPiece(squareTo, Color(!sideToMove)).piece;
+
+				if (captured == KING) break; // captured can't be enemy king
+
+				Move m = composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0);
+				moveList.push_back(m);
+				
+			} // end while (moves)
+		} // end while (bb)
+	} // end for loop
 
 	return moveList;
 }

@@ -72,7 +72,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
 
+		auto t1 = Clock::now();
 		Move m = searchRoot(board, depth);
+		auto t2 = Clock::now();
 
 		if (m) {
 			doMove(m, board);
@@ -88,6 +90,8 @@ void readCommand(std::stringstream &inputStream, Position &board)
 			board.setCheckmate(true);
 			std::cout << "It's CHECKMATE!" << std::endl;
 		}
+
+		std::cout << "\nTime elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
 	}
 
 	else if (inputStream.str().substr(0, 5) == "perft" && inputStream.str().substr(5, 1) == " "

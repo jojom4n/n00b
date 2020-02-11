@@ -121,11 +121,11 @@ struct perftCache {
 };
 
 
-typedef struct tagPV {
+/* typedef struct tagPV {
 
 	int cmove;              // Number of moves in the line.
 	std::vector<Move> argmove{};  // The line.
 
-} PV;
+} PV; */
 
 #endif

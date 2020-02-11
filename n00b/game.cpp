@@ -77,21 +77,21 @@ void readCommand(std::stringstream &inputStream, Position &board)
 
 		for (short i = 1; i <= depth; i++) {
 			short bestScore = -SHRT_INFINITY;
-			PV pv{};
+			std::vector<Move> pv{};
+			pv.clear();
 			
 			auto t1 = Clock::now();
 			m = searchRoot(board, i, bestScore, nodes, pv);
 			auto t2 = Clock::now();
 
 			if (m) {
-				std::cout << "\ndepth:" << i << " score:" << bestScore << " move:" << displayMove(board, m)
-					<< " pv:" << displayMove(board,m) << " ";
+				std::cout << "\ndepth:" << i << " score:" << bestScore << " move:" << displayMove(board, m) << " pv:";
 
-				for (auto &m : pv.argmove) {
-					std::cout << displayMove(board, m) << " ";
+				for (auto &m : pv) {
+					std::cout << displayMove(board, m);
 				}
 
-				std::cout << "nodes:" << nodes << " ms:" << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+				std::cout << " nodes:" << nodes << " ms:" << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
 			}
 
 			else if (!m && !underCheck(board.getTurn(), board)) {

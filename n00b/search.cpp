@@ -5,7 +5,7 @@
 #include "protos.h"
 #include "Position.h"
 
-const Move searchRoot(Position const& p, short depth, short &bestScore, long &nodes, PV &pv) 
+const Move searchRoot(Position const& p, short depth, short &bestScore, long &nodes, std::vector<Move> &pv) 
 {
 	Position copy = p;
 	Move bestMove{};
@@ -34,14 +34,11 @@ const Move searchRoot(Position const& p, short depth, short &bestScore, long &no
 }
 
 
-const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta, PV &pv)
+const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta, std::vector<Move> &pv)
 {
-	PV line{};
-	
-	if (depth == 0) {
-		pv.cmove = 0;
-		return quiescence(p, alpha, beta, nodes);
-	}
+	if (depth == 0)
+		// return quiescence(copy, alpha, beta, nodes);
+		return evaluate(p);
 
 	Position copy = p;
 	short bestScore = -SHRT_INFINITY;	
@@ -50,22 +47,20 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 
 	for (auto& m : moveList) {
 		short score{};
+		std::vector<Move> childPV;
 		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, line);
+		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, childPV);
 
 		if (score > bestScore) 
 			bestScore = score;
 			
 		
 		if (score > alpha) {
-			pv.argmove.clear();
 			alpha = score;
-			pv.argmove.push_back(m);
 			
-			for (auto& m : line.argmove)
-				pv.argmove.push_back(m);
-			
-			pv.cmove = line.cmove + 1;
+			pv.clear();
+			pv.push_back(m);
+			std::copy(childPV.begin(), childPV.end(), back_inserter(pv));
 		}
 
 		undoMove(m, copy, p);
@@ -90,25 +85,22 @@ const short quiescence(Position const& p, short alpha, short beta, long &nodes)
 		alpha = stand_pat;
 
 	Position copy = p;
-	std::vector<Move> moveList = moveGeneration(copy);
+	std::vector<Move> moveList = moveGenQS(copy);
 	moveList = pruneIllegal(moveList, copy);
 
 	for (auto& m : moveList) {
 		
 		short score{};
-		ushort moveType = ((C64(1) << 3) - 1) & (m >> 6); //check if move is a capture
-		
-		if (moveType == CAPTURE) {
-			doMove(m, copy);
-			score = -quiescence(copy, -beta, -alpha);
-			undoMove(m, copy, p);
+		doMove(m, copy);
+		score = -quiescence(copy, -beta, -alpha, nodes);
+		undoMove(m, copy, p);
+		nodes++;
 
-			if (score >= beta)
-				return beta;
+		if (score >= beta)
+			return beta;
 
-			if (score > alpha)
-				alpha = score;
-		}
+		if (score > alpha)
+			alpha = score;
 	}
 
 	return alpha;

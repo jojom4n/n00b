@@ -40,7 +40,7 @@ void fenParser(std::stringstream &fen, Position &board);
 //display.cpp
 void displayBoard(Position const &board);
 void displayMoveList(Position const &board, std::vector<Move> const &m);
-void displayMove(Position const& board, Move const& m);
+std::string displayMove(Position const& board, Move const& m);
 const char printPiece(PieceID const &ID);
 
 
@@ -88,10 +88,12 @@ const short evaluate(Position const &p);
 const short evMaterial(Position const& p);
 const short evPSQT(Position const& p);
 
+
 // search.cpp
-const Move searchRoot(Position const& p, short depth);
-const short negamaxAB(Position const& p, short depth, long& nodes, short alpha, short beta);
+const Move searchRoot(Position const& p, short depth, short &bestScore, long& nodes, PV &pv);
+const short negamaxAB(Position const& p, short depth, long& nodes, short alpha, short beta, PV &pv);
 const short quiescence(Position const& p, short alpha, short beta);
+
 
 // bitscan.cpp
 #if defined(__GNUC__)  // GCC, Clang, ICC

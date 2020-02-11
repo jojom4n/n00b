@@ -43,15 +43,16 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		std::vector<Move> moveList;
 		moveList = moveGeneration(board);
 		moveList = pruneIllegal(moveList, board);
+		
 		if (moveList.size() > 0) {
 			displayMoveList(board, moveList);
 		}
-		else if (moveList.size() == 0 && !underCheck(board.getTurn(), board))
-		{
+		
+		else if (moveList.size() == 0 && !underCheck(board.getTurn(), board)) {
 			std::cout << "It's STALEMATE!" << std::endl;
 		}
-		else if (moveList.size() == 0 && underCheck(board.getTurn(), board))
-		{
+		
+		else if (moveList.size() == 0 && underCheck(board.getTurn(), board)) {
 			board.setCheckmate(true);
 			std::cout << "It's CHECKMATE!" << std::endl;
 		}
@@ -71,23 +72,43 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 6) == "search" && inputStream.str().substr(6,1) == " "
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
+		long nodes{};
+		Move m{};
 
-		Move m = searchRoot(board, depth);
+		for (short i = 1; i <= depth; i++) {
+			short bestScore = -SHRT_INFINITY;
+			PV pv{};
+			
+			auto t1 = Clock::now();
+			m = searchRoot(board, i, bestScore, nodes, pv);
+			auto t2 = Clock::now();
 
-		if (m) {
-			doMove(m, board);
-			displayBoard(board);
-			displayMove(board, m);
+			if (m) {
+				std::cout << "\ndepth:" << i << " score:" << bestScore << " move:" << displayMove(board, m)
+					<< " pv:" << displayMove(board,m) << " ";
+
+				for (auto &m : pv.argmove) {
+					std::cout << displayMove(board, m) << " ";
+				}
+
+				std::cout << "nodes:" << nodes << " ms:" << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+			}
+
+			else if (!m && !underCheck(board.getTurn(), board)) {
+				std::cout << "\nIt's STALEMATE!" << std::endl;
+			}
+
+			else if (!m && underCheck(board.getTurn(), board)) {
+				board.setCheckmate(true);
+				std::cout << "\nIt's CHECKMATE!" << std::endl;
+			}
+			
+			
 		}
-		else if (!m && !underCheck(board.getTurn(), board))
-		{
-			std::cout << "It's STALEMATE!" << std::endl;
-		}	
-		else if (!m && underCheck(board.getTurn(), board))
-		{
-			board.setCheckmate(true);
-			std::cout << "It's CHECKMATE!" << std::endl;
-		}
+
+		doMove(m, board);
+		std:: cout << std::endl;
+		displayBoard(board);
 	}
 
 	else if (inputStream.str().substr(0, 5) == "perft" && inputStream.str().substr(5, 1) == " "

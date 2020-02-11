@@ -5,10 +5,8 @@
 #include "protos.h"
 #include "Position.h"
 
-const Move searchRoot(Position const& p, short depth) 
+const Move searchRoot(Position const& p, short depth, short &bestScore, long &nodes, PV &pv) 
 {
-	long nodes{};
-	short bestScore = -SHRT_INFINITY;
 	Position copy = p;
 	Move bestMove{};
 	
@@ -18,7 +16,7 @@ const Move searchRoot(Position const& p, short depth)
 	for (auto& m : moveList) {
 		short score{};
 		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA);
+		score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA, pv);
 
 		if (score >= bestScore) {
 			bestScore = score;
@@ -30,16 +28,20 @@ const Move searchRoot(Position const& p, short depth)
 
 	}
 
-	std::cout << "Nodes traversed: " << nodes << std::endl;
-	std::cout << "Best score: " << bestScore << std::endl;
+	/* std::cout << "Nodes traversed: " << nodes << std::endl;
+	std::cout << "Best score: " << bestScore << std::endl; */
 	return bestMove;
 }
 
 
-const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta)
+const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta, PV &pv)
 {
-	if (depth == 0)
-		return quiescence(p, alpha, beta);
+	PV line{};
+	
+	if (depth == 0) {
+		pv.cmove = 0;
+		return quiescence(p, alpha, beta, nodes);
+	}
 
 	Position copy = p;
 	short bestScore = -SHRT_INFINITY;	
@@ -49,13 +51,22 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 	for (auto& m : moveList) {
 		short score{};
 		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha);
+		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, line);
 
 		if (score > bestScore) 
 			bestScore = score;
+			
 		
-		if (score > alpha)
+		if (score > alpha) {
+			pv.argmove.clear();
 			alpha = score;
+			pv.argmove.push_back(m);
+			
+			for (auto& m : line.argmove)
+				pv.argmove.push_back(m);
+			
+			pv.cmove = line.cmove + 1;
+		}
 
 		undoMove(m, copy, p);
 		nodes++;
@@ -68,7 +79,7 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 }
 
 
-const short quiescence(Position const& p, short alpha, short beta)
+const short quiescence(Position const& p, short alpha, short beta, long &nodes)
 {
 	short stand_pat = evaluate(p);
 
@@ -102,6 +113,7 @@ const short quiescence(Position const& p, short alpha, short beta)
 
 	return alpha;
 }
+
 
 /* 
 const Move calculateBestMove(Position const& p, short depth, bool maxim) 

@@ -5,6 +5,7 @@
 #include <chrono>
 #include <string>
 #include <array>
+#include <vector>
 
 #define C64(constantuint64_t) constantuint64_t##ULL
 
@@ -118,5 +119,13 @@ struct perftCache {
 	unsigned long long key;
 	unsigned long long nodes;
 };
+
+
+typedef struct tagPV {
+
+	int cmove;              // Number of moves in the line.
+	std::vector<Move> argmove{};  // The line.
+
+} PV;
 
 #endif

@@ -132,8 +132,7 @@ void displayMoveList(Position const &board, std::vector<Move> const &m) {
 }
 
 
-void displayMove(Position const& board, Move const& m) {
-	std::cout << "My move is: ";
+std::string displayMove(Position const& board, Move const& m) {
 	std::string output = "";
 
 	Square squareFrom{}, squareTo{};
@@ -160,7 +159,7 @@ void displayMove(Position const& board, Move const& m) {
 			break;
 		}
 
-	std::cout << output;
+	return output;
 }
 
 

@@ -74,6 +74,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		short depth = stoi(inputStream.str().substr(7));
 		long nodes{};
 		Move m{};
+		std::cout << std::endl;
 
 		for (short i = 1; i <= depth; i++) {
 			short bestScore = -SHRT_INFINITY;
@@ -84,14 +85,17 @@ void readCommand(std::stringstream &inputStream, Position &board)
 			m = searchRoot(board, i, bestScore, nodes, pv);
 			auto t2 = Clock::now();
 
+			std::chrono::duration<float, std::milli> time = t2 - t1;
+
 			if (m) {
-				std::cout << "\ndepth:" << i << " score:" << bestScore << " move:" << displayMove(board, m) << " pv:";
+				std::cout << "depth:" << i << "\tnodes:" << nodes << " ms:" << time.count() << " nps:" << nodes / (time.count() / 1000) << std::endl;  
+				std::cout << "move:" << displayMove(board, m) << " score:" << bestScore << " pv:";
 
 				for (auto &m : pv) {
-					std::cout << displayMove(board, m);
+					std::cout << displayMove(board, m) << " ";
 				}
 
-				std::cout << " nodes:" << nodes << " ms:" << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
+				std::cout << std::endl << std::endl;
 			}
 
 			else if (!m && !underCheck(board.getTurn(), board)) {
@@ -102,8 +106,6 @@ void readCommand(std::stringstream &inputStream, Position &board)
 				board.setCheckmate(true);
 				std::cout << "\nIt's CHECKMATE!" << std::endl;
 			}
-			
-			
 		}
 
 		doMove(m, board);

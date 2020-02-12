@@ -92,7 +92,7 @@ const short evPSQT(Position const& p);
 
 // search.cpp
 const Move searchRoot(Position const& p, short depth, short& bestScore, long& nodes, std::vector<Move> &pv);
-const short negamaxAB(Position const& p, short depth, long& nodes, short alpha, short beta, std::vector<Move> &pv);
+const short negamaxAB(Position const& p, short depth, long& nodes, short alpha, short beta, std::vector<Move> &childPv);
 const short quiescence(Position const& p, short alpha, short beta, long &nodes);
 
 

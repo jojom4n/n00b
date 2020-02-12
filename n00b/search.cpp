@@ -14,13 +14,17 @@ const Move searchRoot(Position const& p, short depth, short &bestScore, long &no
 	moveList = pruneIllegal(moveList, copy);
 
 	for (auto& m : moveList) {
+		std::vector<Move> childPv{};
 		short score{};
 		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA, pv);
+		score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA, childPv);
 
 		if (score >= bestScore) {
 			bestScore = score;
 			bestMove = m;
+			pv.clear();
+			pv.push_back(m);
+			std::copy(childPv.begin(), childPv.end(), back_inserter(pv));
 		}
 
 		undoMove(m, copy, p);
@@ -28,28 +32,27 @@ const Move searchRoot(Position const& p, short depth, short &bestScore, long &no
 
 	}
 
-	/* std::cout << "Nodes traversed: " << nodes << std::endl;
-	std::cout << "Best score: " << bestScore << std::endl; */
 	return bestMove;
 }
 
 
-const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta, std::vector<Move> &pv)
+const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta, std::vector<Move> &childPv)
 {
-	if (depth == 0)
-		// return quiescence(copy, alpha, beta, nodes);
-		return evaluate(p);
-
 	Position copy = p;
+
+	if (depth == 0)
+		return quiescence(copy, alpha, beta, nodes);
+		// return evaluate(p);
+
 	short bestScore = -SHRT_INFINITY;	
 	std::vector<Move> moveList = moveGeneration(copy);
 	moveList = pruneIllegal(moveList, copy);
 
 	for (auto& m : moveList) {
 		short score{};
-		std::vector<Move> childPV;
+		std::vector<Move> nephewPv{};
 		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, childPV);
+		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, nephewPv);
 
 		if (score > bestScore) 
 			bestScore = score;
@@ -57,10 +60,9 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 		
 		if (score > alpha) {
 			alpha = score;
-			
-			pv.clear();
-			pv.push_back(m);
-			std::copy(childPV.begin(), childPV.end(), back_inserter(pv));
+			childPv.clear();
+			childPv.push_back(m);
+			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
 		}
 
 		undoMove(m, copy, p);

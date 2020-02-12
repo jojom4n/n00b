@@ -27,7 +27,7 @@ const Move iterativeSearch (Position &p, short depth)
 			std::cout << "\n*depth:" << i << " nodes:" << nodes << " ms:" << time.count() << " nps:" << nodes / (time.count() / 1000) << std::endl;
 			std::cout << "\t move:" << displayMove(p, m) << " score:" << bestScore << " pv:";
 
-			for (const auto &it = pv.begin(); it != pv.end(); ++it) {
+			for (auto it = pv.begin(); it != pv.end(); ++it) {
 				(it == std::prev(pv.end()) && bestScore == MATE) ? std::cout << displayMove(p, *it) << "# " 
 					: std::cout << displayMove(p, *it) << " ";
 			}

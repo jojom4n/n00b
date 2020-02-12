@@ -48,7 +48,7 @@ const short evPSQT(Position const &p)
 	for (Color c = BLACK; c <= WHITE; c++) {
 		for (Piece piece = KING; piece <= PAWN; piece++)
 		{
-			for (auto& sq : p.getPieceOnSquare(c, piece)) {
+			for (const auto& sq : p.getPieceOnSquare(c, piece)) {
 				
 				if (c == WHITE) 
 					scorePSQT[WHITE] += PSQT[piece][sq];

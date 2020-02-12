@@ -99,7 +99,7 @@ void displayMoveList(Position const &board, std::vector<Move> const &m) {
 	std::cout << "Available moves: ";
 	std::string output = "";
 	
-	for (auto& elem : m)
+	for (const auto& elem : m)
 	{
 		Square squareFrom{}, squareTo{};
 		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 19));

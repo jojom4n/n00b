@@ -18,7 +18,7 @@ unsigned long long perft(short depth, Position& p, bool init)
 	if (depth <= 0 || moveList.size() == 0)
 		return 0;
 
-	for (auto& elem : moveList) {
+	for (const auto& elem : moveList) {
 		unsigned long long partialNodes;
 		Square squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 19));
 		Square squareTo = Square(((C64(1) << 6) - 1) & (elem >> 13));
@@ -60,7 +60,7 @@ static unsigned long long perft(short depth, Position& p, std::array<perftCache,
 	if (depth == 1 || moveList.size() == 0)
 		return moveList.size();
 
-	for (auto& elem : moveList) {
+	for (const auto& elem : moveList) {
 		doMove(elem, copy);
 		nodes += perft(depth - 1, copy, cache);
 		undoMove(elem, copy, p);

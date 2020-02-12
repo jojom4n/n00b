@@ -13,6 +13,7 @@
 #define RANK_INDEX (square / 8)
 
 #define SHRT_INFINITY std::numeric_limits<short>::max()
+#define MATE (std::numeric_limits<short>::max() / 2)
 #define ALPHA -SHRT_INFINITY
 #define BETA SHRT_INFINITY
 

@@ -11,10 +11,9 @@ const Move iterativeSearch (Position &p, short depth)
 	Move m{};
 	std::vector<Move> moveList = moveGeneration(p);
 	moveList = pruneIllegal(moveList, p);
-	std::cout << std::endl;
 
 	for (short i = 1; i <= depth; i++) {
-		short bestScore = -SHRT_INFINITY;
+		short bestScore = -MATE;
 		std::vector<Move> pv{};
 		pv.clear();
 		
@@ -25,14 +24,13 @@ const Move iterativeSearch (Position &p, short depth)
 		std::chrono::duration<float, std::milli> time = t2 - t1;
 
 		if (m) {
-			std::cout << "depth:" << i << "\tnodes:" << nodes << " ms:" << time.count() << " nps:" << nodes / (time.count() / 1000) << std::endl;
-			std::cout << "move:" << displayMove(p, m) << " score:" << bestScore << " pv:";
+			std::cout << "\n*depth:" << i << " nodes:" << nodes << " ms:" << time.count() << " nps:" << nodes / (time.count() / 1000) << std::endl;
+			std::cout << "\t move:" << displayMove(p, m) << " score:" << bestScore << " pv:";
 
-			for (auto& m : pv) {
-				std::cout << displayMove(p, m) << " ";
+			for (auto it = pv.begin(); it != pv.end(); ++it) {
+				(it == std::prev(pv.end()) && bestScore == MATE) ? std::cout << displayMove(p, *it) << "# " 
+					: std::cout << displayMove(p, *it) << " ";
 			}
-
-			std::cout << std::endl << std::endl;
 		}
 
 		else if (!m && !underCheck(p.getTurn(), p)) {
@@ -87,7 +85,7 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 		return quiescence(copy, alpha, beta, nodes);
 		// return evaluate(p);
 
-	short bestScore = -SHRT_INFINITY;	
+	short bestScore = -MATE;	
 	std::vector<Move> moveList = moveGeneration(copy);
 	moveList = pruneIllegal(moveList, copy);
 

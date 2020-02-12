@@ -47,11 +47,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		if (moveList.size() > 0) {
 			displayMoveList(board, moveList);
 		}
-		
 		else if (moveList.size() == 0 && !underCheck(board.getTurn(), board)) {
 			std::cout << "It's STALEMATE!" << std::endl;
 		}
-		
 		else if (moveList.size() == 0 && underCheck(board.getTurn(), board)) {
 			board.setCheckmate(true);
 			std::cout << "It's CHECKMATE!" << std::endl;
@@ -72,45 +70,14 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 6) == "search" && inputStream.str().substr(6,1) == " "
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
-		long nodes{};
-		Move m{};
-		std::cout << std::endl;
-
-		for (short i = 1; i <= depth; i++) {
-			short bestScore = -SHRT_INFINITY;
-			std::vector<Move> pv{};
-			pv.clear();
-			
-			auto t1 = Clock::now();
-			m = searchRoot(board, i, bestScore, nodes, pv);
-			auto t2 = Clock::now();
-
-			std::chrono::duration<float, std::milli> time = t2 - t1;
-
-			if (m) {
-				std::cout << "depth:" << i << "\tnodes:" << nodes << " ms:" << time.count() << " nps:" << nodes / (time.count() / 1000) << std::endl;  
-				std::cout << "move:" << displayMove(board, m) << " score:" << bestScore << " pv:";
-
-				for (auto &m : pv) {
-					std::cout << displayMove(board, m) << " ";
-				}
-
-				std::cout << std::endl << std::endl;
-			}
-
-			else if (!m && !underCheck(board.getTurn(), board)) {
-				std::cout << "\nIt's STALEMATE!" << std::endl;
-			}
-
-			else if (!m && underCheck(board.getTurn(), board)) {
-				board.setCheckmate(true);
-				std::cout << "\nIt's CHECKMATE!" << std::endl;
-			}
+		if (depth > 0) {
+			Move m = iterativeSearch(board, depth);
+			doMove(m, board);
+			std::cout << std::endl;
+			displayBoard(board);
 		}
-
-		doMove(m, board);
-		std:: cout << std::endl;
-		displayBoard(board);
+		else
+			std::cout << "Invalid depth.\n";
 	}
 
 	else if (inputStream.str().substr(0, 5) == "perft" && inputStream.str().substr(5, 1) == " "

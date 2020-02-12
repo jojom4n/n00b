@@ -5,14 +5,54 @@
 #include "protos.h"
 #include "Position.h"
 
-const Move searchRoot(Position const& p, short depth, short &bestScore, long &nodes, std::vector<Move> &pv) 
+const Move iterativeSearch (Position &p, short depth)
+{
+	long nodes{};
+	Move m{};
+	std::vector<Move> moveList = moveGeneration(p);
+	moveList = pruneIllegal(moveList, p);
+	std::cout << std::endl;
+
+	for (short i = 1; i <= depth; i++) {
+		short bestScore = -SHRT_INFINITY;
+		std::vector<Move> pv{};
+		pv.clear();
+		
+		auto t1 = Clock::now();
+		m = negamaxRoot(p, i, bestScore, nodes, pv, moveList);
+		auto t2 = Clock::now();
+
+		std::chrono::duration<float, std::milli> time = t2 - t1;
+
+		if (m) {
+			std::cout << "depth:" << i << "\tnodes:" << nodes << " ms:" << time.count() << " nps:" << nodes / (time.count() / 1000) << std::endl;
+			std::cout << "move:" << displayMove(p, m) << " score:" << bestScore << " pv:";
+
+			for (auto& m : pv) {
+				std::cout << displayMove(p, m) << " ";
+			}
+
+			std::cout << std::endl << std::endl;
+		}
+
+		else if (!m && !underCheck(p.getTurn(), p)) {
+			std::cout << "\nIt's STALEMATE!" << std::endl;
+		}
+
+		else if (!m && underCheck(p.getTurn(), p)) {
+			p.setCheckmate(true);
+			std::cout << "\nIt's CHECKMATE!" << std::endl;
+		}
+	}
+	
+	return m;
+}
+
+const Move negamaxRoot(Position const& p, short depth, short &bestScore, long &nodes, std::vector<Move> &pv, std::vector<Move> &moveList) 
 {
 	Position copy = p;
 	Move bestMove{};
 	
-	std::vector<Move> moveList = moveGeneration(copy);
-	moveList = pruneIllegal(moveList, copy);
-
 	for (auto& m : moveList) {
 		std::vector<Move> childPv{};
 		short score{};
@@ -31,6 +71,10 @@ const Move searchRoot(Position const& p, short depth, short &bestScore, long &no
 		nodes++;
 
 	}
+
+	//put the best move found to the beginning of movelist for further depth search
+	std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestMove);
+	std::rotate(moveList.begin(), it, it + 1);
 
 	return bestMove;
 }

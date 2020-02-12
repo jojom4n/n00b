@@ -8,11 +8,12 @@
 const Move iterativeSearch (Position &p, short depth)
 {
 	long nodes{};
+	bool flagMate{ true };
 	Move m{};
 	std::vector<Move> moveList = moveGeneration(p);
 	moveList = pruneIllegal(moveList, p);
 
-	for (short i = 1; i <= depth; i++) {
+	for (short i = 1; i <= depth && flagMate; i++) {
 		short bestScore = -MATE;
 		std::vector<Move> pv{};
 		pv.clear();
@@ -21,6 +22,9 @@ const Move iterativeSearch (Position &p, short depth)
 		m = negamaxRoot(p, i, bestScore, nodes, pv, moveList);
 		auto t2 = Clock::now();
 
+		if (bestScore == MATE || bestScore == -MATE)
+			flagMate = false;
+		
 		std::chrono::duration<float, std::milli> time = t2 - t1;
 
 		if (m) {
@@ -28,7 +32,7 @@ const Move iterativeSearch (Position &p, short depth)
 			std::cout << "\t move:" << displayMove(p, m) << " score:" << bestScore << " pv:";
 
 			for (auto it = pv.begin(); it != pv.end(); ++it) {
-				(it == std::prev(pv.end()) && bestScore == MATE) ? std::cout << displayMove(p, *it) << "# " 
+				(it == std::prev(pv.end()) && (bestScore == MATE || bestScore == -MATE)) ? std::cout << displayMove(p, *it) << "# "
 					: std::cout << displayMove(p, *it) << " ";
 			}
 		}
@@ -50,7 +54,7 @@ const Move negamaxRoot(Position const& p, short depth, short &bestScore, long &n
 {
 	Position copy = p;
 	Move bestMove{};
-	
+		
 	for (const auto& m : moveList) {
 		std::vector<Move> childPv{};
 		short score{};
@@ -68,7 +72,7 @@ const Move negamaxRoot(Position const& p, short depth, short &bestScore, long &n
 		undoMove(m, copy, p);
 		nodes++;
 	}
-
+	
 	//put the best move found to the beginning of movelist for further depth search
 	std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestMove);
 	std::rotate(moveList.begin(), it, it + 1);
@@ -86,17 +90,20 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 		// return evaluate(p);
 
 	short bestScore = -MATE;	
-	std::vector<Move> moveList = moveGeneration(copy);
-	moveList = pruneIllegal(moveList, copy);
-
-	for (const auto& m : moveList) {
+	Move bestMove{};
+	std::vector<Move> MoveList = moveGeneration(copy);
+	MoveList = pruneIllegal(MoveList, copy);
+	
+	for (const auto& m : MoveList) {
 		short score{};
 		std::vector<Move> nephewPv{};
 		doMove(m, copy);
 		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, nephewPv);
 
-		if (score > bestScore) 
+		if (score > bestScore) {
 			bestScore = score;
+			bestMove = m;
+		}
 			
 		
 		if (score > alpha) {

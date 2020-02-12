@@ -69,7 +69,6 @@ const Move negamaxRoot(Position const& p, short depth, short &bestScore, long &n
 
 		undoMove(m, copy, p);
 		nodes++;
-
 	}
 
 	//put the best move found to the beginning of movelist for further depth search

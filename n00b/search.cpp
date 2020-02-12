@@ -28,7 +28,7 @@ const Move iterativeSearch (Position &p, short depth)
 		std::chrono::duration<float, std::milli> time = t2 - t1;
 
 		if (m) {
-			std::cout << "\n*depth:" << i << " nodes:" << nodes << " ms:" << time.count() << " nps:" << nodes / (time.count() / 1000) << std::endl;
+			std::cout << "\n*depth:" << i << " nodes:" << nodes << " ms:" << int(time.count()) << " nps:" << int(nodes / (time.count() / 1000)) << std::endl;
 			std::cout << "\t move:" << displayMove(p, m) << " score:" << bestScore << " pv:";
 
 			for (auto it = pv.begin(); it != pv.end(); ++it) {
@@ -71,6 +71,9 @@ const Move negamaxRoot(Position const& p, short depth, short &bestScore, long &n
 
 		undoMove(m, copy, p);
 		nodes++;
+
+		if (score == MATE)
+			return bestMove;
 	}
 	
 	//put the best move found to the beginning of movelist for further depth search
@@ -103,8 +106,7 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 		if (score > bestScore) {
 			bestScore = score;
 			bestMove = m;
-		}
-			
+		}	
 		
 		if (score > alpha) {
 			alpha = score;

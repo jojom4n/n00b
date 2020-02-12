@@ -7,7 +7,6 @@ extern struct LookupTable MoveTables;
 const std::vector<Move> moveGeneration(Position const &p)
 {
 	std::vector<Move> moveList{};
-	// moveList.clear();
 	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
 	
 	if (underCheck(sideToMove, p) > 1) {
@@ -198,6 +197,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 		switch (c) {
 		case WHITE: // is there a white pawn attacking the en-passant square?
 			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
+			
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -208,6 +208,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 			}
 			
 			probablePawn = p.idPiece(Square(enPassant - 9), c);
+			
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -216,10 +217,10 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			// p.setEnPassant(SQ_EMPTY);
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
 			probablePawn = p.idPiece(Square(enPassant + 7), c);
+			
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(), 
@@ -230,6 +231,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 			}
 			
 			probablePawn = p.idPiece(Square(enPassant + 9), c);
+			
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
@@ -238,7 +240,6 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			// p.setEnPassant(SQ_EMPTY);
 			break;
 		} // end switch	
 
@@ -253,7 +254,6 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
-				// p.setEnPassant(SQ_EMPTY);
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
@@ -265,7 +265,6 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
-				// p.setEnPassant(SQ_EMPTY);
 			}
 			break;
 		} // end switch	
@@ -281,7 +280,6 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 					attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
 					m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 					moveList.push_back(m);
-					// p.setEnPassant(SQ_EMPTY);
 			}
 			break;
 		case BLACK: // is there a black pawn attacking the en-passant square?
@@ -293,7 +291,6 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
-				// p.setEnPassant(SQ_EMPTY);
 			}
 			break;
 		} // end switch	

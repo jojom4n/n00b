@@ -26,6 +26,7 @@ void doMove(Move const &m, Position &p)
 
 		if ((piece == PAWN) && ((squareFrom / 8) == RANK_2) && ((squareTo / 8) == RANK_4)
 			|| (piece == PAWN) && ((squareFrom / 8) == RANK_7) && ((squareTo / 8) == RANK_5))
+			
 			switch (color)
 			{
 			case WHITE: {
@@ -285,22 +286,19 @@ void doMove(Move const &m, Position &p)
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
 		p.setCastle(WHITE, Castle(p.getCastle(WHITE) - KINGSIDE));
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
-	}
-	
+	}	
 	else if (color == BLACK && captured == ROOK && squareTo == A1
 		&& (p.getCastle(WHITE) == QUEENSIDE || p.getCastle(WHITE) == ALL)) {
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
 		p.setCastle(WHITE, Castle(p.getCastle(WHITE) - QUEENSIDE));
 		p.updateZobrist(WHITE, p.getCastle(WHITE));
 	}
-	
 	else if (color == WHITE && captured == ROOK && squareTo == H8
 		&& (p.getCastle(BLACK) == KINGSIDE || p.getCastle(BLACK) == ALL)) {
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
 		p.setCastle(BLACK, Castle(p.getCastle(BLACK) - KINGSIDE));
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
 	}
-	
 	else if (color == WHITE && captured == ROOK && squareTo == A8
 		&& (p.getCastle(BLACK) == QUEENSIDE || p.getCastle(BLACK) == ALL)) {
 		p.updateZobrist(BLACK, p.getCastle(BLACK));

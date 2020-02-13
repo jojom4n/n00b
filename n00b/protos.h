@@ -64,10 +64,10 @@ void undoMove(Move const &m, Position &p, Position const &backup);
 
 
 // perft.cpp
-unsigned long long perft(short depth, Position& p, bool init = false);
+unsigned long long perft(ushort depth, Position& p, bool init = false);
 
 template<size_t PERFT_CACHE_SIZE>
-static unsigned long long perft(short depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache);
+static unsigned long long perft(ushort depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache);
 
 void perftInit();
 
@@ -91,10 +91,10 @@ const short evPSQT(Position const& p);
 
 
 // search.cpp
-const Move iterativeSearch(Position &p, short depth);
-const Move negamaxRoot(Position const& p, short depth, short& bestScore, long& nodes, std::vector<Move> &pv, std::vector<Move> &movelist);
-const short negamaxAB(Position const& p, short depth, long& nodes, short alpha, short beta, std::vector<Move> &childPv);
-const short quiescence(Position const& p, short alpha, short beta, long &nodes);
+const Move iterativeSearch(Position &p, ushort depth);
+const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, std::vector<Move> &movelist);
+const short negamaxAB(Position const& p, ushort depth, unsigned long &nodes, short alpha, short beta, std::vector<Move> &childPv);
+const short quiescence(Position const& p, short alpha, short beta, unsigned long &nodes);
 
 
 // bitscan.cpp

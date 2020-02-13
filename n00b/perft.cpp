@@ -6,7 +6,7 @@
 
 constexpr unsigned long long PERFT_CACHE_SIZE = 0x2DC6C0;
 
-unsigned long long perft(short depth, Position& p, bool init)
+unsigned long long perft(ushort depth, Position& p, bool init)
 {
 	unsigned long long nodes{};
 	std::vector<Move> moveList = moveGeneration(p);
@@ -38,7 +38,7 @@ unsigned long long perft(short depth, Position& p, bool init)
 }
 
 template<size_t PERFT_CACHE_SIZE>
-static unsigned long long perft(short depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
+static unsigned long long perft(ushort depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
 {
 	unsigned long long nodes{};
 	std::vector<Move> moveList = moveGeneration(p);

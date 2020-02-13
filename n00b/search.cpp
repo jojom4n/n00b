@@ -5,9 +5,9 @@
 #include "protos.h"
 #include "Position.h"
 
-const Move iterativeSearch (Position &p, short depth)
+const Move iterativeSearch (Position &p, ushort depth)
 {
-	long nodes{};
+	unsigned long nodes{};
 	bool flagMate{ true };
 	Move m{};
 	std::vector<Move> moveList = moveGeneration(p);
@@ -50,7 +50,7 @@ const Move iterativeSearch (Position &p, short depth)
 	return m;
 }
 
-const Move negamaxRoot(Position const& p, short depth, short &bestScore, long &nodes, std::vector<Move> &pv, std::vector<Move> &moveList) 
+const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, std::vector<Move> &moveList) 
 {
 	Position copy = p;
 	Move bestMove{};
@@ -84,7 +84,7 @@ const Move negamaxRoot(Position const& p, short depth, short &bestScore, long &n
 }
 
 
-const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, short beta, std::vector<Move> &childPv)
+const short negamaxAB(Position const& p, ushort depth, unsigned long &nodes, short alpha, short beta, std::vector<Move> &childPv)
 {
 	Position copy = p;
 
@@ -102,7 +102,9 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 		std::vector<Move> nephewPv{};
 		doMove(m, copy);
 		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, nephewPv);
-
+		undoMove(m, copy, p);
+		nodes++;
+				
 		if (score > bestScore) {
 			bestScore = score;
 			bestMove = m;
@@ -115,9 +117,6 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
 		}
 
-		undoMove(m, copy, p);
-		nodes++;
-
 		if (alpha >= beta)
 			return alpha;
 	}
@@ -126,7 +125,7 @@ const short negamaxAB(Position const& p, short depth, long &nodes, short alpha, 
 }
 
 
-const short quiescence(Position const& p, short alpha, short beta, long &nodes)
+const short quiescence(Position const& p, short alpha, short beta, unsigned long &nodes)
 {
 	short stand_pat = evaluate(p);
 

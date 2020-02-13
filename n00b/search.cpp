@@ -75,7 +75,7 @@ const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsign
 		if (score == MATE)
 			return bestMove;
 	}
-	
+
 	//put the best move found to the beginning of movelist for further depth search
 	std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestMove);
 	std::rotate(moveList.begin(), it, it + 1);
@@ -104,12 +104,12 @@ const short negamaxAB(Position const& p, ushort depth, unsigned long &nodes, sho
 		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, nephewPv);
 		undoMove(m, copy, p);
 		nodes++;
-				
+
 		if (score > bestScore) {
 			bestScore = score;
 			bestMove = m;
-		}	
-		
+		}
+
 		if (score > alpha) {
 			alpha = score;
 			childPv.clear();
@@ -120,7 +120,7 @@ const short negamaxAB(Position const& p, ushort depth, unsigned long &nodes, sho
 		if (alpha >= beta)
 			return alpha;
 	}
-	
+
 	return bestScore;
 }
 

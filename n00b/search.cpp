@@ -9,17 +9,15 @@ const Move iterativeSearch (Position &p, ushort depth)
 {
 	unsigned long nodes{};
 	bool flagMate{ true };
-	Move m{};
-	std::vector<Move> moveList = moveGeneration(p);
-	moveList = pruneIllegal(moveList, p);
-
+	Move bestMove{};
+	
 	for (short i = 1; i <= depth && flagMate; i++) {
 		short bestScore = -MATE;
 		std::vector<Move> pv{};
 		pv.clear();
 		
 		auto t1 = Clock::now();
-		m = negamaxRoot(p, i, bestScore, nodes, pv, moveList);
+		bestMove = negamaxRoot(p, i, bestScore, nodes, pv, bestMove);
 		auto t2 = Clock::now();
 
 		if (bestScore == MATE || bestScore == -MATE)
@@ -27,9 +25,9 @@ const Move iterativeSearch (Position &p, ushort depth)
 		
 		std::chrono::duration<float, std::milli> time = t2 - t1;
 
-		if (m) {
+		if (bestMove) {
 			std::cout << "\n*depth:" << i << " nodes:" << nodes << " ms:" << int(time.count()) << " nps:" << int(nodes / (time.count() / 1000)) << std::endl;
-			std::cout << "\t move:" << displayMove(p, m) << " score:" << bestScore << " pv:";
+			std::cout << "\t move:" << displayMove(p, bestMove) << " score:" << bestScore << " pv:";
 
 			for (auto it = pv.begin(); it != pv.end(); ++it) {
 				(it == std::prev(pv.end()) && (bestScore == MATE || bestScore == -MATE)) ? std::cout << displayMove(p, *it) << "# "
@@ -37,24 +35,32 @@ const Move iterativeSearch (Position &p, ushort depth)
 			}
 		}
 
-		else if (!m && !underCheck(p.getTurn(), p)) {
+		else if (!bestMove && !underCheck(p.getTurn(), p)) {
 			std::cout << "\nIt's STALEMATE!" << std::endl;
 		}
 
-		else if (!m && underCheck(p.getTurn(), p)) {
+		else if (!bestMove && underCheck(p.getTurn(), p)) {
 			p.setCheckmate(true);
 			std::cout << "\nIt's CHECKMATE!" << std::endl;
 		}
 	}
 	
-	return m;
+	return bestMove;
 }
 
-const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, std::vector<Move> &moveList) 
+const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, Move &bestSoFar) 
 {
 	Position copy = p;
 	Move bestMove{};
-		
+	std::vector<Move> moveList = moveGeneration(copy);
+	moveList = pruneIllegal(moveList, copy);
+
+	//put the best move found so far to the beginning of movelist
+	if (bestSoFar) {
+		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
+		std::rotate(moveList.begin(), it, it + 1);
+	}
+
 	for (const auto& m : moveList) {
 		std::vector<Move> childPv{};
 		short score{};
@@ -76,10 +82,7 @@ const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsign
 			return bestMove;
 	}
 
-	//put the best move found to the beginning of movelist for further depth search
-	std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestMove);
-	std::rotate(moveList.begin(), it, it + 1);
-
+	
 	return bestMove;
 }
 

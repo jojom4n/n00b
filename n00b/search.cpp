@@ -11,14 +11,13 @@ const Move iterativeSearch (Position &p, ushort depth)
 	bool flagMate{ true };
 	Move bestMove{};
 	
-
 	for (short i = 1; i <= depth && flagMate; i++) {
-		short bestScore = -MATE;
+		short bestScore{};
 		std::vector<Move> pv{};
 		pv.clear();
 		
 		auto t1 = Clock::now();
-		bestMove = negamaxRoot(p, i, bestScore, nodes, pv, bestMove);
+		bestMove = negamaxRoot(p, i, depth, bestScore, nodes, pv, bestMove);
 		auto t2 = Clock::now();
 
 		if (bestScore == MATE || bestScore == -MATE)
@@ -49,40 +48,56 @@ const Move iterativeSearch (Position &p, ushort depth)
 	return bestMove;
 }
 
-const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, Move &bestSoFar) 
+const Move negamaxRoot(Position const& p, ushort depth, ushort const& absoluteDepth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, Move &bestSoFar) 
 {
 	Position copy = p;
 	Move bestMove{};
-	std::vector<Move> moveList = moveGeneration(copy);
-	moveList = pruneIllegal(moveList, copy);
+	TTEntry TTEntry = TT::Lookup(copy.getZobrist());
 
-	/* if (bestSoFar) {
-		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
-		std::rotate(moveList.begin(), it, it + 1);
-	} */
+	if ((TTEntry) && TTEntry.depth >= depth)
 
-	for (const auto& m : moveList) {
-		std::vector<Move> childPv{};
-		short score{};
-		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA, childPv);
+	if (bestMove = TT::probeRoot(copy, depth, bestScore)) // probe TT for position
+		return bestMove;
 
-		if (score >= bestScore) {
-			bestScore = score;
-			bestMove = m;
-			pv.clear();
-			pv.push_back(m);
-			std::copy(childPv.begin(), childPv.end(), back_inserter(pv));
+	else {  // position is not in TT
+		bestScore = -MATE;
+		std::vector<Move> moveList = moveGeneration(copy);
+		moveList = pruneIllegal(moveList, copy);
+
+		/* if (bestSoFar) {
+			std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
+			std::rotate(moveList.begin(), it, it + 1);
+		} */
+
+		for (const auto& m : moveList) {
+			std::vector<Move> childPv{};
+			short score{};
+			doMove(m, copy);
+			score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA, childPv);
+
+			if (score >= bestScore) {
+				bestScore = score;
+				bestMove = m;
+				pv.clear();
+				pv.push_back(m);
+				std::copy(childPv.begin(), childPv.end(), back_inserter(pv));
+			}
+
+			undoMove(m, copy, p);
+			nodes++;
+
+			if (score == MATE) {
+				// update TT
+				TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, MATE, absoluteDepth, copy.getMoveNumber());
+				return bestMove;
+			}
+				
 		}
-
-		undoMove(m, copy, p);
-		nodes++;
-
-		if (score == MATE)
-			return bestMove;
 	}
-
 	
+	// update TT
+	TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, bestScore, absoluteDepth, copy.getMoveNumber());
+
 	return bestMove;
 }
 

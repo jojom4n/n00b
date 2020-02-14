@@ -68,7 +68,8 @@ struct TTEntry {
 	uint8_t depth{}; // depth - 8-bit
 	Move move{}; // best move - 32-bit
 	int16_t score{}; // score for move - 16-bit
-	uint8_t nodeTypeAndAge{}; // node-type (2-bit) and age (6-bit)
+	unsigned char nodeType{}; // type of node (exact, fail-high, fail-low)
+	uint8_t age{}; // age (6-bit)
 };
 
 

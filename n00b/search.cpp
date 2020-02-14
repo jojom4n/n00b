@@ -1,9 +1,9 @@
 #include "pch.h"
 #include <iostream>
-#include <algorithm>
-#include <limits>
 #include "protos.h"
 #include "Position.h"
+#include "params.h"
+
 
 const Move iterativeSearch (Position &p, ushort depth)
 {
@@ -11,6 +11,7 @@ const Move iterativeSearch (Position &p, ushort depth)
 	bool flagMate{ true };
 	Move bestMove{};
 	
+
 	for (short i = 1; i <= depth && flagMate; i++) {
 		short bestScore = -MATE;
 		std::vector<Move> pv{};
@@ -55,11 +56,10 @@ const Move negamaxRoot(Position const& p, ushort depth, short &bestScore, unsign
 	std::vector<Move> moveList = moveGeneration(copy);
 	moveList = pruneIllegal(moveList, copy);
 
-	//put the best move found so far to the beginning of movelist
-	if (bestSoFar) {
+	/* if (bestSoFar) {
 		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
 		std::rotate(moveList.begin(), it, it + 1);
-	}
+	} */
 
 	for (const auto& m : moveList) {
 		std::vector<Move> childPv{};

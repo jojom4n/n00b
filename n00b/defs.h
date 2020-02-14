@@ -17,6 +17,7 @@
 #define ALPHA -SHRT_INFINITY
 #define BETA SHRT_INFINITY
 
+#define TT_BIT (8000000 / 96) // MB (8 mln bits) / 96-bit TT
 
 using Clock = std::chrono::high_resolution_clock;
 using ushort = unsigned short;
@@ -26,7 +27,6 @@ using Move = uint32_t;
 
 // ENUMS
 enum Piece : const short { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
-
 enum Color : const ushort { BLACK, WHITE, ALL_COLOR };
 
 enum Square : const short
@@ -43,45 +43,45 @@ enum Square : const short
 };
 
 enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE_K, CASTLE_Q, EN_PASSANT};
-
 enum {PAWN_TO_QUEEN = 1, PAWN_TO_KNIGHT, PAWN_TO_ROOK, PAWN_TO_BISHOP};
-
 enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
-
 enum File : const short { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER };
-
 enum Rank : const short { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER };
-
 enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, RAYS_NUMBER};
 
 enum RaysKnight : const ushort {NORTH_NORTH_WEST, NORTH_NORTH_EAST, NORTH_EAST_EAST, SOUTH__EAST_EAST, SOUTH_SOUTH_EAST,
 	SOUTH_SOUTH_WEST, SOUTH__WEST_WEST, NORTH_WEST_WEST, RAYS_KNIGHT_NUMBER};
 
+enum nodeType : const char {EXACT, UPPER, LOWER};
+
 
 // OTHER TYPES
 struct PieceID { Color color; Piece piece; };
 
+struct perftCache {
+	unsigned long long key;
+	unsigned long long nodes;
+};
+
+struct TTEntry {
+	uint32_t key{}; // zobrist key - reduced to 32-bit
+	uint8_t depth{}; // depth - 8-bit
+	Move move{}; // best move - 32-bit
+	int16_t score{}; // score for move - 16-bit
+	uint8_t nodeTypeAndAge{}; // node-type (2-bit) and age (6-bit)
+};
+
 
 // see magic.cpp
 constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
-
 constexpr uint64_t A1H8_DIAG = C64(0x8040201008040201);
 constexpr ushort DIAG_NUMBER = 15;
-
 constexpr uint64_t NOT_FILE_A = 0xfefefefefefefefe;
 constexpr uint64_t NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
 constexpr uint64_t NOT_FILE_AB = 0xfcfcfcfcfcfcfcfc;
 constexpr uint64_t NOT_FILE_GH = 0x3f3f3f3f3f3f3f3f;
-
 constexpr uint64_t BB_RANK4 = 0xff000000;
 constexpr uint64_t BB_RANK5 = 0x1095216660480;
-
-
-// for popcount() functions - see https://www.chessprogramming.org/Population_Count
-const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
-const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
-const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
-const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
 
 struct Mask {
 	std::array<Bitboard, FILE_NUMBER> file;
@@ -91,7 +91,7 @@ struct Mask {
 	std::array<Bitboard, SQ_NUMBER> linesEx;
 	std::array<Bitboard, SQ_NUMBER> diagonalsEx;
 	std::array<std::array<Bitboard, SQ_NUMBER>, RAYS_NUMBER>rays;
-	std::array<std::array<Bitboard,SQ_NUMBER>, RAYS_NUMBER>raysEx;
+	std::array<std::array<Bitboard, SQ_NUMBER>, RAYS_NUMBER>raysEx;
 };
 
 struct LookupTable {
@@ -99,11 +99,19 @@ struct LookupTable {
 	std::array<Bitboard, SQ_NUMBER> knight;
 	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
 	std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishopMagic;
-	const Bitboard whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const;
-	const Bitboard blackPawn(Bitboard const &pawn, Bitboard const &occupancy) const;
-	const Bitboard rook(Square const &square, Bitboard const &blockers) const;
-	const Bitboard bishop(Square const &square, Bitboard const &blockers) const;
+	const Bitboard whitePawn(Bitboard const& pawn, Bitboard const& occupancy) const;
+	const Bitboard blackPawn(Bitboard const& pawn, Bitboard const& occupancy) const;
+	const Bitboard rook(Square const& square, Bitboard const& blockers) const;
+	const Bitboard bishop(Square const& square, Bitboard const& blockers) const;
 };
+
+
+// for popcount() functions - see https://www.chessprogramming.org/Population_Count
+const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
+const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
+const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
+const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
+
 
 // see magic.cpp and attack.cpp
 extern const Bitboard MAGIC_ROOK[64];
@@ -111,14 +119,15 @@ extern const Bitboard MAGIC_BISHOP[64];
 extern const ushort SHIFT_ROOK[64];
 extern const ushort SHIFT_BISHOP[64];
 
+
 // see display.cpp
 extern std::map<std::string, Square> stringToSquareMap;
 extern std::map<Square, std::string> squareToStringMap;
 
 
-struct perftCache {
-	unsigned long long key;
-	unsigned long long nodes;
+// see tt.cpp
+namespace TT {
+	extern std::vector<TTEntry> table;
 };
 
 #endif

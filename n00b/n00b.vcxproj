@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="divide.h" />
+    <ClInclude Include="params.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="pch.h" />
@@ -186,6 +187,7 @@
     </ClCompile>
     <ClCompile Include="attack.cpp" />
     <ClCompile Include="search.cpp" />
+    <ClCompile Include="tt.cpp" />
     <ClCompile Include="zobrist.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

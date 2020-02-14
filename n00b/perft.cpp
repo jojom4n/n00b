@@ -3,8 +3,7 @@
 #include "protos.h"
 #include "defs.h"
 #include "Position.h"
-
-constexpr unsigned long long PERFT_CACHE_SIZE = 0x2DC6C0;
+#include "params.h"
 
 unsigned long long perft(ushort depth, Position& p, bool init)
 {

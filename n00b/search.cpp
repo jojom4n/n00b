@@ -52,12 +52,15 @@ const Move negamaxRoot(Position const& p, ushort depth, ushort const& absoluteDe
 {
 	Position copy = p;
 	Move bestMove{};
-	TTEntry TTEntry = TT::Lookup(copy.getZobrist());
+	TTEntry TTEntry{};
 
-	if ((TTEntry) && TTEntry.depth >= depth)
+	if (TT::table[copy.getZobrist() % TT_SIZE].key == uint32_t(copy.getZobrist())) 
+		TTEntry = TT::table[copy.getZobrist() % TT_SIZE];
 
-	if (bestMove = TT::probeRoot(copy, depth, bestScore)) // probe TT for position
+	if (TTEntry.depth >= depth) {
+		bestScore = TTEntry.score;
 		return bestMove;
+	}
 
 	else {  // position is not in TT
 		bestScore = -MATE;
@@ -88,7 +91,7 @@ const Move negamaxRoot(Position const& p, ushort depth, ushort const& absoluteDe
 
 			if (score == MATE) {
 				// update TT
-				TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, MATE, absoluteDepth, copy.getMoveNumber());
+				TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, MATE, depth, copy.getMoveNumber());
 				return bestMove;
 			}
 				
@@ -96,7 +99,7 @@ const Move negamaxRoot(Position const& p, ushort depth, ushort const& absoluteDe
 	}
 	
 	// update TT
-	TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, bestScore, absoluteDepth, copy.getMoveNumber());
+	TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, bestScore, depth, copy.getMoveNumber());
 
 	return bestMove;
 }

@@ -98,7 +98,6 @@ const short quiescence(Position const& p, short alpha, short beta, unsigned long
 
 // tt.cpp
 namespace TT {
-	TTEntry Lookup(uint32_t key);
 	void update(unsigned long long const& index, uint32_t const& hashKey, Move const& m, short const& score, ushort const& depth, ushort const& age);
 };
 

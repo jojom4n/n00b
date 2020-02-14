@@ -6,13 +6,6 @@
 namespace TT {
 	extern std::vector<TTEntry> table(TT_SIZE);
 
-	TTEntry Lookup(uint32_t key) 
-	{
-		if (table[key % TT_SIZE].key)
-			return table[key % TT_SIZE]; //if no position in TT, return false
-	}
-
-
 	void update(unsigned long long const& index, uint32_t const& hashKey, Move const& m, short const& score, ushort const& depth, ushort const& age)
 	{
 		if (table[index].key) { // a previous key exists at the index

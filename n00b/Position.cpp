@@ -53,6 +53,8 @@ void Position::setNew()
 	castle_[BLACK] = Castle::ALL;
 
 	setZobrist();
+	
+	TT::table.clear(); // clear TT in case of a new game
 }
 
 

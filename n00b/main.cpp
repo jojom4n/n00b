@@ -1,8 +1,11 @@
 #include "pch.h"
 #include <iostream>
-#include <thread>
-#include "protos.h"
+// #include <thread>
 #include "defs.h"
+#include "Position.h"
+#include "Search.h"
+#include "protos.h"
+
 
 int main()
 {

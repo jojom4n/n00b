@@ -75,6 +75,9 @@
     <ClInclude Include="params.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="Search.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="File di intestazione">

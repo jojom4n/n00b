@@ -1,12 +1,13 @@
 #ifndef PROTOS_H
 #define PROTOS_H
 
-#include "defs.h"
 #include <vector>
 #include <iostream>
+#include "defs.h"
 
 class Position;
-struct Search;
+struct g_Search;
+
 
 // attack.cpp
 void initAttacks();
@@ -91,14 +92,15 @@ const short evPSQT(Position const& p);
 
 // search.cpp
 const Move iterativeSearch(Position &p, ushort const& depth);
-void negamaxRoot(Search& Search, ushort const& rootDepth);
-const short negamaxAB(Position const& p, ushort const& nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv);
+void negamaxRoot(g_Search& Search, ushort const& rootDepth);
+const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv);
 const short quiescence(Position const& p, short alpha, short beta, unsigned long &nodes);
 
 
 // tt.cpp
 namespace TT {
-	void update(unsigned long long const& index, uint32_t const& hashKey, Move const& m, short const& score, ushort const& depth, ushort const& age);
+	void Store(g_Search const& Search);
+	void Store(TTEntry const& entry);
 };
 
 // bitscan.cpp

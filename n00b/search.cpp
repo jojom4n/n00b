@@ -1,12 +1,13 @@
 #include "pch.h"
 #include <iostream>
 #include <iomanip>
+#include "defs.h"
 #include "protos.h"
 #include "Position.h"
 #include "params.h"
 
-struct Search {
-	Position pos{};
+struct g_Search {
+	Position pos;
 	unsigned short ply{};
 	short bestScore{};
 	unsigned long nodes{};
@@ -16,16 +17,17 @@ struct Search {
 	bool flagMate{};
 };
 
+g_Search Search{};
+
 const Move iterativeSearch (Position &p, ushort const& depth)
 {
-	Search Search{};
+	// Search Search{};
 	Search.bestScore = 0;
 	Search.pos = p;
 		
 	for (short ply = 1; ply <= depth && !Search.flagMate; ply++) {
 		Search.nodes = 0;
 		Search.pv.clear();
-		Search.ply = ply;
 
 		auto t1 = Clock::now();
 		negamaxRoot(Search, ply);
@@ -88,43 +90,45 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 	return Search.bestMove;
 }
 
-void negamaxRoot(Search& Search, ushort const& depth)
+void negamaxRoot(g_Search& Search, ushort const& depth)
 {
 	Move bestMove{};
 	TTEntry TTEntry{};
 	short alpha = ALPHA;
 	short beta = BETA;
+	uint32_t key = static_cast<uint32_t>(Search.pos.getZobrist());
+	Search.ply = 1;
 
+	if (TT::table[key % TT_SIZE].key == key) {
+		TTEntry = TT::table[key % TT_SIZE];
 
-	if (TT::table[Search.pos.getZobrist() % TT_SIZE].key == uint32_t(Search.pos.getZobrist()))
-		TTEntry = TT::table[Search.pos.getZobrist() % TT_SIZE];
+		// TTENTRY LEGALITY MUST BE CHECKED **** PLACEHOLDER //
 
-	// TTENTRY LEGALITY MUST BE CHECKED **** PLACEHOLDER //
-	
-	if (TTEntry.depth >= Search.ply) {
+		if (TTEntry.depth >= Search.ply) {
 
-		switch (TTEntry.nodeType) {
-		case EXACT:
-			Search.bestScore = TTEntry.score;
-			Search.bestMove = TTEntry.move;
-			return;
-			break;
-		case LOWER_BOUND:
-			alpha = TTEntry.score;
-			break;
-		case UPPER_BOUND:
-			beta = TTEntry.score;
-			break;
-		}
+			switch (TTEntry.nodeType) {
+			case EXACT:
+				Search.bestScore = TTEntry.score;
+				Search.bestMove = TTEntry.move;
+				return;
+				break;
+			case LOWER_BOUND:
+				alpha = TTEntry.score;
+				break;
+			case UPPER_BOUND:
+				beta = TTEntry.score;
+				break;
+			}
 
-		if (alpha >= beta) {
-			Search.bestScore = TTEntry.score;
-			Search.bestMove = TTEntry.move;
-			return;
+			if (alpha >= beta) {
+				Search.bestScore = TTEntry.score;
+				Search.bestMove = TTEntry.move;
+				return;
+			}
 		}
 	}
-
-	// position is not in TT */
+	
+	// position is not in TT
 	Search.bestScore = -MATE;
 	std::vector<Move> moveList = moveGeneration(Search.pos);
 	moveList = pruneIllegal(moveList, Search.pos);
@@ -151,18 +155,49 @@ void negamaxRoot(Search& Search, ushort const& depth)
 		undoMove(m, copy, Search.pos);
 		Search.nodes++;
 	}
+
+	TT::Store(Search);
 }
 
 
-const short negamaxAB(Position const& p, ushort const& nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv)
+const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv)
 {
+	uint32_t key = static_cast<uint32_t>(p.getZobrist());
+	TTEntry TTEntry{};
+	short bestScore = -MATE;
 	Position copy = p;
 
-	if (nodeDepth == 0)
+	if (depth == 0)
 		return quiescence(copy, alpha, beta, nodes);
 		// return evaluate(p);
+	
+	if (TT::table[key % TT_SIZE].key == key) {
+		TTEntry = TT::table[key % TT_SIZE];
 
-	short bestScore = -MATE;	
+		// TTENTRY LEGALITY MUST BE CHECKED **** PLACEHOLDER //
+
+		if (TTEntry.depth >= depth) {
+
+			switch (TTEntry.nodeType) {
+			case EXACT:
+				return bestScore = TTEntry.score;
+				break;
+			case LOWER_BOUND:
+				if (alpha < TTEntry.score)
+					alpha = TTEntry.score;
+				break;
+			case UPPER_BOUND:
+				if (beta > TTEntry.score)
+					beta = TTEntry.score;
+				break;
+			}
+
+			if (alpha >= beta)
+				return bestScore = TTEntry.score;
+		}
+	}
+
+	// position is not in TT
 	Move bestMove{};
 	std::vector<Move> moveList = moveGeneration(copy);
 	moveList = pruneIllegal(moveList, copy);
@@ -171,7 +206,7 @@ const short negamaxAB(Position const& p, ushort const& nodeDepth, short alpha, s
 		short score{};
 		std::vector<Move> nephewPv{};
 		doMove(m, copy);
-		score = -negamaxAB(copy, nodeDepth - 1, -beta, -alpha, nodes, nephewPv);
+		score = -negamaxAB(copy, depth - 1, -beta, -alpha, nodes, nephewPv);
 		undoMove(m, copy, p);
 		nodes++;
 
@@ -187,10 +222,26 @@ const short negamaxAB(Position const& p, ushort const& nodeDepth, short alpha, s
 			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
 		}
 
+		
 		if (alpha >= beta)
 			return alpha;
 	}
 
+	TTEntry.score = bestScore;
+	if (bestScore <= alpha)
+		TTEntry.nodeType = UPPER_BOUND;
+	else if (bestScore >= beta)
+		TTEntry.nodeType = LOWER_BOUND;
+	else {
+		TTEntry.nodeType = EXACT;
+	}
+	
+	TTEntry.age = static_cast<uint8_t>(copy.getMoveNumber());
+	TTEntry.depth = static_cast<uint8_t>(depth);
+	TTEntry.key = static_cast<uint32_t>(copy.getZobrist());
+	TTEntry.move = bestMove;
+
+	TT::Store(TTEntry);
 	return bestScore;
 }
 

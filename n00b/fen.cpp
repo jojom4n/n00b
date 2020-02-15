@@ -266,5 +266,6 @@ void fenParser(std::stringstream &fen, Position &board)
 		board.setMoveNumber(1);
 
 	board.setZobrist();
+	TT::table.clear(); // clear TT
 	displayBoard(board);
 }

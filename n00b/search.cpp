@@ -1,71 +1,103 @@
 #include "pch.h"
 #include <iostream>
+#include <iomanip>
 #include "protos.h"
 #include "Position.h"
 #include "params.h"
 
-
-const Move iterativeSearch (Position &p, ushort depth)
-{
+struct Search {
+	Position pos{};
+	unsigned short ply{};
+	short bestScore{};
 	unsigned long nodes{};
-	bool flagMate{ true };
-	Move bestMove{};
-	
-	for (short i = 1; i <= depth && flagMate; i++) {
-		short bestScore{};
-		std::vector<Move> pv{};
-		pv.clear();
+	std::vector<Move> pv{};
+	Move currBestMove{};
+	Move bestMove;
+	bool flagMate{};
+};
+
+const Move iterativeSearch (Position &p, ushort const depth)
+{
+	Search Search{};
+	Search.bestScore = 0;
+	Search.pos = p;
 		
+	for (short ply = 1; ply <= depth && !Search.flagMate; ply++) {
+		Search.nodes = 0;
+		Search.pv.clear();
+		Search.ply = ply;
+
 		auto t1 = Clock::now();
-		bestMove = negamaxRoot(p, i, depth, bestScore, nodes, pv, bestMove);
+		negamaxRoot(Search, ply);
 		auto t2 = Clock::now();
 
-		if (bestScore == MATE || bestScore == -MATE)
-			flagMate = false;
-		
 		std::chrono::duration<float, std::milli> time = t2 - t1;
 
-		if (bestMove) {
-			std::cout << "\n*depth:" << i << " nodes:" << nodes << " ms:" << int(time.count()) << " nps:" << int(nodes / (time.count() / 1000)) << std::endl;
-			std::cout << "\t move:" << displayMove(p, bestMove) << " score:" << bestScore << " pv:";
+		if (Search.bestMove) {
+			
+			if (Search.bestScore == MATE || Search.bestScore == -MATE)
+				Search.flagMate = true;
 
-			for (auto it = pv.begin(); it != pv.end(); ++it) {
-				(it == std::prev(pv.end()) && (bestScore == MATE || bestScore == -MATE)) ? std::cout << displayMove(p, *it) << "# "
-					: std::cout << displayMove(p, *it) << " ";
+			std::cout << "\n*depth:" << ply << " nodes:" << Search.nodes << " ms:" << int(time.count()) << " nps:" 
+				<< int(Search.nodes / (time.count() / 1000)) << std::endl;
+
+			std::cout << "\t move:" << displayMove(Search.pos, Search.bestMove) << " score:";
+
+			float score = static_cast<float>(Search.bestScore / 100.00);
+
+			switch (Search.pos.getTurn()) {
+			case WHITE: 
+				if (score > 0)
+					std::cout << "+";
+				else if (score < 0)
+					std::cout << "-";
+				break;
+			case BLACK:
+				if (score > 0)
+					std::cout << "-";
+				else if (score < 0)
+					std::cout << "+";
+				break; 
 			}
+			
+			(Search.flagMate == true) ? std::cout << "#" << (ply / 2) : std::cout << std::fixed << std::setprecision(2) << fabs(score) << " pv:";
+
+			for (auto it = Search.pv.begin(); it != Search.pv.end(); ++it)
+				(it == std::prev(Search.pv.end()) && (Search.bestScore == MATE || Search.bestScore == -MATE)) ? std::cout 
+					<< displayMove(Search.pos, *it) << "# " : std::cout << displayMove(Search.pos, *it) << " ";
 		}
 
-		else if (!bestMove && !underCheck(p.getTurn(), p)) {
+		else if (!Search.bestMove && !underCheck(Search.pos.getTurn(), Search.pos)) {
 			std::cout << "\nIt's STALEMATE!" << std::endl;
+			Search.flagMate = true;
 		}
 
-		else if (!bestMove && underCheck(p.getTurn(), p)) {
+		else if (!Search.bestMove && underCheck(Search.pos.getTurn(), Search.pos)) {
 			p.setCheckmate(true);
 			std::cout << "\nIt's CHECKMATE!" << std::endl;
 		}
 	}
 	
-	return bestMove;
+	return Search.bestMove;
 }
 
-const Move negamaxRoot(Position const& p, ushort depth, ushort const& absoluteDepth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, Move &bestSoFar) 
+void negamaxRoot(Search& Search, ushort const depth) 
 {
-	Position copy = p;
 	Move bestMove{};
 	TTEntry TTEntry{};
 
-	if (TT::table[copy.getZobrist() % TT_SIZE].key == uint32_t(copy.getZobrist())) 
-		TTEntry = TT::table[copy.getZobrist() % TT_SIZE];
+/*	if (TT::table[Search.pos.getZobrist() % TT_SIZE].key == uint32_t(Search.pos.getZobrist())) 
+		TTEntry = TT::table[Search.pos.getZobrist() % TT_SIZE];
 
-	if (TTEntry.depth >= depth) {
-		bestScore = TTEntry.score;
-		return bestMove;
+	if (TTEntry.depth >= Search.depth) {
+		Search.bestScore = TTEntry.score;
+		Search.bestMove = TTEntry.move;
 	}
 
-	else {  // position is not in TT
-		bestScore = -MATE;
-		std::vector<Move> moveList = moveGeneration(copy);
-		moveList = pruneIllegal(moveList, copy);
+	else {  // position is not in TT */
+		Search.bestScore = -MATE;
+		std::vector<Move> moveList = moveGeneration(Search.pos);
+		moveList = pruneIllegal(moveList, Search.pos);
 
 		/* if (bestSoFar) {
 			std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
@@ -74,55 +106,43 @@ const Move negamaxRoot(Position const& p, ushort depth, ushort const& absoluteDe
 
 		for (const auto& m : moveList) {
 			std::vector<Move> childPv{};
+			Position copy = Search.pos;
 			short score{};
 			doMove(m, copy);
-			score = -negamaxAB(copy, depth - 1, nodes, -BETA, -ALPHA, childPv);
+			score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, Search.nodes, childPv);
 
-			if (score >= bestScore) {
-				bestScore = score;
-				bestMove = m;
-				pv.clear();
-				pv.push_back(m);
-				std::copy(childPv.begin(), childPv.end(), back_inserter(pv));
+			if (score >= Search.bestScore) {
+				Search.bestScore = score;
+				Search.bestMove = m;
+				Search.pv.clear();
+				Search.pv.push_back(m);
+				std::copy(childPv.begin(), childPv.end(), back_inserter(Search.pv));
 			}
 
-			undoMove(m, copy, p);
-			nodes++;
-
-			if (score == MATE) {
-				// update TT
-				TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, MATE, depth, copy.getMoveNumber());
-				return bestMove;
-			}
-				
+			undoMove(m, copy, Search.pos);
+			Search.nodes++;
 		}
-	}
-	
-	// update TT
-	TT::update(copy.getZobrist() % TT_SIZE, copy.getZobrist(), bestMove, bestScore, depth, copy.getMoveNumber());
-
-	return bestMove;
 }
 
 
-const short negamaxAB(Position const& p, ushort depth, unsigned long &nodes, short alpha, short beta, std::vector<Move> &childPv)
+const short negamaxAB(Position const& p, ushort const nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv)
 {
 	Position copy = p;
 
-	if (depth == 0)
+	if (nodeDepth == 0)
 		return quiescence(copy, alpha, beta, nodes);
 		// return evaluate(p);
 
 	short bestScore = -MATE;	
 	Move bestMove{};
-	std::vector<Move> MoveList = moveGeneration(copy);
-	MoveList = pruneIllegal(MoveList, copy);
+	std::vector<Move> moveList = moveGeneration(copy);
+	moveList = pruneIllegal(moveList, copy);
 	
-	for (const auto& m : MoveList) {
+	for (const auto& m : moveList) {
 		short score{};
 		std::vector<Move> nephewPv{};
 		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, nodes, -beta, -alpha, nephewPv);
+		score = -negamaxAB(copy, nodeDepth - 1, -beta, -alpha, nodes, nephewPv);
 		undoMove(m, copy, p);
 		nodes++;
 

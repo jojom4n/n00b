@@ -2,6 +2,7 @@
 #include <iostream>
 #include <thread>
 #include "protos.h"
+#include "defs.h"
 
 int main()
 {

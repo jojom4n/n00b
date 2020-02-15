@@ -5,9 +5,8 @@
 #include <vector>
 #include <iostream>
 
-
 class Position;
-
+struct Search;
 
 // attack.cpp
 void initAttacks();
@@ -91,10 +90,11 @@ const short evPSQT(Position const& p);
 
 
 // search.cpp
-const Move iterativeSearch(Position &p, ushort depth);
-const Move negamaxRoot(Position const& p, ushort depth, ushort const& absoluteDepth, short &bestScore, unsigned long &nodes, std::vector<Move> &pv, Move &bestSoFar);
-const short negamaxAB(Position const& p, ushort depth, unsigned long &nodes, short alpha, short beta, std::vector<Move> &childPv);
+const Move iterativeSearch(Position &p, ushort const depth);
+void negamaxRoot(Search& Search, ushort const rootDepth);
+const short negamaxAB(Position const& p, ushort const nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv);
 const short quiescence(Position const& p, short alpha, short beta, unsigned long &nodes);
+
 
 // tt.cpp
 namespace TT {

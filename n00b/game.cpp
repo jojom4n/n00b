@@ -70,6 +70,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 6) == "search" && inputStream.str().substr(6,1) == " "
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
+		
 		if (depth > 0) {
 			Move m = iterativeSearch(board, depth);
 			doMove(m, board);

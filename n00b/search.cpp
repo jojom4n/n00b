@@ -88,47 +88,69 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 	return Search.bestMove;
 }
 
-void negamaxRoot(Search& Search, ushort const& depth) 
+void negamaxRoot(Search& Search, ushort const& depth)
 {
 	Move bestMove{};
 	TTEntry TTEntry{};
+	short alpha = ALPHA;
+	short beta = BETA;
 
-/*	if (TT::table[Search.pos.getZobrist() % TT_SIZE].key == uint32_t(Search.pos.getZobrist())) 
+
+	if (TT::table[Search.pos.getZobrist() % TT_SIZE].key == uint32_t(Search.pos.getZobrist()))
 		TTEntry = TT::table[Search.pos.getZobrist() % TT_SIZE];
 
-	if (TTEntry.depth >= Search.depth) {
-		Search.bestScore = TTEntry.score;
-		Search.bestMove = TTEntry.move;
+	// TTENTRY LEGALITY MUST BE CHECKED **** PLACEHOLDER //
+	
+	if (TTEntry.depth >= Search.ply) {
+
+		switch (TTEntry.nodeType) {
+		case EXACT:
+			Search.bestScore = TTEntry.score;
+			Search.bestMove = TTEntry.move;
+			return;
+			break;
+		case LOWER_BOUND:
+			alpha = TTEntry.score;
+			break;
+		case UPPER_BOUND:
+			beta = TTEntry.score;
+			break;
+		}
+
+		if (alpha >= beta) {
+			Search.bestScore = TTEntry.score;
+			Search.bestMove = TTEntry.move;
+			return;
+		}
 	}
 
-	else {  // position is not in TT */
-		Search.bestScore = -MATE;
-		std::vector<Move> moveList = moveGeneration(Search.pos);
-		moveList = pruneIllegal(moveList, Search.pos);
+	// position is not in TT */
+	Search.bestScore = -MATE;
+	std::vector<Move> moveList = moveGeneration(Search.pos);
+	moveList = pruneIllegal(moveList, Search.pos);
 
-		/* if (bestSoFar) {
-			std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
-			std::rotate(moveList.begin(), it, it + 1);
-		} */
+	/* if (bestSoFar) {
+		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
+		std::rotate(moveList.begin(), it, it + 1);
+	} */
 
-		for (const auto& m : moveList) {
-			std::vector<Move> childPv{};
-			Position copy = Search.pos;
-			short score{};
-			doMove(m, copy);
-			score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, Search.nodes, childPv);
+	for (const auto& m : moveList) {
+		std::vector<Move> childPv{};
+		Position copy = Search.pos;
+		short score{};
+		doMove(m, copy);
+		score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, Search.nodes, childPv);
 
-			if (score >= Search.bestScore) {
-				Search.bestScore = score;
-				Search.bestMove = m;
-				Search.pv.clear();
-				Search.pv.push_back(m);
-				std::copy(childPv.begin(), childPv.end(), back_inserter(Search.pv));
-			}
-
-			undoMove(m, copy, Search.pos);
-			Search.nodes++;
+		if (score >= Search.bestScore) {
+			Search.bestScore = score;
+			Search.bestMove = m;
+			Search.pv.clear();
+			Search.pv.push_back(m);
+			std::copy(childPv.begin(), childPv.end(), back_inserter(Search.pv));
 		}
+		undoMove(m, copy, Search.pos);
+		Search.nodes++;
+	}
 }
 
 

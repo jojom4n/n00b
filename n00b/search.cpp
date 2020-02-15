@@ -47,7 +47,7 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 
 			switch (Search.pos.getTurn()) {
 			case WHITE: 
-				if (score > 0)
+				if (score > 0 && !Search.bestScore == MATE)
 					std::cout << "+";
 				else if (score < 0)
 					std::cout << "-";
@@ -55,12 +55,19 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 			case BLACK:
 				if (score > 0)
 					std::cout << "-";
-				else if (score < 0)
+				else if (score < 0 && !Search.bestScore == MATE)
 					std::cout << "+";
 				break; 
+			default:
+				std::cout << "0.00";
+				break;
 			}
 			
-			(Search.flagMate == true) ? std::cout << "#" << (ply / 2) : std::cout << std::fixed << std::setprecision(2) << fabs(score) << " pv:";
+			
+			(!Search.bestScore == 0 && Search.flagMate == true) ? std::cout << "#" << (ply / 2) 
+				: std::cout << std::setprecision(3) << fabs(score);
+
+			std::cout << " pv:";
 
 			for (auto it = Search.pv.begin(); it != Search.pv.end(); ++it)
 				(it == std::prev(Search.pv.end()) && (Search.bestScore == MATE || Search.bestScore == -MATE)) ? std::cout 

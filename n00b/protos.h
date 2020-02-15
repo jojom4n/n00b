@@ -90,9 +90,9 @@ const short evPSQT(Position const& p);
 
 
 // search.cpp
-const Move iterativeSearch(Position &p, ushort const depth);
-void negamaxRoot(Search& Search, ushort const rootDepth);
-const short negamaxAB(Position const& p, ushort const nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv);
+const Move iterativeSearch(Position &p, ushort const& depth);
+void negamaxRoot(Search& Search, ushort const& rootDepth);
+const short negamaxAB(Position const& p, ushort const& nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv);
 const short quiescence(Position const& p, short alpha, short beta, unsigned long &nodes);
 
 

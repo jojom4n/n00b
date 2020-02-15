@@ -16,7 +16,7 @@ struct Search {
 	bool flagMate{};
 };
 
-const Move iterativeSearch (Position &p, ushort const depth)
+const Move iterativeSearch (Position &p, ushort const& depth)
 {
 	Search Search{};
 	Search.bestScore = 0;
@@ -81,7 +81,7 @@ const Move iterativeSearch (Position &p, ushort const depth)
 	return Search.bestMove;
 }
 
-void negamaxRoot(Search& Search, ushort const depth) 
+void negamaxRoot(Search& Search, ushort const& depth) 
 {
 	Move bestMove{};
 	TTEntry TTEntry{};
@@ -125,7 +125,7 @@ void negamaxRoot(Search& Search, ushort const depth)
 }
 
 
-const short negamaxAB(Position const& p, ushort const nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv)
+const short negamaxAB(Position const& p, ushort const& nodeDepth, short alpha, short beta, unsigned long& nodes, std::vector<Move> &childPv)
 {
 	Position copy = p;
 

@@ -2,7 +2,6 @@
 #define DIVIDE_H
 
 #include "defs.h"
-#include "display.h"
 #include "movegen.h"
 #include "Position.h"
 #include <iostream>
@@ -12,6 +11,7 @@ template<bool Root>
 uint64_t divide(short depth, Position& p)
 {
 	std::vector<Move> moveList = moveGeneration(p);
+	extern std::map<Square, std::string> squareToStringMap;
 	uint64_t cnt, nodes = 0;
 	Position copy = p;
 	moveList = pruneIllegal(moveList, copy);

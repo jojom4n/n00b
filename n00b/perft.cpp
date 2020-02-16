@@ -1,17 +1,18 @@
 #include "pch.h"
 #include "perft.h"
-#include "display.h"
 #include "enums.h"
 #include "makemove.h"
 #include "movegen.h"
 #include "params.h"
 #include "Position.h"
 #include <iostream>
+#include <map>
 
 
 unsigned long long perft(ushort depth, Position& p, bool init)
 {
 	unsigned long long nodes{};
+	extern std::map<Square, std::string> squareToStringMap; // see display.cpp
 	std::vector<Move> moveList = moveGeneration(p);
 	Position copy = p;
 	moveList = pruneIllegal(moveList, copy);

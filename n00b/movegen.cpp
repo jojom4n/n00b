@@ -6,7 +6,7 @@
 #include "overloading.h"
 #include "Position.h"
 
-extern LookupTable MoveTables; // see attack.cpp (and its header file)
+extern struct LookupTable MoveTables; // see attack.cpp (and its header file)
 
 const std::vector<Move> moveGeneration(Position const &p)
 {

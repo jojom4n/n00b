@@ -13,14 +13,14 @@ constexpr uint64_t NOT_FILE_AB = 0xfcfcfcfcfcfcfcfc;
 constexpr uint64_t NOT_FILE_GH = 0x3f3f3f3f3f3f3f3f;
 constexpr uint64_t BB_RANK4 = 0xff000000;
 constexpr uint64_t BB_RANK5 = 0x1095216660480;
-const Bitboard gen_blockerboard(ushort const& index, ushort const& bits, Bitboard b);
-const Bitboard gen_r_attks(Square const& square, Bitboard const& blockerboard);
-const Bitboard gen_b_attks(Square const& square, Bitboard const& blockerboard);
 extern const ushort SHIFT_ROOK[64];
 extern const ushort SHIFT_BISHOP[64];
 extern const Bitboard MAGIC_ROOK[64];
 extern const Bitboard MAGIC_BISHOP[64];
 
+const Bitboard gen_blockerboard(ushort const& index, ushort const& bits, Bitboard b);
+const Bitboard gen_r_attks(Square const& square, Bitboard const& blockerboard);
+const Bitboard gen_b_attks(Square const& square, Bitboard const& blockerboard);
 void rookMagic();
 void bishopMagic();
 

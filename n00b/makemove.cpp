@@ -4,7 +4,7 @@
 #include "enums.h"
 #include "Position.h"
 
-extern LookupTable MoveTables; // see attack.cpp (and its header file)
+extern struct LookupTable MoveTables; // see attack.cpp (and its header file)
 
 void doMove(Move const &m, Position &p)
 {

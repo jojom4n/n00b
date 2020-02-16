@@ -27,8 +27,8 @@ struct LookupTable {
 	const Bitboard bishop(Square const& square, Bitboard const& blockers) const;
 };
 
-extern struct Mask Masks;
-extern struct LookupTable MoveTables;
+/* struct Mask Masks;
+struct LookupTable MoveTables; */
 
 void initAttacks();
 void SlidingMaskEx();

@@ -14,7 +14,4 @@ void displayMoveList(Position const& board, std::vector<Move> const& m);
 std::string displayMove(Position const& board, Move const& m);
 const char printPiece(PieceID const& ID);
 
-extern std::map<std::string, Square> stringToSquareMap;
-extern std::map<Square, std::string> squareToStringMap;
-
 #endif

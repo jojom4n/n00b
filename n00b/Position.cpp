@@ -6,6 +6,7 @@
 #include "tt.h"
 
 extern struct LookupTable MoveTables; // see attack.cpp (and its header file)
+extern std::vector<TTEntry> TT::table;
 
 
 Position::Position()
@@ -21,7 +22,7 @@ Position::~Position()
 
 
 void Position::setNew()
-{
+{	
 	// white pieces
 	putPiece(WHITE, KING, E1);
 	putPiece(WHITE, QUEEN, D1);

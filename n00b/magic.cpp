@@ -76,9 +76,9 @@ const ushort SHIFT_BISHOP[64] = {
 	58, 59, 59, 59, 59, 59, 59, 58
 };
 
-// globals declared in attack.cpp (and its header file)
-extern Mask Masks; 
-extern LookupTable MoveTables;
+// see attack.cpp (and its header file)
+extern struct Mask Masks; 
+extern struct LookupTable MoveTables;
 
 void rookMagic()
 {

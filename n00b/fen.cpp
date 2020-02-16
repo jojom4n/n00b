@@ -7,6 +7,10 @@
 #include "tt.h"
 #include <vector>
 
+
+extern std::map<std::string, Square> stringToSquareMap; // see display.cpp
+
+
 const bool fenValidate(std::stringstream &fen)
 {
 	std::vector<std::string> buffer{};

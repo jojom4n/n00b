@@ -1,10 +1,9 @@
 #include "pch.h"
 #include "tt.h"
-#include "params.h"
 
 namespace TT
 {
-	std::vector<TTEntry> table(TT_SIZE);
+	std::array<TTEntry, TT_SIZE> table{};
 
 	void Store(struct Search const& Search)
 	{

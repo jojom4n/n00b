@@ -5,11 +5,12 @@
 #include "makemove.h"
 #include "movegen.h"
 #include "params.h"
-#include <iostream>
-#include <iomanip>
 #include "tt.h"
+#include <iomanip>
+#include <iostream>
 
 struct Search Search{};
+extern std::array<TTEntry, TT_SIZE> TT::table;
 
 const Move iterativeSearch (Position &p, ushort const& depth)
 {

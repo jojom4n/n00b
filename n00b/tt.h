@@ -1,9 +1,8 @@
 #ifndef TT_H
 #define TT_H
 
+#include "params.h"
 #include "search.h"
-
-#define TT_BIT (8000000 / 96) // MB (8 mln bits) / 96-bit TT
 
 struct TTEntry {
 	uint32_t key{}; // zobrist key - reduced to 32-bit
@@ -15,7 +14,7 @@ struct TTEntry {
 };
 
 namespace TT {
-	extern std::vector<TTEntry> table;
+	extern std::array<TTEntry, TT_SIZE> table;
 	void Store(struct Search const& Search);
 	void Store(TTEntry const& entry);
 }

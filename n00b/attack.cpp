@@ -1,16 +1,11 @@
 #include "pch.h"
 #include "attack.h"
 #include "bitscan.h"
+#include "magic.h"
 #include "overloading.h"
 
 Mask Masks{};
 LookupTable MoveTables{};
-
-extern const Bitboard MAGIC_ROOK[64]; // see magic.cpp
-extern const Bitboard MAGIC_BISHOP[64]; // see magic.cpp
-extern const ushort SHIFT_BISHOP[64]; // see magic.cpp
-extern const ushort SHIFT_ROOK[64]; // see magic.cpp
-
 
 void initAttacks()
 {		

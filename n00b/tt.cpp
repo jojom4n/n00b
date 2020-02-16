@@ -5,37 +5,37 @@ namespace TT
 {
 	std::array<TTEntry, TT_SIZE> table{};
 
-	void Store(struct Search const& Search)
+	void Store(struct Search const& g_Search)
 	{
-		uint32_t key = static_cast<uint32_t>(Search.pos.getZobrist());
+		uint32_t key = static_cast<uint32_t>(g_Search.pos.getZobrist());
 		unsigned long long index = key % TT_SIZE;
 
 		if (table[index].key) { // a previous key exists at the index
 
-			if (table[index].key == key && table[index].depth < Search.ply) {  // replace same entry, if at minor depth
+			if (table[index].key == key && table[index].depth < g_Search.ply) {  // replace same entry, if at minor depth
 				table[index].key = key;
-				table[index].move = Search.bestMove;
-				table[index].score = Search.bestScore;
-				table[index].depth = static_cast<uint8_t>(Search.ply);
-				table[index].age = static_cast<uint8_t>(Search.pos.getMoveNumber());
+				table[index].move = g_Search.bestMove;
+				table[index].score = g_Search.bestScore;
+				table[index].depth = static_cast<uint8_t>(g_Search.ply);
+				table[index].age = static_cast<uint8_t>(g_Search.pos.getMoveNumber());
 			}
 
-			if (table[index].age < Search.pos.getMoveNumber()) {  // if the entry is old, replace it whatever in case of collision
+			if (table[index].age < g_Search.pos.getMoveNumber()) {  // if the entry is old, replace it whatever in case of collision
 				table[index].key = key;
-				table[index].move = Search.bestMove;
-				table[index].score = Search.bestScore;
-				table[index].depth = static_cast<uint8_t>(Search.ply);
-				table[index].age = static_cast<uint8_t>(Search.pos.getMoveNumber());
+				table[index].move = g_Search.bestMove;
+				table[index].score = g_Search.bestScore;
+				table[index].depth = static_cast<uint8_t>(g_Search.ply);
+				table[index].age = static_cast<uint8_t>(g_Search.pos.getMoveNumber());
 			}
 
 		}
 
 		else {  // a previous key does not exist at index position of the table
 			table[index].key = key;
-			table[index].move = Search.bestMove;
-			table[index].score = Search.bestScore;
-			table[index].depth = static_cast<uint8_t>(Search.ply);
-			table[index].age = static_cast<uint8_t>(Search.pos.getMoveNumber());
+			table[index].move = g_Search.bestMove;
+			table[index].score = g_Search.bestScore;
+			table[index].depth = static_cast<uint8_t>(g_Search.ply);
+			table[index].age = static_cast<uint8_t>(g_Search.pos.getMoveNumber());
 		}
 	}
 

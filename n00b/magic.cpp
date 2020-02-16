@@ -1,5 +1,8 @@
 #include "pch.h"
-#include "protos.h"
+#include "magic.h"
+#include "attack.h"
+#include "bitscan.h"
+#include "overloading.h"
 
 const Bitboard MAGIC_ROOK[64] = {
 	0x0080004000608010L, 0x2240100040012002L, 0x008008a000841000L,
@@ -73,8 +76,9 @@ const ushort SHIFT_BISHOP[64] = {
 	58, 59, 59, 59, 59, 59, 59, 58
 };
 
-extern struct Mask Masks;
-extern struct LookupTable MoveTables;
+// globals declared in attack.cpp (and its header file)
+extern Mask Masks; 
+extern LookupTable MoveTables;
 
 void rookMagic()
 {

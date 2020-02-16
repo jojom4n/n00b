@@ -1,10 +1,9 @@
 #include "pch.h"
+#include "attack.h"
+#include "game.h"
+#include "zobrist.h"
 #include <iostream>
 // #include <thread>
-#include "defs.h"
-#include "Position.h"
-#include "Search.h"
-#include "protos.h"
 
 
 int main()

@@ -1,134 +1,15 @@
 #ifndef DEFS_H
 #define DEFS_H
 
-#include <map>
 #include <chrono>
-#include <string>
-#include <array>
-#include <vector>
 
 #define C64(constantuint64_t) constantuint64_t##ULL
-
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
-
-#define SHRT_INFINITY std::numeric_limits<short>::max()
-#define MATE (std::numeric_limits<short>::max() / 2)
-#define ALPHA -SHRT_INFINITY
-#define BETA SHRT_INFINITY
-
-#define TT_BIT (8000000 / 96) // MB (8 mln bits) / 96-bit TT
 
 using Clock = std::chrono::high_resolution_clock;
 using ushort = unsigned short;
 using Bitboard = uint64_t;
 using Move = uint32_t;
-
-
-// ENUMS
-enum Piece : const short { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
-enum Color : const ushort { BLACK, WHITE, ALL_COLOR };
-
-enum Square : const short
-{
-	A1, B1, C1, D1, E1, F1, G1, H1,
-	A2, B2, C2, D2, E2, F2, G2, H2,
-	A3, B3, C3, D3, E3, F3, G3, H3,
-	A4, B4, C4, D4, E4, F4, G4, H4,
-	A5, B5, C5, D5, E5, F5, G5, H5,
-	A6, B6, C6, D6, E6, F6, G6, H6,
-	A7, B7, C7, D7, E7, F7, G7, H7,
-	A8, B8, C8, D8, E8, F8, G8, H8,
-	SQ_NUMBER, SQ_EMPTY
-};
-
-enum MoveType : const ushort {QUIET = 1, CAPTURE, EVASION, PROMOTION, CASTLE_K, CASTLE_Q, EN_PASSANT};
-enum {PAWN_TO_QUEEN = 1, PAWN_TO_KNIGHT, PAWN_TO_ROOK, PAWN_TO_BISHOP};
-enum Castle : const ushort { KINGSIDE = 1, QUEENSIDE, ALL, NONE = 0 };
-enum File : const short { FILE_A, FILE_B, FILE_C, FILE_D, FILE_E, FILE_F, FILE_G, FILE_H, FILE_NUMBER };
-enum Rank : const short { RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NUMBER };
-enum Rays : const ushort {NORTH, NORTH_EAST, EAST, SOUTH_EAST, SOUTH, SOUTH_WEST, WEST, NORTH_WEST, RAYS_NUMBER};
-
-enum RaysKnight : const ushort {NORTH_NORTH_WEST, NORTH_NORTH_EAST, NORTH_EAST_EAST, SOUTH__EAST_EAST, SOUTH_SOUTH_EAST,
-	SOUTH_SOUTH_WEST, SOUTH__WEST_WEST, NORTH_WEST_WEST, RAYS_KNIGHT_NUMBER};
-
-enum nodeType : const char {EXACT, LOWER_BOUND, UPPER_BOUND};
-
-
-// OTHER TYPES
-struct PieceID { Color color; Piece piece; };
-
-struct perftCache {
-	unsigned long long key;
-	unsigned long long nodes;
-};
-
-struct TTEntry {
-	uint32_t key{}; // zobrist key - reduced to 32-bit
-	uint8_t depth{}; // depth - 8-bit
-	Move move{}; // best move - 32-bit
-	int16_t score{}; // score for move - 16-bit
-	unsigned char nodeType{}; // type of node (exact, fail-high, fail-low)
-	uint8_t age{}; // age (6-bit)
-};
-
-
-// see magic.cpp
-constexpr ushort ROOK_INDEX_BITS = 12, BISHOP_INDEX_BITS = 9;
-constexpr uint64_t A1H8_DIAG = C64(0x8040201008040201);
-constexpr ushort DIAG_NUMBER = 15;
-constexpr uint64_t NOT_FILE_A = 0xfefefefefefefefe;
-constexpr uint64_t NOT_FILE_H = 0x7f7f7f7f7f7f7f7f;
-constexpr uint64_t NOT_FILE_AB = 0xfcfcfcfcfcfcfcfc;
-constexpr uint64_t NOT_FILE_GH = 0x3f3f3f3f3f3f3f3f;
-constexpr uint64_t BB_RANK4 = 0xff000000;
-constexpr uint64_t BB_RANK5 = 0x1095216660480;
-
-struct Mask {
-	std::array<Bitboard, FILE_NUMBER> file;
-	std::array<Bitboard, RANK_NUMBER> rank;
-	std::array<Bitboard, DIAG_NUMBER> diagonal;
-	std::array<Bitboard, DIAG_NUMBER> antiDiagonal;
-	std::array<Bitboard, SQ_NUMBER> linesEx;
-	std::array<Bitboard, SQ_NUMBER> diagonalsEx;
-	std::array<std::array<Bitboard, SQ_NUMBER>, RAYS_NUMBER>rays;
-	std::array<std::array<Bitboard, SQ_NUMBER>, RAYS_NUMBER>raysEx;
-};
-
-struct LookupTable {
-	std::array<Bitboard, SQ_NUMBER> king;
-	std::array<Bitboard, SQ_NUMBER> knight;
-	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
-	std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishopMagic;
-	const Bitboard whitePawn(Bitboard const& pawn, Bitboard const& occupancy) const;
-	const Bitboard blackPawn(Bitboard const& pawn, Bitboard const& occupancy) const;
-	const Bitboard rook(Square const& square, Bitboard const& blockers) const;
-	const Bitboard bishop(Square const& square, Bitboard const& blockers) const;
-};
-
-
-// for popcount() functions - see https://www.chessprogramming.org/Population_Count
-const Bitboard k1 = C64(0x5555555555555555); /*  -1/3   */
-const Bitboard k2 = C64(0x3333333333333333); /*  -1/5   */
-const Bitboard k4 = C64(0x0f0f0f0f0f0f0f0f); /*  -1/17  */
-const Bitboard kf = C64(0x0101010101010101); /*  -1/255 */
-
-
-// see magic.cpp and attack.cpp
-extern const Bitboard MAGIC_ROOK[64];
-extern const Bitboard MAGIC_BISHOP[64];
-extern const ushort SHIFT_ROOK[64];
-extern const ushort SHIFT_BISHOP[64];
-
-
-// see display.cpp
-extern std::map<std::string, Square> stringToSquareMap;
-extern std::map<Square, std::string> squareToStringMap;
-
-
-// see tt.cpp
-namespace TT {
-	extern std::vector<TTEntry> table;
-};
 
 #endif

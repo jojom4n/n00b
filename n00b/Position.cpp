@@ -1,8 +1,11 @@
 #include "pch.h"
-#include "protos.h"
 #include "Position.h"
+#include "attack.h"
+#include "bitscan.h"
+#include "overloading.h"
+#include "tt.h"
 
-extern struct LookupTable MoveTables;
+extern struct LookupTable MoveTables; // see attack.cpp (and its header file)
 
 
 Position::Position()

@@ -158,14 +158,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="attack.h" />
+    <ClInclude Include="bitscan.h" />
     <ClInclude Include="divide.h" />
+    <ClInclude Include="enums.h" />
+    <ClInclude Include="evaluation.h" />
+    <ClInclude Include="game.h" />
+    <ClInclude Include="globals.h" />
+    <ClInclude Include="display.h" />
+    <ClInclude Include="fen.h" />
+    <ClInclude Include="makemove.h" />
+    <ClInclude Include="perft.h" />
+    <ClInclude Include="search.h" />
+    <ClInclude Include="tt.h" />
+    <ClInclude Include="magic.h" />
+    <ClInclude Include="movegen.h" />
+    <ClInclude Include="overloading.h" />
     <ClInclude Include="params.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="protos.h" />
     <ClInclude Include="psqt.h" />
-    <ClInclude Include="Search.h" />
+    <ClInclude Include="zobrist.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitscan.cpp" />

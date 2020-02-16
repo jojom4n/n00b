@@ -1,7 +1,6 @@
 #include "pch.h"
+#include "bitscan.h"
 #include <assert.h>
-#include "defs.h"
-
 
 //now the BitScanForward and BitScanReverse by hardware
 #if defined(__GNUC__)  // GCC, Clang, ICC

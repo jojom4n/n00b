@@ -1,8 +1,10 @@
 #include "pch.h"
-#include "protos.h"
+#include "makemove.h"
+#include "attack.h"
+#include "enums.h"
 #include "Position.h"
 
-extern struct LookupTable MoveTables;
+extern LookupTable MoveTables; // see attack.cpp (and its header file)
 
 void doMove(Move const &m, Position &p)
 {

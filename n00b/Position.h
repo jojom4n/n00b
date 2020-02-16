@@ -1,10 +1,12 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include "defs.h"
+#include "enums.h"
+#include "zobrist.h"
 #include <array>
 #include <vector>
-#include "defs.h"
-#include "protos.h"
+
 
 class Position
 {

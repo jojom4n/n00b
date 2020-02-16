@@ -1,6 +1,5 @@
 #include "pch.h"
-#include "protos.h"
-
+#include "overloading.h"
 
 Square operator++(Square &s, int) {
 	Square temp = s;

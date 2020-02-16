@@ -1,7 +1,10 @@
 #include "pch.h"
-#include "protos.h"
+#include "evaluation.h"
+#include "enums.h"
+#include "overloading.h"
 #include "psqt.h"
 #include "Position.h"
+#include <map>
 
 const std::map <Piece, ushort> pieceValue_
 { {PAWN, 100}, {KNIGHT, 300}, {BISHOP, 320}, {ROOK, 500}, {QUEEN, 900}, {KING, 5000} };

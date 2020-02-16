@@ -60,9 +60,6 @@
     <ClInclude Include="defs.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="protos.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="Position.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
@@ -75,7 +72,52 @@
     <ClInclude Include="params.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Search.h">
+    <ClInclude Include="attack.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="magic.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="bitscan.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="overloading.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="movegen.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="display.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="zobrist.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="enums.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="tt.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="perft.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="fen.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="makemove.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="evaluation.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="search.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

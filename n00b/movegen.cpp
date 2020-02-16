@@ -1,8 +1,12 @@
 #include "pch.h"
-#include "protos.h"
+#include "movegen.h"
+#include "attack.h"
+#include "bitscan.h"
+#include "makemove.h"
+#include "overloading.h"
 #include "Position.h"
 
-extern struct LookupTable MoveTables;
+extern LookupTable MoveTables; // see attack.cpp (and its header file)
 
 const std::vector<Move> moveGeneration(Position const &p)
 {

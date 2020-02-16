@@ -1,27 +1,18 @@
 #include "pch.h"
+#include "search.h"
+#include "display.h"
+#include "evaluation.h"
+#include "makemove.h"
+#include "movegen.h"
+#include "params.h"
 #include <iostream>
 #include <iomanip>
-#include "defs.h"
-#include "protos.h"
-#include "Position.h"
-#include "params.h"
+#include "tt.h"
 
-struct g_Search {
-	Position pos;
-	unsigned short ply{};
-	short bestScore{};
-	unsigned long nodes{};
-	std::vector<Move> pv{};
-	Move currBestMove{};
-	Move bestMove;
-	bool flagMate{};
-};
-
-g_Search Search{};
+struct Search Search{};
 
 const Move iterativeSearch (Position &p, ushort const& depth)
 {
-	// Search Search{};
 	Search.bestScore = 0;
 	Search.pos = p;
 		
@@ -90,7 +81,7 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 	return Search.bestMove;
 }
 
-void negamaxRoot(g_Search& Search, ushort const& depth)
+void negamaxRoot(struct Search& Search, ushort const& depth)
 {
 	Move bestMove{};
 	TTEntry TTEntry{};

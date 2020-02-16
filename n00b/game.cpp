@@ -1,9 +1,15 @@
 #include "pch.h"
-#include <iostream>
-#include <sstream>
-#include "protos.h"
-#include "Position.h"
+#include "game.h"
+#include "display.h"
 #include "divide.h"
+#include "evaluation.h"
+#include "fen.h"
+#include "makemove.h"
+#include "movegen.h"
+#include "perft.h"
+#include "Position.h"
+#include "search.h"
+#include <iostream>
 
 std::string input = " ";
 

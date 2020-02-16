@@ -1,7 +1,9 @@
 #include "pch.h"
-#include <random>
-#include "protos.h"
+#include "zobrist.h"
+#include "bitscan.h"
+#include "overloading.h"
 #include "Position.h"
+#include <random>
 
 constexpr uint64_t maxU64 = 0xFFFFFFFFFFFFFFFF;
 uint64_t zobristKeys[2][6][64];
@@ -98,4 +100,4 @@ namespace Zobrist {
 		return zobristDepth[depth];
 	}
 
-};
+}

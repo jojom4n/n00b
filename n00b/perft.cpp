@@ -1,9 +1,13 @@
 #include "pch.h"
-#include <iostream>
-#include "protos.h"
-#include "defs.h"
-#include "Position.h"
+#include "perft.h"
+#include "display.h"
+#include "enums.h"
+#include "makemove.h"
+#include "movegen.h"
 #include "params.h"
+#include "Position.h"
+#include <iostream>
+
 
 unsigned long long perft(ushort depth, Position& p, bool init)
 {

@@ -1,20 +1,18 @@
 #include "pch.h"
-#include "protos.h"
+#include "tt.h"
 #include "params.h"
-#include "Search.h"
 
+namespace TT
+{
+	std::vector<TTEntry> table(TT_SIZE);
 
-namespace TT {
-	
-	extern std::vector<TTEntry> table(TT_SIZE);
-
-	void Store(g_Search const& Search)
+	void Store(struct Search const& Search)
 	{
 		uint32_t key = static_cast<uint32_t>(Search.pos.getZobrist());
 		unsigned long long index = key % TT_SIZE;
-		
+
 		if (table[index].key) { // a previous key exists at the index
-			
+
 			if (table[index].key == key && table[index].depth < Search.ply) {  // replace same entry, if at minor depth
 				table[index].key = key;
 				table[index].move = Search.bestMove;
@@ -43,7 +41,7 @@ namespace TT {
 	}
 
 
-	void Store(TTEntry const& entry) 
+	void Store(TTEntry const& entry)
 	{
 		uint32_t key = static_cast<uint32_t>(entry.key);
 		unsigned long long index = key % TT_SIZE;

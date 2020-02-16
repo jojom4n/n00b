@@ -1,8 +1,13 @@
 #include "pch.h"
-#include "protos.h"
+#include "attack.h"
+#include "bitscan.h"
+#include "overloading.h"
 
-struct Mask Masks;
-struct LookupTable MoveTables;
+struct Mask Masks{};
+struct LookupTable MoveTables{};
+extern const Bitboard MAGIC_ROOK[64];
+extern const Bitboard MAGIC_BISHOP[64];
+
 
 void initAttacks()
 {		

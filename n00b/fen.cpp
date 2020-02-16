@@ -1,8 +1,11 @@
 #include "pch.h"
-#include <sstream>
-#include "protos.h"
+#include "fen.h"
+#include "defs.h"
+#include "display.h"
+#include "enums.h"
 #include "Position.h"
-
+#include "tt.h"
+#include <vector>
 
 const bool fenValidate(std::stringstream &fen)
 {

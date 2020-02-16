@@ -5,8 +5,8 @@
 
 struct Mask Masks{};
 struct LookupTable MoveTables{};
-extern const Bitboard MAGIC_ROOK[64];
-extern const Bitboard MAGIC_BISHOP[64];
+extern const Bitboard MAGIC_ROOK[64]; // see magic.cpp (and its header file)
+extern const Bitboard MAGIC_BISHOP[64]; // see magic.cpp (and its header file)
 
 
 void initAttacks()

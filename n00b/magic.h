@@ -21,7 +21,6 @@ extern const ushort SHIFT_BISHOP[64];
 extern const Bitboard MAGIC_ROOK[64];
 extern const Bitboard MAGIC_BISHOP[64];
 
-
 void rookMagic();
 void bishopMagic();
 

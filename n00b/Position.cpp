@@ -5,7 +5,7 @@
 #include "overloading.h"
 #include "tt.h"
 
-extern struct LookupTable MoveTables; // see attack.cpp (and its header file)
+extern struct LookupTable g_MoveTables; // see attack.cpp (and its header file)
 extern std::array<TTEntry, TT_SIZE> TT::table;
 
 
@@ -184,38 +184,38 @@ const bool Position::isSquareAttackedBy(Color const &color, Square const &square
 
 	// ROOK
 	enemy = getPieces(color, ROOK); // get rook's bitboard
-	mask = MoveTables.rook(square, occ); // does rook's attack mask...
+	mask = g_MoveTables.rook(square, occ); // does rook's attack mask...
 	if (mask &= enemy) // ...intersect the square?
 		return true;
 
 	// BISHOP
 	enemy = getPieces(color, BISHOP); // get bishop's bitboard
-	mask = MoveTables.bishop(square, occ); // does bishop's attack mask...
+	mask = g_MoveTables.bishop(square, occ); // does bishop's attack mask...
 	if (mask &= enemy) // ...intersect square?
 		return true;
 
 	// QUEEN
 	enemy = getPieces(color, QUEEN); // get queen's bitboard
-	mask = MoveTables.rook(square, occ) | MoveTables.bishop(square, occ); // does queen's attack mask...
+	mask = g_MoveTables.rook(square, occ) | g_MoveTables.bishop(square, occ); // does queen's attack mask...
 	if (mask &= enemy) // ...intersect square?
 		return true;
 
 	// KNIGHT
 	enemy = getPieces(color, KNIGHT); // get knight's bitboard
-	mask = MoveTables.knight[square]; // does knight's attack mask...
+	mask = g_MoveTables.knight[square]; // does knight's attack mask...
 	if (mask &= enemy) // ...intersect square?
 		return true;
 
 	// KING
 	enemy = getPieces(color, KING); // get enemy king's bitboard
-	mask = MoveTables.king[square]; // does enemy king's attack mask...
+	mask = g_MoveTables.king[square]; // does enemy king's attack mask...
 	if (mask &= enemy) // ...intersect square?
 		return true;
 
 	//PAWNS
 	enemy = getPieces(color, PAWN); // get pawn's bitboard
 	// does enemy pawn's attack mask...
-	(color == WHITE) ? mask = MoveTables.whitePawn(enemy, sq) : mask = MoveTables.blackPawn(enemy, sq);
+	(color == WHITE) ? mask = g_MoveTables.whitePawn(enemy, sq) : mask = g_MoveTables.blackPawn(enemy, sq);
 	if (mask &= sq) // ...intersect square?
 		return true;
 	

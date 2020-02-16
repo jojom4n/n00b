@@ -4,8 +4,8 @@
 #include "magic.h"
 #include "overloading.h"
 
-Mask Masks{};
-LookupTable MoveTables{};
+Mask g_Masks{};
+LookupTable g_MoveTables{};
 
 void initAttacks()
 {		
@@ -25,16 +25,16 @@ void initAttacks()
 
 void SlidingMaskEx()
 {
-	Masks.linesEx.fill({});
-	Masks.diagonalsEx.fill({});
+	g_Masks.linesEx.fill({});
+	g_Masks.diagonalsEx.fill({});
 	
 	for (Square square = A1; square <= H8; square++) {
 		
-		Masks.linesEx[square] = Masks.raysEx[NORTH][square] | Masks.raysEx[SOUTH][square] 
-			| Masks.raysEx[WEST][square] | Masks.raysEx[EAST][square];
+		g_Masks.linesEx[square] = g_Masks.raysEx[NORTH][square] | g_Masks.raysEx[SOUTH][square] 
+			| g_Masks.raysEx[WEST][square] | g_Masks.raysEx[EAST][square];
 		
-		Masks.diagonalsEx[square] = Masks.raysEx[NORTH_WEST][square] | Masks.raysEx[NORTH_EAST][square] 
-			| Masks.raysEx[SOUTH_WEST][square] | Masks.raysEx[SOUTH_EAST][square];
+		g_Masks.diagonalsEx[square] = g_Masks.raysEx[NORTH_WEST][square] | g_Masks.raysEx[NORTH_EAST][square] 
+			| g_Masks.raysEx[SOUTH_WEST][square] | g_Masks.raysEx[SOUTH_EAST][square];
 	}
 }
 
@@ -42,43 +42,43 @@ void SlidingMaskEx()
 void linesAttacks()
 {
 	// FILES AND RANKS
-	Masks.file.fill({});
-	Masks.rank.fill({});
+	g_Masks.file.fill({});
+	g_Masks.rank.fill({});
 
 	for (ushort f = FILE_A, square = f; f <= FILE_H; f++, square = f)
 		for (Rank r = RANK_1; r <= RANK_8; r++, square += 8) 
-			Masks.file[f] |= C64(1) << square;
+			g_Masks.file[f] |= C64(1) << square;
 
 	for (ushort r = RANK_1, square = 0; r <= RANK_8; r++)
 		for (File f = FILE_A; f <= FILE_H; f++, square += 1) 
-			Masks.rank[r] |= C64(1) << square;
+			g_Masks.rank[r] |= C64(1) << square;
 
 	
 	// DIAGONALS
 	uint64_t baseDiagonal = C64(0x8040201008040201); // diagonal from A1 to H8
-	Masks.diagonalsEx.fill({});
+	g_Masks.diagonalsEx.fill({});
 	
 	/* calculate and store diagonals from A1 to H1.
 	We use a mask to remove all excessive bits coming from baseDiagonal << 1 */
 	for (File f = FILE_A; f <= FILE_H; f++, baseDiagonal = (baseDiagonal << 1) & C64(0x80c0e0f0f8fcfe))
-		Masks.diagonal[7 - f] = baseDiagonal;
+		g_Masks.diagonal[7 - f] = baseDiagonal;
 	
 	baseDiagonal = C64(0x4020100804020100); // reset baseDiagonal to diagonal from A2 to H7
 
 	for (Rank r = RANK_2; r <= RANK_8; r++, baseDiagonal = (baseDiagonal >> 1) & C64(0x7f3f1f0f07030100))
-		Masks.diagonal[7 + r] = baseDiagonal;
+		g_Masks.diagonal[7 + r] = baseDiagonal;
 	
 	uint64_t baseAntiDiagonal = C64(0x102040810204080); // antidiagonal from A8 to H1
 
 	/* calculate and store anti-diagonals from A8 to H8.
 	We use a mask to remove all excessive bits coming from baseAntiDiagonal << 1 */
 	for (File f = FILE_A; f <= FILE_H; f++, baseAntiDiagonal = (baseAntiDiagonal << 1) & C64(0xfefcf8f0e0c08000))
-		Masks.antiDiagonal[(RANK_8 + f)] = baseAntiDiagonal;
+		g_Masks.antiDiagonal[(RANK_8 + f)] = baseAntiDiagonal;
 
 	baseAntiDiagonal = C64(0x1020408102040); // reset baseDiagonal to diagonal from A7 to H2
 
 	for (Rank r = RANK_7; r >= RANK_1; r--, baseAntiDiagonal = (baseAntiDiagonal >> 1) & C64(0x103070f1f3f7f))
-		Masks.antiDiagonal[r] = baseAntiDiagonal;
+		g_Masks.antiDiagonal[r] = baseAntiDiagonal;
 }
 
 
@@ -87,22 +87,22 @@ void raysAttacks()
 	// N ray
 	uint64_t baseN = C64(0x0101010101010100);
 	for (Square square = A1; square <= H8; square++, baseN <<= 1)
-		Masks.rays[NORTH][square] = baseN;
+		g_Masks.rays[NORTH][square] = baseN;
 
 	// S ray
 	uint64_t baseS = C64(0x0080808080808080);
 	for (Square square = H8; square >= A1; square--, baseS >>= 1)
-		Masks.rays[SOUTH][square] = baseS;
+		g_Masks.rays[SOUTH][square] = baseS;
 
 	// W ray
 	uint64_t baseW = C64(0x7f00000000000000);
 	for (Square square = H8; square >= A1; square--, baseW >>= 1)
-		Masks.rays[WEST][square] = baseW & Masks.rank[RANK_INDEX];
+		g_Masks.rays[WEST][square] = baseW & g_Masks.rank[RANK_INDEX];
 
 	// E ray
 	uint64_t baseE = C64(0xfe);
 	for (Square square = A1; square <= H8; square++, baseE <<=1)
-		Masks.rays[EAST][square] = baseE & Masks.rank[RANK_INDEX];
+		g_Masks.rays[EAST][square] = baseE & g_Masks.rank[RANK_INDEX];
 	
 	// NW ray
 	uint64_t baseDiagonalNW = C64(0x102040810204000);
@@ -111,7 +111,7 @@ void raysAttacks()
 		uint64_t copyDiagonal = baseDiagonalNW;
 
 		for (ushort r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
-			Masks.rays[NORTH_WEST][r + f] = copyDiagonal;
+			g_Masks.rays[NORTH_WEST][r + f] = copyDiagonal;
 	}
 
 	// NE ray
@@ -121,7 +121,7 @@ void raysAttacks()
 		uint64_t copyDiagonal = baseDiagonalNE;
 
 		for (ushort r = RANK_1; r < SQ_NUMBER; r += 8, copyDiagonal <<= 8)
-			Masks.rays[NORTH_EAST][r + f] = copyDiagonal;
+			g_Masks.rays[NORTH_EAST][r + f] = copyDiagonal;
 	}
 	
 	// SW ray
@@ -131,7 +131,7 @@ void raysAttacks()
 		uint64_t copyDiagonal = baseDiagonalSW;
 
 		for (short r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
-			Masks.rays[SOUTH_WEST][(C64(8) * r) + f] = copyDiagonal;
+			g_Masks.rays[SOUTH_WEST][(C64(8) * r) + f] = copyDiagonal;
 	}
 	
 	// SE ray
@@ -141,39 +141,39 @@ void raysAttacks()
 		uint64_t copyDiagonal = baseDiagonalSE;
 
 		for (short r = RANK_8; r >= RANK_1; r -= 1, copyDiagonal >>= 8)
-			Masks.rays[SOUTH_EAST][(C64(8) * r) + f] = copyDiagonal;
+			g_Masks.rays[SOUTH_EAST][(C64(8) * r) + f] = copyDiagonal;
 	}
 }
 
 
 void raysEx() 
 {
-	Masks.raysEx = Masks.rays;
+	g_Masks.raysEx = g_Masks.rays;
 
 	for (Square square = A1; square <= H8; square++) {
-		if (square <= H7) Masks.raysEx[NORTH][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH][square]);
-		if (square >= A2) Masks.raysEx[SOUTH][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH][square]);
-		if (!(FILE_INDEX == FILE_A)) Masks.raysEx[WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[WEST][square]);
-		if (!(FILE_INDEX == FILE_H)) Masks.raysEx[EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[EAST][square]);
+		if (square <= H7) g_Masks.raysEx[NORTH][square] ^= C64(1) << bitscan_rvs(g_Masks.raysEx[NORTH][square]);
+		if (square >= A2) g_Masks.raysEx[SOUTH][square] ^= C64(1) << bitscan_fwd(g_Masks.raysEx[SOUTH][square]);
+		if (!(FILE_INDEX == FILE_A)) g_Masks.raysEx[WEST][square] ^= C64(1) << bitscan_fwd(g_Masks.raysEx[WEST][square]);
+		if (!(FILE_INDEX == FILE_H)) g_Masks.raysEx[EAST][square] ^= C64(1) << bitscan_rvs(g_Masks.raysEx[EAST][square]);
 
-		if (Masks.raysEx[NORTH_WEST][square]) 
-			Masks.raysEx[NORTH_WEST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_WEST][square]);
+		if (g_Masks.raysEx[NORTH_WEST][square]) 
+			g_Masks.raysEx[NORTH_WEST][square] ^= C64(1) << bitscan_rvs(g_Masks.raysEx[NORTH_WEST][square]);
 		
-		if (Masks.raysEx[NORTH_EAST][square]) 
-			Masks.raysEx[NORTH_EAST][square] ^= C64(1) << bitscan_rvs(Masks.raysEx[NORTH_EAST][square]);
+		if (g_Masks.raysEx[NORTH_EAST][square]) 
+			g_Masks.raysEx[NORTH_EAST][square] ^= C64(1) << bitscan_rvs(g_Masks.raysEx[NORTH_EAST][square]);
 		
-		if (Masks.raysEx[SOUTH_WEST][square]) 
-			Masks.raysEx[SOUTH_WEST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_WEST][square]);
+		if (g_Masks.raysEx[SOUTH_WEST][square]) 
+			g_Masks.raysEx[SOUTH_WEST][square] ^= C64(1) << bitscan_fwd(g_Masks.raysEx[SOUTH_WEST][square]);
 		
-		if (Masks.raysEx[SOUTH_EAST][square]) 
-			Masks.raysEx[SOUTH_EAST][square] ^= C64(1) << bitscan_fwd(Masks.raysEx[SOUTH_EAST][square]);
+		if (g_Masks.raysEx[SOUTH_EAST][square]) 
+			g_Masks.raysEx[SOUTH_EAST][square] ^= C64(1) << bitscan_fwd(g_Masks.raysEx[SOUTH_EAST][square]);
 	}
 }
 
 
 void kingMask()
 {
-	MoveTables.king.fill({});
+	g_MoveTables.king.fill({});
 
 	for (Square square = A1; square <= H8; square++) {
 		uint64_t kingPosition{0}, north, south, west, east, northWest, southWest, northEast, southEast;
@@ -188,7 +188,7 @@ void kingMask()
 		northEast = (kingPosition & NOT_FILE_H) << 9;
 		southEast = (kingPosition & NOT_FILE_H) >> 7;
 
-		MoveTables.king[square] = north | south | west | east | northWest | southWest
+		g_MoveTables.king[square] = north | south | west | east | northWest | southWest
 			| northEast | southEast;
 	}
 }
@@ -196,7 +196,7 @@ void kingMask()
 
 void knightMask()
 {
-	MoveTables.knight.fill({});
+	g_MoveTables.knight.fill({});
 
 	for (Square square = A1; square <= H8; square++) {
 		uint64_t knightPosition{ 0 }, nnw, nne, ne, se, sse, ssw, sw, nw;
@@ -211,22 +211,22 @@ void knightMask()
 		sw = (knightPosition & NOT_FILE_AB) >> 10;
 		nw = (knightPosition & NOT_FILE_AB) << 6;
 
-		MoveTables.knight[square] = nnw | nne | ne | se | sse | ssw | sw | nw;
+		g_MoveTables.knight[square] = nnw | nne | ne | se | sse | ssw | sw | nw;
 	}
 }
 
 
 const Bitboard LookupTable::rook(Square const &square, Bitboard const &blockers) const
 {
-	return MoveTables.rookMagic[square]
-		[((blockers & Masks.linesEx[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
+	return g_MoveTables.rookMagic[square]
+		[((blockers & g_Masks.linesEx[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
 }
 
 
 const Bitboard LookupTable::bishop(Square const &square, Bitboard const &blockers) const
 {
-	return MoveTables.bishopMagic[square]
-		[((blockers & Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];
+	return g_MoveTables.bishopMagic[square]
+		[((blockers & g_Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];
 }
 
 const Bitboard LookupTable::whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const

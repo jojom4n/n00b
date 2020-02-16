@@ -21,7 +21,7 @@ struct Search {
 };
 
 const Move iterativeSearch(Position& p, ushort const& depth);
-void negamaxRoot(struct Search& g_Search, ushort const& rootDepth);
+void negamaxRoot(struct Search& mySearch, ushort const& rootDepth);
 const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long& nodes, std::vector<Move>& childPv);
 const short quiescence(Position const& p, short alpha, short beta, unsigned long& nodes);
 

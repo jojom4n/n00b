@@ -5,27 +5,27 @@
 #include "overloading.h"
 
 // see attack.cpp (and its header file)
-extern struct Mask Masks; 
-extern struct LookupTable MoveTables;
+extern struct Mask g_Masks; 
+extern struct LookupTable g_MoveTables;
 
 void rookMagic()
 {
-	MoveTables.rookMagic.fill({});
+	g_MoveTables.rookMagic.fill({});
 
 	for (Square square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_rook{};
-		ushort bits = popcount(Masks.linesEx[square]);
+		ushort bits = popcount(g_Masks.linesEx[square]);
 
 		for (ushort i = 0; i < (1 << bits); i++) {
-			blockerboard[i] = gen_blockerboard(i, bits, Masks.linesEx[square]);
+			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.linesEx[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
 			
-			uint64_t index = ((blockerboard[i] & Masks.linesEx[square]) 
+			uint64_t index = ((blockerboard[i] & g_Masks.linesEx[square]) 
 				* MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
 			
-			MoveTables.rookMagic[square][ushort(index)] = tmp_rook;
+			g_MoveTables.rookMagic[square][ushort(index)] = tmp_rook;
 		}
 	}
 }
@@ -33,22 +33,22 @@ void rookMagic()
 
 void bishopMagic()
 {
-	MoveTables.bishopMagic.fill({});
+	g_MoveTables.bishopMagic.fill({});
 
 	for (Square square = A1; square <= H8; square++) {
 		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_bishop{};
-		ushort bits = popcount(Masks.diagonalsEx[square]);
+		ushort bits = popcount(g_Masks.diagonalsEx[square]);
 
 		for (ushort i = 0; i < (1 << bits); i++) {
-			blockerboard[i] = gen_blockerboard(i, bits, Masks.diagonalsEx[square]);
+			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.diagonalsEx[square]);
 			tmp_bishop = gen_b_attks(square, blockerboard[i]);
 
-			uint64_t index = ((blockerboard[i] & Masks.diagonalsEx[square]) 
+			uint64_t index = ((blockerboard[i] & g_Masks.diagonalsEx[square]) 
 				* MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square];
 
-			MoveTables.bishopMagic[square][ushort(index)] = tmp_bishop;
+			g_MoveTables.bishopMagic[square][ushort(index)] = tmp_bishop;
 		}
 	}
 }

@@ -8,41 +8,41 @@
 #include <iomanip>
 #include <iostream>
 
-struct Search g_Search({});
+struct Search mySearch({});
 extern std::array<TTEntry, TT_SIZE> TT::table;
 
 const Move iterativeSearch (Position &p, ushort const& depth)
 {
-	g_Search.bestScore = 0;
-	g_Search.pos = p;
+	mySearch.bestScore = 0;
+	mySearch.pos = p;
 		
-	for (short ply = 1; ply <= depth && !g_Search.flagMate; ply++) {
-		g_Search.nodes = 0;
-		g_Search.depth = depth;
-		g_Search.ply = ply;
-		g_Search.pv.clear();
+	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
+		mySearch.nodes = 0;
+		mySearch.depth = depth;
+		mySearch.ply = ply;
+		mySearch.pv.clear();
 
 		auto t1 = Clock::now();
-		negamaxRoot(g_Search, ply);
+		negamaxRoot(mySearch, ply);
 		auto t2 = Clock::now();
 
 		std::chrono::duration<float, std::milli> time = t2 - t1;
 
-		if (g_Search.bestMove) {
+		if (mySearch.bestMove) {
 			
-			if (g_Search.bestScore == MATE || g_Search.bestScore == -MATE)
-				g_Search.flagMate = true;
+			if (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)
+				mySearch.flagMate = true;
 
-			std::cout << "\n*depth:" << ply << " nodes:" << g_Search.nodes << " ms:" << int(time.count()) << " nps:" 
-				<< int(g_Search.nodes / (time.count() / 1000)) << std::endl;
+			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(time.count()) << " nps:" 
+				<< int(mySearch.nodes / (time.count() / 1000)) << std::endl;
 
-			std::cout << "\t move:" << displayMove(g_Search.pos, g_Search.bestMove) << " score:";
+			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 
-			float score = static_cast<float>(g_Search.bestScore / 100.00);
+			float score = static_cast<float>(mySearch.bestScore / 100.00);
 
-			switch (g_Search.pos.getTurn()) {
+			switch (mySearch.pos.getTurn()) {
 			case WHITE: 
-				if (score > 0 && !g_Search.bestScore == MATE)
+				if (score > 0 && !mySearch.bestScore == MATE)
 					std::cout << "+";
 				else if (score < 0)
 					std::cout << "-";
@@ -50,7 +50,7 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 			case BLACK:
 				if (score > 0)
 					std::cout << "-";
-				else if (score < 0 && !g_Search.bestScore == MATE)
+				else if (score < 0 && !mySearch.bestScore == MATE)
 					std::cout << "+";
 				break; 
 			default:
@@ -59,49 +59,49 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 			}
 			
 			
-			(!g_Search.bestScore == 0 && g_Search.flagMate == true) ? std::cout << "#" << (ply / 2) 
+			(!mySearch.bestScore == 0 && mySearch.flagMate == true) ? std::cout << "#" << (ply / 2) 
 				: std::cout << std::setprecision(3) << fabs(score);
 
 			std::cout << " pv:";
 
-			for (auto it = g_Search.pv.begin(); it != g_Search.pv.end(); ++it)
-				(it == std::prev(g_Search.pv.end()) && (g_Search.bestScore == MATE || g_Search.bestScore == -MATE)) ? std::cout 
-					<< displayMove(g_Search.pos, *it) << "# " : std::cout << displayMove(g_Search.pos, *it) << " ";
+			for (auto it = mySearch.pv.begin(); it != mySearch.pv.end(); ++it)
+				(it == std::prev(mySearch.pv.end()) && (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)) ? std::cout 
+					<< displayMove(mySearch.pos, *it) << "# " : std::cout << displayMove(mySearch.pos, *it) << " ";
 		}
 
-		else if (!g_Search.bestMove && !underCheck(g_Search.pos.getTurn(), g_Search.pos)) {
+		else if (!mySearch.bestMove && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 			std::cout << "\nIt's STALEMATE!" << std::endl;
-			g_Search.flagMate = true;
+			mySearch.flagMate = true;
 		}
 
-		else if (!g_Search.bestMove && underCheck(g_Search.pos.getTurn(), g_Search.pos)) {
+		else if (!mySearch.bestMove && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 			p.setCheckmate(true);
 			std::cout << "\nIt's CHECKMATE!" << std::endl;
 		}
 	}
 	
-	return g_Search.bestMove;
+	return mySearch.bestMove;
 }
 
-void negamaxRoot(struct Search& g_Search, ushort const& depth)
+void negamaxRoot(struct Search& mySearch, ushort const& depth)
 {
 	Move bestMove{};
 	TTEntry TTEntry{};
 	short alpha = ALPHA;
 	short beta = BETA;
-	uint32_t key = static_cast<uint32_t>(g_Search.pos.getZobrist());
+	uint32_t key = static_cast<uint32_t>(mySearch.pos.getZobrist());
 
 	if (TT::table[key % TT_SIZE].key == key) {
 		TTEntry = TT::table[key % TT_SIZE];
 
 		// TTENTRY LEGALITY MUST BE CHECKED **** PLACEHOLDER //
 
-		if (TTEntry.depth >= g_Search.ply) {
+		if (TTEntry.depth >= mySearch.ply) {
 
 			switch (TTEntry.nodeType) {
 			case EXACT:
-				g_Search.bestScore = TTEntry.score;
-				g_Search.bestMove = TTEntry.move;
+				mySearch.bestScore = TTEntry.score;
+				mySearch.bestMove = TTEntry.move;
 				return;
 				break;
 			case LOWER_BOUND:
@@ -113,17 +113,17 @@ void negamaxRoot(struct Search& g_Search, ushort const& depth)
 			}
 
 			if (alpha >= beta) {
-				g_Search.bestScore = TTEntry.score;
-				g_Search.bestMove = TTEntry.move;
+				mySearch.bestScore = TTEntry.score;
+				mySearch.bestMove = TTEntry.move;
 				return;
 			}
 		}
 	}
 	
 	// position is not in TT
-	g_Search.bestScore = -MATE;
-	std::vector<Move> moveList = moveGeneration(g_Search.pos);
-	moveList = pruneIllegal(moveList, g_Search.pos);
+	mySearch.bestScore = -MATE;
+	std::vector<Move> moveList = moveGeneration(mySearch.pos);
+	moveList = pruneIllegal(moveList, mySearch.pos);
 
 	/* if (bestSoFar) {
 		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), bestSoFar);
@@ -132,23 +132,23 @@ void negamaxRoot(struct Search& g_Search, ushort const& depth)
 
 	for (const auto& m : moveList) {
 		std::vector<Move> childPv{};
-		Position copy = g_Search.pos;
+		Position copy = mySearch.pos;
 		short score{};
 		doMove(m, copy);
-		score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, g_Search.nodes, childPv);
+		score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
 
-		if (score >= g_Search.bestScore) {
-			g_Search.bestScore = score;
-			g_Search.bestMove = m;
-			g_Search.pv.clear();
-			g_Search.pv.push_back(m);
-			std::copy(childPv.begin(), childPv.end(), back_inserter(g_Search.pv));
+		if (score >= mySearch.bestScore) {
+			mySearch.bestScore = score;
+			mySearch.bestMove = m;
+			mySearch.pv.clear();
+			mySearch.pv.push_back(m);
+			std::copy(childPv.begin(), childPv.end(), back_inserter(mySearch.pv));
 		}
-		undoMove(m, copy, g_Search.pos);
-		g_Search.nodes++;
+		undoMove(m, copy, mySearch.pos);
+		mySearch.nodes++;
 	}
 
-	TT::Store(g_Search);
+	TT::Store(mySearch);
 }
 
 

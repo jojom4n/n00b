@@ -6,7 +6,7 @@
 #include "overloading.h"
 #include "Position.h"
 
-extern struct LookupTable MoveTables; // see attack.cpp (and its header file)
+extern struct LookupTable g_MoveTables; // see attack.cpp (and its header file)
 
 const std::vector<Move> moveGeneration(Position const &p)
 {
@@ -30,20 +30,20 @@ const std::vector<Move> moveGeneration(Position const &p)
 			// get move bitboard for the piece, given its square
 			switch (piece) {
 			case KING:
-				moves = MoveTables.king[squareFrom];
+				moves = g_MoveTables.king[squareFrom];
 				break;
 			case QUEEN:
-				moves = MoveTables.bishop(squareFrom, occupancy)
-					| MoveTables.rook(squareFrom, occupancy);
+				moves = g_MoveTables.bishop(squareFrom, occupancy)
+					| g_MoveTables.rook(squareFrom, occupancy);
 				break;
 			case ROOK:
-				moves = MoveTables.rook(squareFrom, occupancy);
+				moves = g_MoveTables.rook(squareFrom, occupancy);
 				break;
 			case KNIGHT:
-				moves = MoveTables.knight[squareFrom];
+				moves = g_MoveTables.knight[squareFrom];
 				break;
 			case BISHOP:
-				moves = MoveTables.bishop(squareFrom, occupancy);
+				moves = g_MoveTables.bishop(squareFrom, occupancy);
 				break;
 			case PAWN: 
 				/* For pawns, it's a bit more complicated, because they have no lookup tables.
@@ -102,7 +102,7 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 	const Bitboard occ = p.getPosition(), ownPieces = p.getPosition(c);
 	Bitboard moves{};
 	Square kingPos = p.getPieceOnSquare(c, KING)[0];
-	moves = MoveTables.king[kingPos] & ~ownPieces;
+	moves = g_MoveTables.king[kingPos] & ~ownPieces;
 
 	while (moves) { // scan collected moves, determine their type and add them to list
 		Square squareTo = Square(bitscan_reset(moves));
@@ -139,8 +139,8 @@ const Bitboard pawnMoves(Position const &p, Square const &from)
 		
 	/* Set in an empty bitboard the bit corresponding to 'from' (i.e. where pawn is)
 	and compute if it can attack from there opponent's pieces*/
-	(c == WHITE) ? m |= MoveTables.whitePawn(C64(1) << from, ~own) & occ
-		: m |= MoveTables.blackPawn(C64(1) << from, ~own) & occ;
+	(c == WHITE) ? m |= g_MoveTables.whitePawn(C64(1) << from, ~own) & occ
+		: m |= g_MoveTables.blackPawn(C64(1) << from, ~own) & occ;
 
 	return m;
 }
@@ -154,7 +154,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 
 	if (p.getCastle(c) == Castle::QUEENSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(A8, c).piece == ROOK && p.idPiece(E8, c).piece == KING) // rook and king in position
-			&& (	(MoveTables.rook(A8, occ) >> E8) & C64(1)	) // no pieces between rook and king
+			&& (	(g_MoveTables.rook(A8, occ) >> E8) & C64(1)	) // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), C8))	)   // C8 and D8 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), D8))	)	)
 		{  
@@ -163,7 +163,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 		}
 
 		else if (	(p.idPiece(A1, c).piece == ROOK && p.idPiece(E1, c).piece == KING)  // rook and king in position
-			&& (	(MoveTables.rook(A1, occ) >> E1) & C64(1)	)  // no pieces between rook and king
+			&& (	(g_MoveTables.rook(A1, occ) >> E1) & C64(1)	)  // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), C1))	)   // C1 and D1 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), D1))	)	)
 		{
@@ -173,7 +173,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 
 	if (p.getCastle(c) == Castle::KINGSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(H8, c).piece == ROOK && p.idPiece(E8, c).piece == KING)  // rook and king in position
-			&& (	(MoveTables.rook(H8, occ) >> E8) & C64(1)	)  // no pieces between rook and king
+			&& (	(g_MoveTables.rook(H8, occ) >> E8) & C64(1)	)  // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), F8))	)   // F8 and G8 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), G8))	)	)
 		{
@@ -182,7 +182,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 		}
 
 		else if (	(p.idPiece(H1, c).piece == ROOK && p.idPiece(E1, c).piece == KING) // rook and king in position
-			&& (	(MoveTables.rook(H1, occ) >> E1) & C64(1)	)   // no pieces between rook and king
+			&& (	(g_MoveTables.rook(H1, occ) >> E1) & C64(1)	)   // no pieces between rook and king
 			&& (	!(p.isSquareAttackedBy(Color(!c), F1))	)   // F1 and G1 must not be under attack
 			&& (	!(p.isSquareAttackedBy(Color(!c), G1))	)	)
 		{
@@ -206,7 +206,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant - 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -217,7 +217,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant - 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -229,7 +229,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant + 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(), 
 					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing|= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				attacksToKing|= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -240,7 +240,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant + 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -255,7 +255,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant - 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -266,7 +266,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant + 9);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -281,7 +281,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant - 9);
 					Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
-					attacksToKing |= MoveTables.whitePawn(C64(1) << enPassant, occ);
+					attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 					m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 					moveList.push_back(m);
 			}
@@ -292,7 +292,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Square squareFrom = Square(enPassant + 7);
 				Bitboard attacksToKing{}, occ = p.getPosition(),
 					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing |= MoveTables.blackPawn(C64(1) << enPassant, occ);
+				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -353,38 +353,38 @@ short underCheck(Color const &c, Position const &p)
 	
 	// ROOK
 	opponent = p.getPieces(Color(!c), ROOK); // get rook's bitboard
-	attackedBy = MoveTables.rook(kingPos, occ); // does rook's attack mask...
+	attackedBy = g_MoveTables.rook(kingPos, occ); // does rook's attack mask...
 	if (attackedBy &= opponent) // ...intersect King's square?
 		attackers += 1; 
 	
 	// BISHOP
 	opponent = p.getPieces(Color(!c), BISHOP); // get bishop's bitboard
-	attackedBy = MoveTables.bishop(kingPos, occ); // does bishop's attack mask...
+	attackedBy = g_MoveTables.bishop(kingPos, occ); // does bishop's attack mask...
 	if (attackedBy &= opponent) // ...intersect King's square?
 		attackers += 1;
 
 	// QUEEN
 	opponent = p.getPieces(Color(!c), QUEEN); // get queen's bitboard
-	attackedBy = MoveTables.rook(kingPos, occ) | MoveTables.bishop(kingPos, occ); // does queen's attack mask...
+	attackedBy = g_MoveTables.rook(kingPos, occ) | g_MoveTables.bishop(kingPos, occ); // does queen's attack mask...
 	if (attackedBy &= opponent) // ...intersect King's square?
 		attackers += 1;
 
 	// KNIGHT
 	opponent = p.getPieces(Color(!c), KNIGHT); // get knight's bitboard
-	attackedBy = MoveTables.knight[kingPos]; // does knight's attack mask...
+	attackedBy = g_MoveTables.knight[kingPos]; // does knight's attack mask...
 	if (attackedBy &= opponent) // ...intersect King's square?
 		attackers += 1;
 
 	// KING
 	opponent = p.getPieces(Color(!c), KING); // get enemy king's bitboard
-	attackedBy = MoveTables.king[kingPos]; // does enemy king's attack mask...
+	attackedBy = g_MoveTables.king[kingPos]; // does enemy king's attack mask...
 	if (attackedBy &= opponent) // ...intersect King's square?
 		attackers += 1;
 
 	//PAWNS
 	opponent = p.getPieces(Color(!c), PAWN); // get pawn's bitboard
 	// does enemy pawn's attack mask...
-	(c == WHITE) ? attackedBy = MoveTables.blackPawn(opponent, occ) : attackedBy = MoveTables.whitePawn(opponent, occ);
+	(c == WHITE) ? attackedBy = g_MoveTables.blackPawn(opponent, occ) : attackedBy = g_MoveTables.whitePawn(opponent, occ);
 	if (attackedBy &= kingBB) // ...intersect King's square?
 		attackers += 1;
 
@@ -438,20 +438,20 @@ const std::vector<Move> moveGenQS(Position const& p)
 			// get move bitboard for the piece, given its square
 			switch (piece) {
 			case KING:
-				moves = MoveTables.king[squareFrom];
+				moves = g_MoveTables.king[squareFrom];
 				break;
 			case QUEEN:
-				moves = MoveTables.bishop(squareFrom, occupancy)
-					| MoveTables.rook(squareFrom, occupancy);
+				moves = g_MoveTables.bishop(squareFrom, occupancy)
+					| g_MoveTables.rook(squareFrom, occupancy);
 				break;
 			case ROOK:
-				moves = MoveTables.rook(squareFrom, occupancy);
+				moves = g_MoveTables.rook(squareFrom, occupancy);
 				break;
 			case KNIGHT:
-				moves = MoveTables.knight[squareFrom];
+				moves = g_MoveTables.knight[squareFrom];
 				break;
 			case BISHOP:
-				moves = MoveTables.bishop(squareFrom, occupancy);
+				moves = g_MoveTables.bishop(squareFrom, occupancy);
 				break;
 			case PAWN:
 				/* For pawns, it's a bit more complicated, because they have no lookup tables.

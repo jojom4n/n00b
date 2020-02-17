@@ -8,12 +8,11 @@
 #include <iomanip>
 #include <iostream>
 
-struct Search mySearch({});
 extern std::array<TTEntry, TT_SIZE> TT::table;
 
 const Move iterativeSearch (Position &p, ushort const& depth)
 {
-	mySearch.bestScore = 0;
+	struct Search mySearch({});
 	mySearch.pos = p;
 		
 	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
@@ -63,8 +62,6 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 			for (auto it = mySearch.pv.begin(); it != mySearch.pv.end(); ++it)
 				(it == std::prev(mySearch.pv.end()) && (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)) ? std::cout 
 					<< displayMove(mySearch.pos, *it) << "# " : std::cout << displayMove(mySearch.pos, *it) << " ";
-
-			std::cout << "Tablehits: " << mySearch.tableHit;
 		}
 
 		else if (!mySearch.bestMove && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
@@ -123,8 +120,6 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 		// TTENTRY LEGALITY MUST BE CHECKED **** PLACEHOLDER //
 
 		if (TTEntry.depth >= depth) {
-
-			mySearch.tableHit++;
 
 			switch (TTEntry.nodeType) {
 			case EXACT:

@@ -1,13 +1,11 @@
 #include "pch.h"
 #include "evaluation.h"
-#include "enums.h"
 #include "overloading.h"
 #include "psqt.h"
 #include "Position.h"
-#include <map>
 
-const std::map <Piece, ushort> pieceValue_
-{ {PAWN, 100}, {KNIGHT, 300}, {BISHOP, 320}, {ROOK, 500}, {QUEEN, 900}, {KING, 5000} };
+const std::map <Piece, ushort> g_pieceValue
+{ {PAWN, 100}, { KNIGHT, 300 }, { BISHOP, 320 }, { ROOK, 500 }, { QUEEN, 900 }, { KING, 5000 } };
 
 
 const short evaluate(Position const &p)
@@ -32,12 +30,12 @@ const short evMaterial (Position const &p)
 		numPawn = p.countPieceType(c, PAWN);
 		numKing = p.countPieceType(c, KING);
 
-		materialScore[c] = pieceValue_.at(ROOK) * numRook
-			+ pieceValue_.at(BISHOP) * numBishop
-			+ pieceValue_.at(KNIGHT) * numKnight
-			+ pieceValue_.at(QUEEN) * numQueen
-			+ pieceValue_.at(PAWN) * numPawn
-			+ pieceValue_.at(KING) * numKing;
+		materialScore[c] = g_pieceValue.at(ROOK) * numRook
+			+ g_pieceValue.at(BISHOP) * numBishop
+			+ g_pieceValue.at(KNIGHT) * numKnight
+			+ g_pieceValue.at(QUEEN) * numQueen
+			+ g_pieceValue.at(PAWN) * numPawn
+			+ g_pieceValue.at(KING) * numKing;
 	}
 
 	return materialScore[WHITE] - materialScore[BLACK];	

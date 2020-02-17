@@ -168,6 +168,7 @@
     <ClInclude Include="display.h" />
     <ClInclude Include="fen.h" />
     <ClInclude Include="makemove.h" />
+    <ClInclude Include="moveorder.h" />
     <ClInclude Include="perft.h" />
     <ClInclude Include="search.h" />
     <ClInclude Include="tt.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="fen.cpp" />
     <ClCompile Include="makemove.cpp" />
     <ClCompile Include="movegen.cpp" />
+    <ClCompile Include="moveorder.cpp" />
     <ClCompile Include="overloading.cpp" />
     <ClCompile Include="perft.cpp" />
     <ClCompile Include="Position.cpp" />

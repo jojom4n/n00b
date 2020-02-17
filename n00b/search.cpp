@@ -4,6 +4,7 @@
 #include "evaluation.h"
 #include "makemove.h"
 #include "movegen.h"
+#include "moveorder.h"
 #include "tt.h"
 #include <iomanip>
 #include <iostream>
@@ -211,6 +212,7 @@ const short quiescence(Position const& p, short alpha, short beta, unsigned long
 	Position copy = p;
 	std::vector<Move> moveList = moveGenQS(copy);
 	moveList = pruneIllegal(moveList, copy);
+	moveList = mvv_lva(moveList);
 
 	for (const auto& m : moveList) {
 		

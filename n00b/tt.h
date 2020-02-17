@@ -15,7 +15,6 @@ struct TTEntry {
 
 namespace TT {
 	extern std::array<TTEntry, TT_SIZE> table;
-	void Store(struct Search const& Search);
 	void Store(TTEntry const& entry);
 }
 

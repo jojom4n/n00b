@@ -12,9 +12,9 @@
 
 struct Search {
 	Position pos;
-	unsigned short ply, depth;
+	ushort depth;
 	short bestScore;
-	unsigned long nodes;
+	unsigned long long nodes, tableHit;
 	std::vector<Move> pv;
 	Move bestMove;
 	bool flagMate;
@@ -22,8 +22,8 @@ struct Search {
 
 const Move iterativeSearch(Position& p, ushort const& depth);
 void negamaxRoot(struct Search& mySearch, ushort const& rootDepth);
-const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long& nodes, std::vector<Move>& childPv);
-const short quiescence(Position const& p, short alpha, short beta, unsigned long& nodes);
+const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long long& nodes, std::vector<Move>& childPv);
+const short quiescence(Position const& p, short alpha, short beta, unsigned long long& nodes);
 
 
 #endif

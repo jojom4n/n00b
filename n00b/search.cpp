@@ -18,13 +18,13 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 	mySearch.flagMate = 0;
 	mySearch.nodes = 0;
 	mySearch.ttHits = 0;
+	mySearch.ttUseful = 0;
+	auto t1 = Clock::now();
+	
 		
 	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
-		mySearch.nodes = 0;
-		mySearch.ttHits = 0;
 		mySearch.pv.clear();
 
-		auto t1 = Clock::now();
 		negamaxRoot(mySearch, ply);
 		auto t2 = Clock::now();
 
@@ -36,7 +36,7 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 				mySearch.flagMate = true;
 
 			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(time.count()) << " nps:"
-				<< int(mySearch.nodes / (time.count() / 1000)) << " TT:" << mySearch.ttHits << std::endl;
+				<< int(mySearch.nodes / (time.count() / 1000)) << " ** TT Hits:" << mySearch.ttHits << " Useful:" << mySearch.ttUseful << std::endl;
 
 			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 
@@ -121,10 +121,12 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 	TTEntry TTEntry{};
 	
 	if (TT::table[key % TT_SIZE].key == key) {
-		mySearch.ttHits++;
 		TTEntry = TT::table[key % TT_SIZE];
+		mySearch.ttHits++;
 
 		if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
+
+			mySearch.ttUseful++;
 
 			switch (TTEntry.nodeType) {
 			case EXACT:

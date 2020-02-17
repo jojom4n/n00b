@@ -171,15 +171,17 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 		nodes++;
 
 		if (score >= beta) {
-			bestScore = beta;
+			bestScore = score;
 			bestMove = m;
 			break;
 		}	
 		
-		if (score > alpha) {
+		if (score > bestScore) {
 			bestScore = score;
 			bestMove = m;
-			alpha = score;
+
+			if (score > alpha)
+				alpha = score;
 		}
 	}
 

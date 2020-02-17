@@ -6,30 +6,40 @@
 
 extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and its header)
 
-std::vector<Move> mvv_lva(std::vector<Move> const& origList) 
+std::vector<Move> ordering(std::vector<Move> const& moves)
 {
-	std::vector<Move> moveCopy{};
+	std::vector<Move> moveList{}, moveTemp{};
+	moveTemp = mvv_lva(moves);
+	moveList.insert(moveList.begin(), moveTemp.begin(), moveTemp.end());
+
+	// add all the other generated moves but not ordered so far
+	for (auto const& elem : moves) {
+		if (std::find(moveList.begin(), moveList.end(), elem) == moveList.end())
+			moveList.push_back(elem);
+	}
+
+	return moveList;
+}
+
+std::vector<Move> mvv_lva(std::vector<Move> const& moves) 
+{
+	std::vector<Move> captures{};
 	std::multimap<short, Move, std::greater<int>> sortedMap{};
 
-	for (const auto& elem : origList) {
+	for (auto const& elem : moves) {
 		ushort moveType = ((C64(1) << 3) - 1) & (elem >> 6); //is move a capture?
-		
+
 		if (moveType == CAPTURE) {
 			Piece attacker = static_cast<Piece>(((C64(1) << 3) - 1) & (elem >> 9));
 			Piece victim = static_cast<Piece>(((C64(1) << 3) - 1) & (elem >> 3));
 			short score = g_pieceValue.at(victim) - g_pieceValue.at(attacker);
 			sortedMap.insert(std::pair<short, Move>(score, elem));
 		}
-		
-		for (std::multimap<short, Move>::iterator it = sortedMap.begin(); it != sortedMap.end(); ++it)
-			std::vector<Move>::iterator it = std::find(moveCopy.begin(), moveCopy.end(), TTEntry.move);
-		std::rotate(moveList.begin(), it, it + 1);
-			
-			moveCopy.push_back((*it).second);
-		
-		moveCopy.push_back(elem);
+
 	}
 
-	
-	return moveCopy;
+	for (std::multimap<short, Move>::iterator it = sortedMap.begin(); it != sortedMap.end(); ++it)
+		captures.push_back((*it).second);
+
+	return captures;
 }

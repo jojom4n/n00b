@@ -4,6 +4,7 @@
 #include "defs.h"
 #include <vector>
 
-std::vector<Move> mvv_lva(std::vector<Move> const& origList);
+std::vector<Move> ordering(std::vector<Move> const& moves);
+std::vector<Move> mvv_lva(std::vector<Move> const& moves);
 
 #endif

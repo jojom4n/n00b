@@ -10,14 +10,18 @@
 #include <iostream>
 
 extern std::array<TTEntry, TT_SIZE> TT::table;
+struct Search mySearch({});
 
 const Move iterativeSearch (Position &p, ushort const& depth)
 {
-	struct Search mySearch({});
 	mySearch.pos = p;
+	mySearch.flagMate = 0;
+	mySearch.nodes = 0;
+	mySearch.ttHits = 0;
 		
 	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
 		mySearch.nodes = 0;
+		mySearch.ttHits = 0;
 		mySearch.pv.clear();
 
 		auto t1 = Clock::now();
@@ -31,8 +35,8 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 			if (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)
 				mySearch.flagMate = true;
 
-			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(time.count()) << " nps:" 
-				<< int(mySearch.nodes / (time.count() / 1000)) << std::endl;
+			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(time.count()) << " nps:"
+				<< int(mySearch.nodes / (time.count() / 1000)) << " TT:" << mySearch.ttHits << std::endl;
 
 			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 
@@ -83,8 +87,9 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 {
 	mySearch.bestScore = -MATE;
 	mySearch.bestMove = 0;
-	std::vector<Move> moveList = moveGeneration(mySearch.pos);
-	moveList = pruneIllegal(moveList, mySearch.pos);
+	std::vector<Move> moves = moveGeneration(mySearch.pos), moveList{};
+	moves = pruneIllegal(moves, mySearch.pos);
+	moveList = ordering(moves);
 
 	for (const auto& m : moveList) {
 		std::vector<Move> childPv{};
@@ -116,11 +121,10 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 	TTEntry TTEntry{};
 	
 	if (TT::table[key % TT_SIZE].key == key) {
+		mySearch.ttHits++;
 		TTEntry = TT::table[key % TT_SIZE];
 
-		// TTENTRY LEGALITY MUST BE CHECKED **** PLACEHOLDER //
-
-		if (TTEntry.depth >= depth) {
+		if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
 
 			switch (TTEntry.nodeType) {
 			case EXACT:
@@ -146,8 +150,9 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 		// return evaluate(p);
 	
 	// position is not in TT, or we received only upper- or lower-bound values
-	std::vector<Move> moveList = moveGeneration(copy);
-	moveList = pruneIllegal(moveList, copy);
+	std::vector<Move> moves = moveGeneration(copy), moveList{};
+	moves = pruneIllegal(moves, copy);
+	moveList = ordering(moves);
 
 	/* we found an hash move with minor depth than current one, so we cannot directly use it?
 	Nonetheless, let's try the hash move first for our ordinary search  */
@@ -210,9 +215,9 @@ const short quiescence(Position const& p, short alpha, short beta, unsigned long
 		alpha = stand_pat;
 
 	Position copy = p;
-	std::vector<Move> moveList = moveGenQS(copy);
-	moveList = pruneIllegal(moveList, copy);
-	moveList = mvv_lva(moveList);
+	std::vector<Move> moves = moveGenQS(copy), moveList{};
+	moves = pruneIllegal(moves, copy);
+	moveList = ordering(moves);
 
 	for (const auto& m : moveList) {
 		

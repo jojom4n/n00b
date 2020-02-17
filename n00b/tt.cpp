@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "tt.h"
+#include "makemove.h"
+#include "movegen.h"
 
 namespace TT
 {
@@ -39,6 +41,17 @@ namespace TT
 			table[index].depth = static_cast<uint8_t>(entry.depth);
 			table[index].age = static_cast<uint8_t>(entry.age);
 		}
+	}
+
+	bool isLegalEntry(TTEntry const& entry, Position p) 
+	{
+		Color c = p.getTurn();
+		doMove(entry.move, p);
+		
+		if (underCheck(c, p))
+			return false; // king under check, hash collision occurred because move is not valid
+		else
+			return true;  // king is safe, no hash collision
 	}
 
 }

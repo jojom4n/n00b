@@ -13,7 +13,7 @@
 struct Search {
 	Position pos;
 	short bestScore;
-	unsigned long long nodes;
+	unsigned long long nodes, ttHits;
 	std::vector<Move> pv;
 	Move bestMove;
 	bool flagMate;

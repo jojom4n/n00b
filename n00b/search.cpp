@@ -36,7 +36,7 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 				mySearch.flagMate = true;
 
 			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(time.count()) << " nps:"
-				<< int(mySearch.nodes / (time.count() / 1000)) << " ** TT Hits:" << mySearch.ttHits << " Useful:" << mySearch.ttUseful << std::endl;
+				<< int(mySearch.nodes / (time.count() / 1000)) << " TT Hits:" << mySearch.ttHits << " Useful:" << mySearch.ttUseful << std::endl;
 
 			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 

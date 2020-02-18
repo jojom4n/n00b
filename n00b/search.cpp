@@ -101,9 +101,10 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 		std::list<std::string> childPv;
 		short score{};
 		doMove(m, copy);
+		mySearch.nodes++;
 		score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
 
-		if (score >= mySearch.bestScore) {
+		if (score >= mySearch.bestScore) { 
 			mySearch.bestScore = score;
 			mySearch.bestMove = m;
 			mySearch.pv.clear();
@@ -112,7 +113,6 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 		}
 
 		undoMove(m, copy, mySearch.pos);
-		mySearch.nodes++;
 	}
 }
 
@@ -128,7 +128,6 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 	if (TT::table[key % TT_SIZE].key == key) {
 		TTEntry = TT::table[key % TT_SIZE];
 		mySearch.ttHits++;
-		childPv.push_back(displayMove(copy, TTEntry.move));
 
 		if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
 
@@ -178,9 +177,9 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 		short score{};
 		std::list<std::string> nephewPv;
 		doMove(m, copy);
+		nodes++;
 		score = -negamaxAB(copy, depth - 1, -beta, -alpha, nodes, nephewPv);
 		undoMove(m, copy, p);
-		nodes++;
 
 		if (score >= beta) {
 			bestScore = score;
@@ -191,7 +190,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 			break;
 		}	
 		
-		if (score > bestScore) {
+		if (score >= bestScore) {
 			bestScore = score;
 			bestMove = m;
 			
@@ -241,9 +240,9 @@ const short quiescence(Position const& p, short alpha, short beta, unsigned long
 		
 		short score{};
 		doMove(m, copy);
+		nodes++;
 		score = -quiescence(copy, -beta, -alpha, nodes);
 		undoMove(m, copy, p);
-		nodes++;
 
 		if (score >= beta)
 			return beta;

@@ -16,7 +16,7 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 {
 	mySearch.pos = p;
 	mySearch.flagMate = 0;
-	int totalTime{};
+	unsigned int totalTime{};
 			
 	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
 		mySearch.nodes = 0;
@@ -36,9 +36,9 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 			if (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)
 				mySearch.flagMate = true;
 
-			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(depthTime.count()) << 
-				" total_ms:" << totalTime << " nps:" << int(mySearch.nodes / (depthTime.count() / 1000)) 
-				<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << std::endl;
+			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << unsigned int(depthTime.count()) << 
+				" total_ms:" << totalTime << " nps:" << unsigned int(mySearch.nodes / (depthTime.count() / 1000)) 
+				<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << std::endl; 
 
 			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 
@@ -128,6 +128,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 	if (TT::table[key % TT_SIZE].key == key) {
 		TTEntry = TT::table[key % TT_SIZE];
 		mySearch.ttHits++;
+		childPv.push_back(displayMove(copy, TTEntry.move));
 
 		if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
 
@@ -135,7 +136,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 
 			switch (TTEntry.nodeType) {
 			case EXACT:
-				childPv.push_back(displayMove(copy, TTEntry.move));
+				childPv.push_back(displayMove(copy, TTEntry.move)); // PROBLEM WITH TRUNCATED PV IF WE JUMP ALL THE OTHER DEPTH SEARCHES
 				return TTEntry.score;
 				break;
 			case LOWER_BOUND:
@@ -149,6 +150,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 			}
 
 			if (alpha >= beta) {
+				childPv.push_back(displayMove(copy, TTEntry.move));
 				return TTEntry.score;
 			}
 		}
@@ -198,8 +200,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 
 			childPv.clear();
 			childPv.push_back(displayMove(copy, bestMove));
-			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
-			
+			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));	
 		}
 	}
 

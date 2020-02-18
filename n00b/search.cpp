@@ -66,9 +66,12 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 
 			std::cout << " pv:";
 
-			for (auto it = mySearch.pv.begin(); it != mySearch.pv.end(); ++it)
+			for (const auto& elem : mySearch.pv)
+				std::cout << elem << " ";
+			
+			/* for (auto it = mySearch.pv.begin(); it != mySearch.pv.end(); ++it)
 				(it == std::prev(mySearch.pv.end()) && (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)) ? std::cout 
-					<< displayMove(mySearch.pos, *it) << "# " : std::cout << displayMove(mySearch.pos, *it) << " ";
+					<< displayMove(mySearch.pos, *it) << "# " : std::cout << displayMove(mySearch.pos, *it) << " "; */
 		}
 
 		else if (!mySearch.bestMove && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
@@ -94,8 +97,8 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 	moveList = ordering(moves);
 
 	for (const auto& m : moveList) {
-		std::vector<Move> childPv{};
 		Position copy = mySearch.pos;
+		std::list<std::string> childPv;
 		short score{};
 		doMove(m, copy);
 		score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
@@ -104,7 +107,7 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 			mySearch.bestScore = score;
 			mySearch.bestMove = m;
 			mySearch.pv.clear();
-			mySearch.pv.push_back(m);
+			mySearch.pv.push_back(displayMove(mySearch.pos, m));
 			std::copy(childPv.begin(), childPv.end(), back_inserter(mySearch.pv));
 		}
 
@@ -114,7 +117,7 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 }
 
 
-const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long long& nodes, std::vector<Move> &childPv)
+const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long long& nodes, std::list<std::string>& childPv)
 {
 	Position copy = p;
 	Move bestMove{};
@@ -132,6 +135,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 
 			switch (TTEntry.nodeType) {
 			case EXACT:
+				childPv.push_back(displayMove(copy, TTEntry.move));
 				return TTEntry.score;
 				break;
 			case LOWER_BOUND:
@@ -144,8 +148,9 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 				break;
 			}
 
-			if (alpha >= beta)
+			if (alpha >= beta) {
 				return TTEntry.score;
+			}
 		}
 	} 
 	
@@ -169,7 +174,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 	
 	for (const auto& m : moveList) {
 		short score{};
-		std::vector<Move> nephewPv{};
+		std::list<std::string> nephewPv;
 		doMove(m, copy);
 		score = -negamaxAB(copy, depth - 1, -beta, -alpha, nodes, nephewPv);
 		undoMove(m, copy, p);
@@ -178,15 +183,23 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 		if (score >= beta) {
 			bestScore = score;
 			bestMove = m;
+			childPv.clear();
+			childPv.push_back(displayMove(copy, bestMove));
+			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
 			break;
 		}	
 		
 		if (score > bestScore) {
 			bestScore = score;
 			bestMove = m;
-
+			
 			if (score > alpha)
 				alpha = score;
+
+			childPv.clear();
+			childPv.push_back(displayMove(copy, bestMove));
+			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
+			
 		}
 	}
 

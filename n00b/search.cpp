@@ -16,27 +16,29 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 {
 	mySearch.pos = p;
 	mySearch.flagMate = 0;
-	mySearch.nodes = 0;
-	mySearch.ttHits = 0;
-	mySearch.ttUseful = 0;
-	auto t1 = Clock::now();
-	
-		
+	int totalTime{};
+			
 	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
+		mySearch.nodes = 0;
+		mySearch.ttHits = 0;
+		mySearch.ttUseful = 0;
 		mySearch.pv.clear();
 
+		auto depthTimeStart = Clock::now();
 		negamaxRoot(mySearch, ply);
-		auto t2 = Clock::now();
+		auto depthTimeEnd = Clock::now();
 
-		std::chrono::duration<float, std::milli> time = t2 - t1;
+		std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
+		totalTime += static_cast<int>(depthTime.count());
 
 		if (mySearch.bestMove) {
 			
 			if (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)
 				mySearch.flagMate = true;
 
-			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(time.count()) << " nps:"
-				<< int(mySearch.nodes / (time.count() / 1000)) << " TT Hits:" << mySearch.ttHits << " Useful:" << mySearch.ttUseful << std::endl;
+			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << int(depthTime.count()) << 
+				" total_ms:" << totalTime << " nps:" << int(mySearch.nodes / (depthTime.count() / 1000)) 
+				<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << std::endl;
 
 			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 

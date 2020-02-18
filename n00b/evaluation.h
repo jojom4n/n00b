@@ -9,7 +9,7 @@ class Position;
 
 extern const std::map<Piece, ushort> g_pieceValue;
 
-const short evaluate(Position const& p);
+const short lazyEval(Position const& p);
 const short evMaterial(Position const& p);
 const short evPSQT(Position const& p);
 

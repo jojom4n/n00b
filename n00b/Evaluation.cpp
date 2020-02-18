@@ -8,7 +8,7 @@ const std::map <Piece, ushort> g_pieceValue
 { {PAWN, 100}, { KNIGHT, 300 }, { BISHOP, 320 }, { ROOK, 500 }, { QUEEN, 900 }, { KING, 5000 } };
 
 
-const short evaluate(Position const &p)
+const short lazyEval(Position const &p)
 {
 	short whoToMove{};
 	(p.getTurn() == WHITE) ? whoToMove = 1 : whoToMove = -1; 

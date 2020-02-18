@@ -16,6 +16,8 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 {
 	mySearch.pos = p;
 	mySearch.flagMate = 0;
+	mySearch.bestScore = -MATE;
+	mySearch.bestMove = 0;
 	unsigned int totalTime{};
 			
 	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
@@ -90,12 +92,16 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 
 void negamaxRoot(struct Search& mySearch, ushort const& depth)
 {
-	mySearch.bestScore = -MATE;
-	mySearch.bestMove = 0;
 	std::vector<Move> moves = moveGeneration(mySearch.pos), moveList{};
 	moves = pruneIllegal(moves, mySearch.pos);
 	moveList = ordering(moves);
 
+	// try PV node anyway first
+	if (mySearch.bestMove) {
+		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
+		std::rotate(moveList.begin(), it, it + 1);
+	}
+	
 	for (const auto& m : moveList) {
 		Position copy = mySearch.pos;
 		std::list<std::string> childPv;
@@ -104,7 +110,7 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 		mySearch.nodes++;
 		score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
 
-		if (score >= mySearch.bestScore) { 
+		if (score > mySearch.bestScore) { 
 			mySearch.bestScore = score;
 			mySearch.bestMove = m;
 			mySearch.pv.clear();
@@ -135,7 +141,6 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 
 			switch (TTEntry.nodeType) {
 			case EXACT:
-				childPv.push_back(displayMove(copy, TTEntry.move)); // PROBLEM WITH TRUNCATED PV IF WE JUMP ALL THE OTHER DEPTH SEARCHES
 				return TTEntry.score;
 				break;
 			case LOWER_BOUND:
@@ -149,7 +154,6 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 			}
 
 			if (alpha >= beta) {
-				childPv.push_back(displayMove(copy, TTEntry.move));
 				return TTEntry.score;
 			}
 		}
@@ -157,7 +161,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 	
 	if (depth == 0)
 		return quiescence(copy, alpha, beta, nodes);
-		// return evaluate(p);
+		// return lazyEval(p);
 	
 	// position is not in TT, or we received only upper- or lower-bound values
 	std::vector<Move> moves = moveGeneration(copy), moveList{};
@@ -184,13 +188,10 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 		if (score >= beta) {
 			bestScore = score;
 			bestMove = m;
-			childPv.clear();
-			childPv.push_back(displayMove(copy, bestMove));
-			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
 			break;
 		}	
 		
-		if (score >= bestScore) {
+		if (score > bestScore) { // Beware: unlike negamaxRoot(), here it seems better only 'greather than'
 			bestScore = score;
 			bestMove = m;
 			
@@ -199,7 +200,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 
 			childPv.clear();
 			childPv.push_back(displayMove(copy, bestMove));
-			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));	
+			std::copy(nephewPv.begin(), nephewPv.end(), back_inserter(childPv));
 		}
 	}
 
@@ -223,7 +224,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 
 const short quiescence(Position const& p, short alpha, short beta, unsigned long long &nodes)
 {
-	short stand_pat = evaluate(p);
+	short stand_pat = lazyEval(p);
 
 	if (stand_pat >= beta)
 		return beta;

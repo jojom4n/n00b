@@ -128,7 +128,7 @@ void negamaxRoot(struct Search& mySearch, short const& depth)
 		mySearch.nodes++;
 		score = -negamaxAB<false>(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
 
-		if (score >= mySearch.bestScore) { 
+		if (score > mySearch.bestScore) { 
 			mySearch.bestScore = score;
 			mySearch.bestMove = m;
 			mySearch.pv.clear();
@@ -180,7 +180,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 
 	if (depth <= 0)
 		return quiescence(copy, alpha, beta, nodes);
-		// return evaluate(p);
+		// return lazyEval(p);
 	
 	// position is not in TT, or we received only upper- or lower-bound values
 	std::vector<Move> moves = moveGeneration(copy), moveList{};
@@ -241,7 +241,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 			break;
 		}	
 		
-		if (score >= bestScore) {
+		if (score > bestScore) { // Beware: unlike negamaxRoot(), here it seems better only 'greather than'
 			bestScore = score;
 			bestMove = m;
 

@@ -79,11 +79,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		
 		if (depth > 0) {
 			Move m = iterativeSearch(board, depth);
-			if (m) {
-				doMove(m, board);
-				std::cout << std::endl;
-				displayBoard(board);
-			}
+			doMove(m, board);
+			std::cout << std::endl;
+			displayBoard(board);
 		}
 		else
 			std::cout << "Invalid depth.\n";

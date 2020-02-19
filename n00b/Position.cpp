@@ -165,6 +165,21 @@ const ushort Position::countPieceType(Color const &color, Piece const &piece) co
 }
 
 
+const bool Position::isEnding() const
+{
+	ushort count{};
+
+	for (Color c = BLACK; c <= WHITE; c++)
+		for (Piece piece = QUEEN; piece <= BISHOP; piece++)
+			count += countPieceType(c, piece);
+
+	if (count > 0)
+		return false;
+	else
+		return true;
+}
+
+
 const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece const &piece) const
 {
 	std::vector<Square> squares;

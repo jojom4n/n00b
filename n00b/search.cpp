@@ -12,7 +12,7 @@
 extern std::array<TTEntry, TT_SIZE> TT::table;
 struct Search mySearch({});
 
-const Move iterativeSearch (Position &p, ushort const& depth)
+const Move iterativeSearch (Position &p, short const& depth)
 {
 	mySearch.pos = p;
 	mySearch.flagMate = 0;
@@ -88,7 +88,7 @@ const Move iterativeSearch (Position &p, ushort const& depth)
 	return mySearch.bestMove;
 }
 
-void negamaxRoot(struct Search& mySearch, ushort const& depth)
+void negamaxRoot(struct Search& mySearch, short const& depth)
 {
 	mySearch.bestScore = -MATE;
 	mySearch.bestMove = 0;
@@ -117,7 +117,7 @@ void negamaxRoot(struct Search& mySearch, ushort const& depth)
 }
 
 
-const short negamaxAB(Position const& p, ushort const& depth, short alpha, short beta, unsigned long long& nodes, std::list<std::string>& childPv)
+const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, unsigned long long& nodes, std::list<std::string>& childPv)
 {
 	Position copy = p;
 	Move bestMove{};
@@ -155,7 +155,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 		}
 	} 
 	
-	if (depth == 0)
+	if (depth <= 0)
 		return quiescence(copy, alpha, beta, nodes);
 		// return evaluate(p);
 	
@@ -163,6 +163,37 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 	std::vector<Move> moves = moveGeneration(copy), moveList{};
 	moves = pruneIllegal(moves, copy);
 	moveList = ordering(moves);
+
+	// null-move pruning. We only use it if side is not under check and if game
+	// is not in ending state (to avoid zugzwang issues with null-move pruning)
+	if (!underCheck(copy.getTurn(), copy) && !copy.isEnding()) {
+		short score{};
+		std::list<std::string> dummyPv;
+
+		// let's do a dummy (null-) move, then proceed with pruning
+		if (copy.getTurn() == BLACK)
+			copy.setMoveNumber(copy.getMoveNumber() + 1);
+
+		copy.updateZobrist(copy.getTurn());
+		if (copy.getTurn() == WHITE)
+			copy.setTurn(BLACK);
+		else
+			copy.setTurn(WHITE);
+		copy.updateZobrist(copy.getTurn());
+
+		if (copy.getEnPassant() != SQ_EMPTY) {
+			copy.updateZobrist(copy.getEnPassant());
+			copy.setEnPassant(SQ_EMPTY);
+			copy.updateZobrist(copy.getEnPassant());
+		}
+
+		score = -negamaxAB(copy, depth - R - 1, -beta, -beta + 1, nodes, dummyPv);
+		
+		if (score >= beta) {
+			return score;
+		}		
+	}
+
 
 	/* we found an hash move with minor depth than current one, so we cannot directly use it?
 	Nonetheless, let's try the hash move first for our ordinary search  */
@@ -190,7 +221,7 @@ const short negamaxAB(Position const& p, ushort const& depth, short alpha, short
 			break;
 		}	
 		
-		if (score >= bestScore) {
+		if (score > bestScore) {
 			bestScore = score;
 			bestMove = m;
 			

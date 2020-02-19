@@ -3,6 +3,7 @@
 #include "defs.h"
 #include "display.h"
 #include "enums.h"
+#include "movegen.h"
 #include "Position.h"
 #include "tt.h"
 #include <vector>
@@ -273,6 +274,12 @@ void fenParser(std::stringstream &fen, Position &board)
 	else
 		board.setMoveNumber(1);
 
+	std::vector<Move> moveList = moveGeneration(board);
+	if (!underCheck(board.getTurn(), board) && moveList.size() > 0)
+		board.setCheckmate(false);
+	else
+		board.setCheckmate(true);
+	
 	board.setZobrist();
 	TT::table.fill({}); // clear TT
 	displayBoard(board);

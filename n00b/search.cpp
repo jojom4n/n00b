@@ -15,28 +15,36 @@ struct Search mySearch({});
 const Move iterativeSearch(Position& p, short const& depth)
 {
 	mySearch.pos = p;
-	mySearch.flagMate = 0;
-	mySearch.bestScore = -MATE;
-	mySearch.bestMove = 0;
-	unsigned int totalTime{};
 
-	for (short ply = 1; ply <= depth && !mySearch.flagMate; ply++) {
+	std::vector<Move> moves = moveGeneration(mySearch.pos);
+	moves = pruneIllegal(moves, mySearch.pos);
+	
+	if (moves.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+		std::cout << "\nIt's STALEMATE!" << std::endl;
+		return 0;
+	}
+
+	if (moves.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+		std::cout << "\nIt's CHECKMATE!" << std::endl;
+		return 0;
+	}
+
+	 unsigned int totalTime{};
+
+	for (short ply = 1; ply <= depth && mySearch.bestScore != MATE; ply++) {
 		mySearch.nodes = 0;
 		mySearch.ttHits = 0;
 		mySearch.ttUseful = 0;
 		mySearch.pv.clear();
 
 		auto depthTimeStart = Clock::now();
-		negamaxRoot(mySearch, ply);
+		mySearch.bestMove = negamaxRoot(mySearch, ply);
 		auto depthTimeEnd = Clock::now();
 
 		std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
 		totalTime += static_cast<int>(depthTime.count());
 
 		if (mySearch.bestMove) {
-
-			if (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)
-				mySearch.flagMate = true;
 
 			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << unsigned int(depthTime.count()) <<
 				" total_ms:" << totalTime << " nps:" << unsigned int(mySearch.nodes / (depthTime.count() / 1000))
@@ -45,10 +53,10 @@ const Move iterativeSearch(Position& p, short const& depth)
 			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 
 			float score = static_cast<float>(mySearch.bestScore / 100.00);
-
+				
 			switch (mySearch.pos.getTurn()) {
 			case WHITE:
-				if (score > 0.0f && mySearch.bestScore != MATE)
+				if (score > 0.0f)
 					std::cout << "+";
 				else if (score < 0.0f)
 					std::cout << "-";
@@ -56,14 +64,14 @@ const Move iterativeSearch(Position& p, short const& depth)
 			case BLACK:
 				if (score > 0.0f)
 					std::cout << "-";
-				else if (score < 0.0f && mySearch.bestScore != MATE)
+				else if (score < 0.0f)
 					std::cout << "+";
 				break;
 			default:
 				break;
 			}
 
-			(!mySearch.bestScore == 0 && mySearch.flagMate == true) ? std::cout << "#" << (ply / 2)
+			(mySearch.bestScore == MATE) ? std::cout << "#" /* << (ply / 2) */
 				: std::cout << std::setprecision(3) << fabs(score);
 
 			std::cout << " pv:";
@@ -90,54 +98,59 @@ const Move iterativeSearch(Position& p, short const& depth)
 				}
 			}
 
-			if (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)
+			if (mySearch.bestScore == MATE)
 				std::cout << "\b#";
 		}
 
-		else if (!mySearch.bestMove && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
-			std::cout << "\nIt's STALEMATE!" << std::endl;
-			mySearch.flagMate = true;
-		}
+		else if (mySearch.pv.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+				std::cout << "\nIt's STALEMATE!" << std::endl;
+				return 0;
+			}
 
-		else if (!mySearch.bestMove && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
-			p.setCheckmate(true);
+		else if (mySearch.pv.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 			std::cout << "\nIt's CHECKMATE!" << std::endl;
+			p.setCheckmate(true);
+			return 0;
 		}
 	}
 
 	return mySearch.bestMove;
 }
 
-void negamaxRoot(struct Search& mySearch, short const& depth)
+Move negamaxRoot(struct Search& mySearch, short const& depth)
 {
-	std::vector<Move> moves = moveGeneration(mySearch.pos), moveList{};
+	
+	std::vector<Move> moves = moveGeneration(mySearch.pos);
 	moves = pruneIllegal(moves, mySearch.pos);
-	moveList = ordering(moves);
-
+	std::vector<Move>moveList = ordering(moves);
+	
 	// try PV node anyway first
 	if (mySearch.bestMove) {
 		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
 		std::rotate(moveList.begin(), it, it + 1);
 	}
 	
+	Move bestMove = 0;
+
 	for (const auto& m : moveList) {
 		Position copy = mySearch.pos;
 		std::list<std::string> childPv;
-		short score{};
+		short score = -SHRT_INFINITY;
 		doMove(m, copy);
 		mySearch.nodes++;
 		score = -negamaxAB<false>(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
+		undoMove(m, copy, mySearch.pos);
 
-		if (score > mySearch.bestScore) { 
+		if (score >= mySearch.bestScore) { 
 			mySearch.bestScore = score;
-			mySearch.bestMove = m;
+			bestMove = m;
 			mySearch.pv.clear();
 			mySearch.pv.push_back(displayMove(mySearch.pos, m));
 			std::copy(childPv.begin(), childPv.end(), back_inserter(mySearch.pv));
 		}
-
-		undoMove(m, copy, mySearch.pos);
 	}
+
+	return bestMove;
 }
 
 
@@ -190,7 +203,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	// null-move pruning. We only use it if side is not under check and if game
 	// is not in ending state (to avoid zugzwang issues with null-move pruning)
 	if (!underCheck(copy.getTurn(), copy) && !copy.isEnding()) {
-		short score{};
+		short score = -SHRT_INFINITY;
 		std::list<std::string> dummyPv;
 
 		// let's do a dummy (null-) move, then proceed with pruning
@@ -228,7 +241,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	}
 
 	for (const auto& m : moveList) {
-		short score{};
+		short score = -SHRT_INFINITY;
 		std::list<std::string> nephewPv;
 		doMove(m, copy);
 		nodes++;
@@ -294,7 +307,7 @@ const short quiescence(Position const& p, short alpha, short beta, unsigned long
 
 	for (const auto& m : moveList) {
 
-		short score{};
+		short score = -SHRT_INFINITY;
 		doMove(m, copy);
 		nodes++;
 		score = -quiescence(copy, -beta, -alpha, nodes);

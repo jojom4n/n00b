@@ -73,6 +73,7 @@ public:
 
 	const ushort count(Color const& color = ALL_COLOR) const;
 	const ushort countPieceType(Color const& color, Piece const& piece) const;
+	const bool isEnding() const;
 
 	const std::vector<Square> getPieceOnSquare(Color const& color, Piece const& piece) const;
 

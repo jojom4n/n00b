@@ -68,10 +68,28 @@ const Move iterativeSearch (Position &p, short const& depth)
 
 			for (const auto& elem : mySearch.pv)
 				std::cout << elem << " ";
+
+			if (mySearch.pv.size() < ply) {  // we had a cut-off because of TT, hence we must rebuild PV from TT
+				Position copy = mySearch.pos;
+				Move pvMove = mySearch.bestMove;
+				bool pvFlag = true;
+
+				while (pvFlag) {
+					doMove(pvMove, copy);
+					uint32_t key = static_cast<uint32_t>(copy.getZobrist());
+
+					if (TT::table[key % TT_SIZE].key == key) {// new position after best move in TT? We show next best move
+						TTEntry pvEntry = TT::table[key % TT_SIZE];
+						pvMove = pvEntry.move;
+						std::cout << displayMove(copy, pvMove) << " ";
+					}
+					else  
+						pvFlag = false;
+				}
+			}
 			
-			/* for (auto it = mySearch.pv.begin(); it != mySearch.pv.end(); ++it)
-				(it == std::prev(mySearch.pv.end()) && (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)) ? std::cout 
-					<< displayMove(mySearch.pos, *it) << "# " : std::cout << displayMove(mySearch.pos, *it) << " "; */
+			if (mySearch.bestScore == MATE || mySearch.bestScore == -MATE)
+				std::cout << "\b#";
 		}
 
 		else if (!mySearch.bestMove && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
@@ -102,7 +120,7 @@ void negamaxRoot(struct Search& mySearch, short const& depth)
 		short score{};
 		doMove(m, copy);
 		mySearch.nodes++;
-		score = -negamaxAB(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
+		score = -negamaxAB<false>(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
 
 		if (score >= mySearch.bestScore) { 
 			mySearch.bestScore = score;
@@ -117,6 +135,7 @@ void negamaxRoot(struct Search& mySearch, short const& depth)
 }
 
 
+template<bool nullMove>
 const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, unsigned long long& nodes, std::list<std::string>& childPv)
 {
 	Position copy = p;
@@ -125,7 +144,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	uint32_t key = static_cast<uint32_t>(copy.getZobrist());
 	TTEntry TTEntry{};
 	
-	if (TT::table[key % TT_SIZE].key == key) {
+	if (TT::table[key % TT_SIZE].key == key && nullMove == false) {
 		TTEntry = TT::table[key % TT_SIZE];
 		mySearch.ttHits++;
 
@@ -187,7 +206,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 			copy.updateZobrist(copy.getEnPassant());
 		}
 
-		score = -negamaxAB(copy, depth - R - 1, -beta, -beta + 1, nodes, dummyPv);
+		score = -negamaxAB<true>(copy, depth - R - 1, -beta, -beta + 1, nodes, dummyPv);
 		
 		if (score >= beta) {
 			return score;
@@ -209,7 +228,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 		std::list<std::string> nephewPv;
 		doMove(m, copy);
 		nodes++;
-		score = -negamaxAB(copy, depth - 1, -beta, -alpha, nodes, nephewPv);
+		score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, nodes, nephewPv);
 		undoMove(m, copy, p);
 
 		if (score >= beta) {
@@ -234,19 +253,24 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 		}
 	}
 
-	TTEntry.score = bestScore;
-	if (bestScore <= alphaOrig)
-		TTEntry.nodeType = UPPER_BOUND;
-	else if (bestScore >= beta)
-		TTEntry.nodeType = LOWER_BOUND;
-	else 
-		TTEntry.nodeType = EXACT;
-	
-	TTEntry.age = static_cast<uint8_t>(copy.getMoveNumber());
-	TTEntry.depth = static_cast<uint8_t>(depth);
-	TTEntry.key = static_cast<uint32_t>(copy.getZobrist());
-	TTEntry.move = bestMove;
-	TT::Store(TTEntry); 
+	/* we only update TT if there is a best move. In other words, if it's mate and therefore
+	there is not any best move (or, hence, any move at all), we do not want to update
+	TT, because otherwise we would have a dummy entry with score MATE or -MATE and move = 0, polluting TT! */
+	if (bestMove) {  
+		TTEntry.score = bestScore;
+		if (bestScore <= alphaOrig)
+			TTEntry.nodeType = UPPER_BOUND;
+		else if (bestScore >= beta)
+			TTEntry.nodeType = LOWER_BOUND;
+		else
+			TTEntry.nodeType = EXACT;
+
+		TTEntry.age = static_cast<uint8_t>(copy.getMoveNumber());
+		TTEntry.depth = static_cast<uint8_t>(depth);
+		TTEntry.key = static_cast<uint32_t>(copy.getZobrist());
+		TTEntry.move = bestMove;
+		TT::Store(TTEntry);
+	}
 	
 	return bestScore;
 }

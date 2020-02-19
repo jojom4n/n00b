@@ -1,7 +1,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
-#define R 3 // for null-move pruning
+#define R 2 // for null-move pruning
 
 #include "defs.h"
 #include "Position.h"
@@ -24,7 +24,10 @@ struct Search {
 
 const Move iterativeSearch(Position& p, short const& depth);
 void negamaxRoot(struct Search& mySearch, short const& depth);
+
+template<bool nullMove>
 const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, unsigned long long& nodes, std::list<std::string>& childPv);
+
 const short quiescence(Position const& p, short alpha, short beta, unsigned long long& nodes);
 
 

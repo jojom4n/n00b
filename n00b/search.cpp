@@ -15,6 +15,7 @@ struct Search mySearch({});
 const Move iterativeSearch(Position& p, short const& depth)
 {
 	mySearch.pos = p;
+	unsigned int totalTime{};
 
 	std::vector<Move> moves = moveGeneration(mySearch.pos);
 	moves = pruneIllegal(moves, mySearch.pos);
@@ -29,116 +30,110 @@ const Move iterativeSearch(Position& p, short const& depth)
 		return 0;
 	}
 
-	 unsigned int totalTime{};
+	else {
 
-	for (short ply = 1; ply <= depth && mySearch.bestScore != MATE; ply++) {
-		mySearch.nodes = 0;
-		mySearch.ttHits = 0;
-		mySearch.ttUseful = 0;
-		mySearch.pv.clear();
+		for (short ply = 1; ply <= depth; ply++) {
+			mySearch.nodes = 0;
+			mySearch.bestScore = -MATE;
+			mySearch.bestMove = 0;
+			mySearch.ttHits = 0;
+			mySearch.ttUseful = 0;
+			mySearch.pv.clear();
 
-		auto depthTimeStart = Clock::now();
-		mySearch.bestMove = negamaxRoot(mySearch, ply);
-		auto depthTimeEnd = Clock::now();
+			auto depthTimeStart = Clock::now();
+			mySearch.bestMove = negamaxRoot(mySearch, ply);
+			auto depthTimeEnd = Clock::now();
 
-		std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
-		totalTime += static_cast<int>(depthTime.count());
+			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
+			totalTime += static_cast<int>(depthTime.count());
 
-		if (mySearch.bestMove) {
+			if (mySearch.bestMove) {
 
-			std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << unsigned int(depthTime.count()) <<
-				" total_ms:" << totalTime << " nps:" << unsigned int(mySearch.nodes / (depthTime.count() / 1000))
-				<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << std::endl;
+				std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << unsigned int(depthTime.count()) <<
+					" total_ms:" << totalTime << " nps:" << unsigned int(mySearch.nodes / (depthTime.count() / 1000))
+					<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << std::endl;
 
-			std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
+				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 
-			float score = static_cast<float>(mySearch.bestScore / 100.00);
-				
-			switch (mySearch.pos.getTurn()) {
-			case WHITE:
-				if (score > 0.0f)
-					std::cout << "+";
-				else if (score < 0.0f)
-					std::cout << "-";
-				break;
-			case BLACK:
-				if (score > 0.0f)
-					std::cout << "-";
-				else if (score < 0.0f)
-					std::cout << "+";
-				break;
-			default:
-				break;
-			}
+				float score = static_cast<float>(mySearch.bestScore / 100.00);
 
-			(mySearch.bestScore == MATE) ? std::cout << "#" /* << (ply / 2) */
-				: std::cout << std::setprecision(3) << fabs(score);
-
-			std::cout << " pv:";
-
-			for (const auto& elem : mySearch.pv)
-				std::cout << elem << " ";
-
-			if (mySearch.pv.size() < ply) {  // we had a cut-off because of TT, hence we must rebuild PV from TT
-				Position copy = mySearch.pos;
-				Move pvMove = mySearch.bestMove;
-				bool pvFlag = true;
-
-				while (pvFlag) {
-					doMove(pvMove, copy);
-					uint32_t key = static_cast<uint32_t>(copy.getZobrist());
-
-					if (TT::table[key % TT_SIZE].key == key) {// new position after best move in TT? We show next best move
-						TTEntry pvEntry = TT::table[key % TT_SIZE];
-						pvMove = pvEntry.move;
-						std::cout << displayMove(copy, pvMove) << " ";
-					}
-					else
-						pvFlag = false;
+				switch (mySearch.pos.getTurn()) {
+				case WHITE:
+					if (score > 0.0f)
+						std::cout << "+";
+					else if (score < 0.0f)
+						std::cout << "-";
+					break;
+				case BLACK:
+					if (score > 0.0f)
+						std::cout << "-";
+					else if (score < 0.0f)
+						std::cout << "+";
+					break;
+				default:
+					break;
 				}
+
+				(mySearch.bestScore == MATE) ? std::cout << "#" << (ply / 2)
+					: std::cout << std::setprecision(3) << fabs(score);
+
+				std::cout << " pv:";
+
+				for (const auto& elem : mySearch.pv)
+					std::cout << elem << " ";
+
+				if (mySearch.pv.size() < ply) {  // we had a cut-off because of TT, hence we must rebuild PV from TT
+					Position copy = mySearch.pos;
+					Move pvMove = mySearch.bestMove;
+					bool pvFlag = true;
+
+					while (pvFlag) {
+						doMove(pvMove, copy);
+						uint32_t key = static_cast<uint32_t>(copy.getZobrist());
+
+						if (TT::table[key % TT_SIZE].key == key) {   // new position after best move in TT? We show next best move
+							TTEntry pvEntry = TT::table[key % TT_SIZE];
+							pvMove = pvEntry.move;
+							std::cout << displayMove(copy, pvMove) << " ";
+						}
+						else
+							pvFlag = false;
+					}
+				}
+
+				if (mySearch.bestScore == MATE)
+					std::cout << "\b#";
 			}
 
-			if (mySearch.bestScore == MATE)
-				std::cout << "\b#";
-		}
-
-		else if (mySearch.pv.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+			else if (mySearch.pv.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 				std::cout << "\nIt's STALEMATE!" << std::endl;
 				return 0;
 			}
 
-		else if (mySearch.pv.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
-			std::cout << "\nIt's CHECKMATE!" << std::endl;
-			p.setCheckmate(true);
-			return 0;
+			else if (mySearch.pv.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+				std::cout << "\nIt's CHECKMATE!" << std::endl;
+				p.setCheckmate(true);
+				return 0;
+			}
 		}
-	}
 
-	return mySearch.bestMove;
+		return mySearch.bestMove;
+	}
 }
 
 Move negamaxRoot(struct Search& mySearch, short const& depth)
-{
-	
+{	
 	std::vector<Move> moves = moveGeneration(mySearch.pos);
 	moves = pruneIllegal(moves, mySearch.pos);
 	std::vector<Move>moveList = ordering(moves);
-	
-	// try PV node anyway first
-	if (mySearch.bestMove) {
-		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
-		std::rotate(moveList.begin(), it, it + 1);
-	}
-	
-	Move bestMove = 0;
+	Move bestMove{};
 
 	for (const auto& m : moveList) {
 		Position copy = mySearch.pos;
 		std::list<std::string> childPv;
-		short score = -SHRT_INFINITY;
 		doMove(m, copy);
 		mySearch.nodes++;
-		score = -negamaxAB<false>(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
+		short score = -negamaxAB<false>(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
 		undoMove(m, copy, mySearch.pos);
 
 		if (score >= mySearch.bestScore) { 
@@ -203,7 +198,6 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	// null-move pruning. We only use it if side is not under check and if game
 	// is not in ending state (to avoid zugzwang issues with null-move pruning)
 	if (!underCheck(copy.getTurn(), copy) && !copy.isEnding()) {
-		short score = -SHRT_INFINITY;
 		std::list<std::string> dummyPv;
 
 		// let's do a dummy (null-) move, then proceed with pruning
@@ -223,7 +217,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 			copy.updateZobrist(copy.getEnPassant());
 		}
 
-		score = -negamaxAB<true>(copy, depth - R - 1, -beta, -beta + 1, nodes, dummyPv);
+		short score = -negamaxAB<true>(copy, depth - R - 1, -beta, -beta + 1, nodes, dummyPv);
 
 		if (score >= beta) {
 			return score;
@@ -241,11 +235,10 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	}
 
 	for (const auto& m : moveList) {
-		short score = -SHRT_INFINITY;
 		std::list<std::string> nephewPv;
 		doMove(m, copy);
 		nodes++;
-		score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, nodes, nephewPv);
+		short score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, nodes, nephewPv);
 		undoMove(m, copy, p);
 
 		if (score >= beta) {
@@ -306,11 +299,9 @@ const short quiescence(Position const& p, short alpha, short beta, unsigned long
 	moveList = ordering(moves);
 
 	for (const auto& m : moveList) {
-
-		short score = -SHRT_INFINITY;
 		doMove(m, copy);
 		nodes++;
-		score = -quiescence(copy, -beta, -alpha, nodes);
+		short score = -quiescence(copy, -beta, -alpha, nodes);
 		undoMove(m, copy, p);
 
 		if (score >= beta)

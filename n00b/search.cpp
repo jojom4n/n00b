@@ -105,12 +105,12 @@ const Move iterativeSearch(Position& p, short const& depth)
 					std::cout << "\b#";
 			}
 
-			else if (mySearch.pv.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+			else if (!underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 				std::cout << "\nIt's STALEMATE!" << std::endl;
 				return 0;
 			}
 
-			else if (mySearch.pv.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+			else if (underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 				std::cout << "\nIt's CHECKMATE!" << std::endl;
 				p.setCheckmate(true);
 				return 0;
@@ -133,7 +133,7 @@ Move negamaxRoot(struct Search& mySearch, short const& depth)
 		std::list<std::string> childPv;
 		doMove(m, copy);
 		mySearch.nodes++;
-		short score = -negamaxAB<false>(copy, depth - 1, -BETA, -ALPHA, mySearch.nodes, childPv);
+		short score = -negamaxAB<false>(copy, depth - 1, ALPHA, BETA, mySearch.nodes, childPv);
 		undoMove(m, copy, mySearch.pos);
 
 		if (score >= mySearch.bestScore) { 
@@ -184,7 +184,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 				return TTEntry.score;
 			}
 		}
-	}
+	} 
 
 	if (depth <= 0)
 		return quiescence(copy, alpha, beta, nodes);

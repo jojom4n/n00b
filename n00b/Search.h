@@ -10,7 +10,7 @@
 #define MATE (std::numeric_limits<short>::max() / 2)
 #define ALPHA -SHRT_INFINITY
 #define BETA SHRT_INFINITY
-#define R 2 // for null-move pruning
+#define R 3 // for null-move pruning
 
 struct Search {
 	Position pos;

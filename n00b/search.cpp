@@ -25,7 +25,8 @@ const Move iterativeSearch(Position& p, short const& depth)
 		return 0;
 	}
 
-	if (moves.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+	if (mySearch.pos.getCheckmate() || (moves.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
+		mySearch.pos.setCheckmate(true);
 		std::cout << "\nIt's CHECKMATE!" << std::endl;
 		return 0;
 	}
@@ -34,14 +35,13 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 		for (short ply = 1; ply <= depth; ply++) {
 			mySearch.nodes = 0;
-			mySearch.bestScore = -MATE;
-			mySearch.bestMove = 0;
+			mySearch.bestScore = -SHRT_INFINITY;
 			mySearch.ttHits = 0;
 			mySearch.ttUseful = 0;
 			mySearch.pv.clear();
 
 			auto depthTimeStart = Clock::now();
-			mySearch.bestMove = negamaxRoot(mySearch, ply);
+			mySearch.bestMove = negamaxRoot(ply);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -112,7 +112,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 			else if (underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 				std::cout << "\nIt's CHECKMATE!" << std::endl;
-				p.setCheckmate(true);
+				mySearch.pos.setCheckmate(true);
 				return 0;
 			}
 		}
@@ -121,7 +121,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 	}
 }
 
-Move negamaxRoot(struct Search& mySearch, short const& depth)
+Move negamaxRoot(short const& depth)
 {	
 	std::vector<Move> moves = moveGeneration(mySearch.pos);
 	moves = pruneIllegal(moves, mySearch.pos);

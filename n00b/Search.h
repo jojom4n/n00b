@@ -22,7 +22,7 @@ struct Search {
 };
 
 const Move iterativeSearch(Position& p, short const& depth);
-Move negamaxRoot(struct Search& mySearch, short const& depth);
+Move negamaxRoot(short const& depth);
 
 template<bool nullMove>
 const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, unsigned long long& nodes, std::list<std::string>& childPv);

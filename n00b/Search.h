@@ -16,14 +16,14 @@ struct Search {
 	Position pos;
 	short bestScore;
 	unsigned long long nodes, ttHits, ttUseful;
-	Move bestMove;
+	Move bestMove, pv[64];
 };
 
 const Move iterativeSearch(Position& p, short const& depth);
-Move negamaxRoot(short const& depth);
+// Move negamaxRoot(short const& depth, Move* pv);
 
 template<bool nullMove>
-const short negamaxAB(Position const& p, short const& depth, short alpha, short beta);
+const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv);
 
 const short quiescence(Position const& p, short alpha, short beta);
 

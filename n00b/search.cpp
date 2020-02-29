@@ -42,7 +42,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 			auto depthTimeStart = Clock::now();
 			// mySearch.bestMove = negamaxRoot(ply);
-			mySearch.bestScore = negamaxAB<false>(mySearch.pos, ply, ALPHA, BETA);
+			mySearch.bestScore = negamaxAB<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -55,7 +55,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 					<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << std::endl;
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
-
+				
 				float score = static_cast<float>(mySearch.bestScore / 100.00);
 
 				switch (mySearch.pos.getTurn()) {
@@ -77,6 +77,13 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				(mySearch.bestScore == MATE) ? std::cout << "#" << (ply / 2)
 					: std::cout << std::setprecision(3) << fabs(score);
+
+				std::cout << " pv:";
+
+				for (ushort i = 0; mySearch.pv[i] != 0; i++)
+				{
+					std::cout << displayMove(mySearch.pos, mySearch.pv[i]) << " ";
+				}
 			}
 
 			else if (!underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
@@ -106,7 +113,7 @@ Move negamaxRoot(short const& depth)
 		Position copy = mySearch.pos;
 		doMove(m, copy);
 		mySearch.nodes++;
-		short score = -negamaxAB<false>(copy, depth - 1, ALPHA, BETA);
+		short score = -negamaxAB<false>(copy, depth - 1, ALPHA, BETA, mySearch.pv);
 		undoMove(m, copy, mySearch.pos);
 
 		if (score >= mySearch.bestScore) { 
@@ -116,14 +123,15 @@ Move negamaxRoot(short const& depth)
 	}
 
 	return bestMove;
-}
+} 
 
 
 template<bool nullMove>
-const short negamaxAB(Position const& p, short const& depth, short alpha, short beta)
+const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv)
 {
 	Position copy = p;
-	Move bestMove{};
+	Move bestMove{}, subPV[64];
+	pv[0] = 0;
 	short bestScore = -MATE, alphaOrig = alpha;
 	uint32_t key = static_cast<uint32_t>(copy.getZobrist());
 	TTEntry TTEntry{};
@@ -188,7 +196,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 			copy.updateZobrist(copy.getEnPassant());
 		}
 
-		short score = -negamaxAB<true>(copy, depth - R - 1, -beta, -beta + 1);
+		short score = -negamaxAB<true>(copy, depth - R - 1, -beta, -beta + 1, subPV);
 
 		if (score >= beta) 
 			return score;
@@ -205,10 +213,9 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	}
 
 	for (const auto& m : moveList) {
-		std::list<std::string> nephewPv;
 		doMove(m, copy);
 		mySearch.nodes++;
-		short score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha);
+		short score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, subPV);
 		undoMove(m, copy, p);
 
 		if (score >= beta) {
@@ -220,6 +227,9 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 		if (score > bestScore) { // Beware: unlike negamaxRoot(), here it seems better only 'greather than'
 			bestScore = score;
 			bestMove = m;
+			pv[0] = bestMove;
+			memcpy(pv + 1, subPV, 63 * sizeof(Move));
+			pv[63] = 0;
 
 			if (score > alpha)
 				alpha = score;
@@ -245,6 +255,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 		TT::Store(TTEntry);
 	}
 
+	mySearch.bestMove = bestMove; 
 	return bestScore;
 }
 

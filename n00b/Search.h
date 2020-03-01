@@ -14,7 +14,7 @@
 
 struct Search {
 	Position pos;
-	short bestScore;
+	short bestScore, depth;
 	unsigned long long nodes, ttHits, ttUseful;
 	Move bestMove, pv[64];
 };

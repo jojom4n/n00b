@@ -26,8 +26,8 @@ const Move iterativeSearch(Position& p, short const& depth)
 		return 0;
 	}
 
-	if (mySearch.pos.getCheckmate() || (moves.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
-		mySearch.pos.setCheckmate(true);
+	if ((moves.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
+		mySearch.pos.setCheckmate(true); // just in case position is examined for the first time
 		std::cout << "\nIt's CHECKMATE!" << std::endl;
 		return 0;
 	}
@@ -36,6 +36,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 		for (short ply = 1; ply <= depth; ply++) {
 			mySearch.nodes = 0;
+			mySearch.depth = ply;
 			mySearch.bestScore = -SHRT_INFINITY;
 			mySearch.ttHits = 0;
 			mySearch.ttUseful = 0;
@@ -75,7 +76,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 					break;
 				}
 
-				(mySearch.bestScore == MATE) ? std::cout << "#" << (ply / 2)
+				mySearch.bestScore == MATE ? std::cout << "#" << (ply / 2)
 					: std::cout << std::setprecision(3) << fabs(score);
 
 				std::cout << " pv:";
@@ -130,9 +131,9 @@ template<bool nullMove>
 const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv)
 {
 	Position copy = p;
-	Move bestMove{}, subPV[64];
+	Move bestMove{}, subPV[64]{};
 	pv[0] = 0;
-	short bestScore = -MATE, alphaOrig = alpha;
+	short bestScore = -MATE + (mySearch.depth - depth), alphaOrig = alpha;
 	uint32_t key = static_cast<uint32_t>(copy.getZobrist());
 	TTEntry TTEntry{};
 
@@ -184,10 +185,12 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 			copy.setMoveNumber(copy.getMoveNumber() + 1);
 
 		copy.updateZobrist(copy.getTurn());
+
 		if (copy.getTurn() == WHITE)
 			copy.setTurn(BLACK);
 		else
 			copy.setTurn(WHITE);
+		
 		copy.updateZobrist(copy.getTurn());
 
 		if (copy.getEnPassant() != SQ_EMPTY) {
@@ -263,7 +266,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 const short quiescence(Position const& p, short alpha, short beta)
 {
 	short stand_pat = lazyEval(p);
-
+	
 	if (stand_pat >= beta)
 		return beta;
 
@@ -271,6 +274,7 @@ const short quiescence(Position const& p, short alpha, short beta)
 		alpha = stand_pat;
 
 	Position copy = p;
+	
 	std::vector<Move> moves = moveGenQS(copy), moveList{};
 	moves = pruneIllegal(moves, copy);
 	moveList = ordering(moves);

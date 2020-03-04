@@ -20,7 +20,9 @@ struct Search {
 };
 
 const Move iterativeSearch(Position& p, short const& depth);
-// Move negamaxRoot(short const& depth, Move* pv);
+
+template<bool nullMove>
+const short pvs(Position const& p, short const& depth, short alpha, short beta);
 
 template<bool nullMove>
 const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv);

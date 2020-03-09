@@ -44,7 +44,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 			auto depthTimeStart = Clock::now();
 			// mySearch.bestScore = negamaxAB<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
-			mySearch.bestScore = pvs<false>(mySearch.pos, ply, ALPHA, BETA);
+			mySearch.bestScore = pvs<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -106,10 +106,11 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 
 template<bool nullMove>
-const short pvs(Position const& p, short const& depth, short alpha, short beta)
+const short pvs(Position const& p, short const& depth, short alpha, short beta, Move* pv)
 {
 	Position copy = p;
-	Move bestMove{};
+	Move bestMove{}, subPV[64]{};
+	pv[0] = 0;
 	short bestScore = -MATE + (mySearch.depth - depth), alphaOrig = alpha;
 	uint32_t key = static_cast<uint32_t>(copy.getZobrist());
 	TTEntry TTEntry{};
@@ -173,7 +174,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta)
 			copy.updateZobrist(copy.getEnPassant());
 		}
 
-		short score = -pvs<true>(copy, depth - R - 1, -beta, -beta + 1);
+		short score = -pvs<true>(copy, depth - R - 1, -beta, -beta + 1, subPV);
 
 		if (score >= beta)
 			return score;
@@ -193,15 +194,19 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta)
 		doMove(moveList[0], copy);
 		mySearch.nodes++;
 		bestMove = moveList[0];
-		bestScore = -pvs<false>(copy, depth - 1, -beta, -alpha);
+		bestScore = -pvs<false>(copy, depth - 1, -beta, -alpha, subPV);
 		undoMove(moveList[0], copy, p);
 
 		if (bestScore > alpha) {
-			if (bestScore >= beta) 
+			if (bestScore >= beta)
 				return bestScore;
 
+			pv[0] = moveList[0];
+			memcpy(pv + 1, subPV, 63 * sizeof(Move));
+			pv[63] = 0;
 			alpha = bestScore;
 		}
+
 		moveList.erase(moveList.begin());
 	}
 	
@@ -209,24 +214,28 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta)
 		doMove(m, copy);
 		mySearch.nodes++;
 		
-		short score = -pvs<false>(copy, depth - 1, -alpha - 1, -alpha);
+		short score = -pvs<false>(copy, depth - 1, -alpha - 1, -alpha, subPV);
 
 		if ((score > alpha) && (score < beta)) {
-			score = -pvs<false>(copy, depth - 1, -beta, -alpha);
-			if (score > alpha)
+			score = -pvs<false>(copy, depth - 1, -beta, -alpha, subPV);
+			
+			if (score > alpha) 
 				alpha = score;
 		}
 
 		undoMove(m, copy, p);
 
 		if (score > bestScore) {
-			
+
 			if (score >= beta) {
 				bestScore = score;
 				bestMove = m;
 				break;
 			}
-				
+			
+			pv[0] = m;
+			memcpy(pv + 1, subPV, 63 * sizeof(Move));
+			pv[63] = 0;
 			bestScore = score;
 			bestMove = m;
 		}

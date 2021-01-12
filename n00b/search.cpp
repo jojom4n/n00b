@@ -120,7 +120,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		TTEntry = TT::table[key % TT_SIZE];
 		mySearch.ttHits++;
 
-		if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
+		 if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
 
 			mySearch.ttUseful++;
 
@@ -137,9 +137,8 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 				break;
 			}
 
-			if (alpha >= beta) {
+			if (alpha >= beta)
 				return TTEntry.score;
-			}
 		}
 	}
 

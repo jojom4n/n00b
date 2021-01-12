@@ -2,6 +2,7 @@
 #include "display.h"
 #include "overloading.h"
 #include "Position.h"
+#include <algorithm>
 #include <iostream>
 
 

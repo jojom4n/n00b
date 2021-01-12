@@ -6,6 +6,7 @@
 #include "movegen.h"
 #include "Position.h"
 #include "tt.h"
+#include <algorithm>
 #include <vector>
 
 

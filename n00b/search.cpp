@@ -76,7 +76,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 					break;
 				}
 
-				score == MATE / 1000 ? std::cout << "#" << (ply / 2)
+				mySearch.bestScore == MATE ? std::cout << "#" << (ply / 2)
 					: std::cout << std::setprecision(3) << fabs(score);
 
 				std::cout << " pv:";
@@ -131,8 +131,6 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 			case UPPER_BOUND:
 				if (beta > TTEntry.score)
 					beta = TTEntry.score;
-				break;
-			default:
 				break;
 			}
 

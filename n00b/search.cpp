@@ -113,26 +113,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	uint32_t key = static_cast<uint32_t>(copy.getZobrist());
 	TTEntry TTEntry{};
 
-	if (depth <= 0)
-		return quiescence(copy, alpha, beta);
-		
-	std::vector<Move> moves = moveGeneration(copy), moveList{};
-	moves = pruneIllegal(moves, copy);
-	moveList = ordering(moves);
 	
-	/* Is there an hash move with minor depth than current one? That's our PV */
-	if (TT::table[key % TT_SIZE].key == key && nullMove == false) {
-		TTEntry = TT::table[key % TT_SIZE];
-
-		if (TTEntry.move) {
-			if (std::find(moveList.begin(), moveList.end(), TTEntry.move) != moveList.end()) {
-				std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), TTEntry.move);
-				std::rotate(moveList.begin(), it, it + 1);
-			}
-		}
-	}
-	
-
 	/* ********************************************************* */
 	/*                                                           */
 	/*                  TRANSPOSITION TABLE                      */
@@ -158,8 +139,6 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 				if (beta > TTEntry.score)
 					beta = TTEntry.score;
 				break;
-			default:
-				break;
 			}
 		}
 	} 
@@ -174,6 +153,10 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		if ((depth == 1) && (lazyEval(copy) + MARGIN < alpha))
 			return quiescence(copy, alpha, beta);
 	}
+
+
+	if (depth <= 0)
+		return quiescence(copy, alpha, beta);
 
 
 	/* ********************************************************* */
@@ -210,9 +193,24 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 			return score;
 	}
 
-	// let's restore the original position
-	copy = p;
 	
+	copy = p;
+	std::vector<Move> moves = moveGeneration(copy), moveList{};
+	moves = pruneIllegal(moves, copy);
+	moveList = ordering(moves);
+
+	/* Is there an hash move with minor depth than current one? That's our PV */
+	if (TT::table[key % TT_SIZE].key == key && nullMove == false) {
+		TTEntry = TT::table[key % TT_SIZE];
+
+		if (TTEntry.move) {
+			if (std::find(moveList.begin(), moveList.end(), TTEntry.move) != moveList.end()) {
+				std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), TTEntry.move);
+				std::rotate(moveList.begin(), it, it + 1);
+			}
+		}
+	}
+
 
 	/* ********************************************************* */
 	/*                        PV NODE                            */
@@ -228,9 +226,10 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		undoMove(moveList[0], copy, p);
 
 		if (bestScore > alpha) {
+			
 			if (bestScore >= beta)
 				return bestScore;
-
+				
 			pv[0] = moveList[0];
 			memcpy(pv + 1, subPV, 63 * sizeof(Move));
 			pv[63] = 0;
@@ -264,18 +263,20 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 
 		if (score > bestScore) {
 
-			if (score >= beta) {
-				bestScore = score;
-				bestMove = m;
-				break;
-			}
-			
 			pv[0] = m;
 			memcpy(pv + 1, subPV, 63 * sizeof(Move));
 			pv[63] = 0;
+
+			if (score >= beta) {
+				bestScore = score;
+				bestMove = m;
+				goto exit_loop;
+			}
+
 			bestScore = score;
 			bestMove = m;
 		}
+	exit_loop:;
 	}
 
 	

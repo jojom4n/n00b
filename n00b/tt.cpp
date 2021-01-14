@@ -6,7 +6,7 @@
 namespace TT
 {
 	std::array<TTEntry, TT_SIZE> table;
-	
+
 	void Store(TTEntry const& entry)
 	{
 		unsigned long long index = entry.key % TT_SIZE;

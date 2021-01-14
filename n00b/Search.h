@@ -11,6 +11,7 @@
 #define ALPHA -SHRT_INFINITY
 #define BETA SHRT_INFINITY
 #define R 2 // for null-move pruning
+#define MARGIN 200 // for futility pruning
 
 struct Search {
 	Position pos;

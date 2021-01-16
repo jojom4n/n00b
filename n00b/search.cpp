@@ -17,15 +17,15 @@ const Move iterativeSearch(Position& p, short const& depth)
 	mySearch.pos = p;
 	unsigned int totalTime{};
 
-	std::vector<Move> moves = moveGeneration(mySearch.pos);
-	moves = pruneIllegal(moves, mySearch.pos);
+	std::vector<Move> moveList = moveGeneration(mySearch.pos);
+	moveList = pruneIllegal(moveList, mySearch.pos);
 	
-	if (moves.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+	if (moveList.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 		std::cout << "\nIt's STALEMATE!" << std::endl;
 		return 0;
 	}
 
-	if ((moves.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
+	if ((moveList.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
 		mySearch.pos.setCheckmate(true); // just in case position is examined for the first time
 		std::cout << "\nIt's CHECKMATE!" << std::endl;
 		return 0;
@@ -40,8 +40,8 @@ const Move iterativeSearch(Position& p, short const& depth)
 			mySearch.ttUseful = 0;
 
 			auto depthTimeStart = Clock::now();
-			mySearch.bestScore = negamaxAB<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
-			// mySearch.bestScore = pvs<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
+			// mySearch.bestScore = negamaxAB<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
+			mySearch.bestScore = pvs(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -79,9 +79,9 @@ const Move iterativeSearch(Position& p, short const& depth)
 					std::cout << std::setprecision(3) << fabs(score);
 				}
 				else {
-					ushort flag{};
-					for (flag = 1; mySearch.pv[flag] != 0; flag++);
-					std::cout << "#" << (flag / 2);
+					ushort index{};
+					for (index = 0; mySearch.pv[index] != 0; index++);
+					std::cout << "#" << (index / 2 + 1);
 				}
 
 				std::cout << " pv:";
@@ -118,19 +118,6 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	if (depth == 0)
 		return quiescence(p, alpha, beta);
 
-	
-	/* ********************************************************* */
-	/*															 */
-	/*  				  FUTILITY PRUNING                       */
-	/*                                                           */
-	/* ********************************************************* */
-	if (!underCheck(p.getTurn(), p) && !p.isEnding()) {
-		if ((depth == 1) && (lazyEval(p) + MARGIN < alpha))
-			return quiescence(p, alpha, beta);
-	}
-	/* ********************************************************* */
-	/*  				  END FUTILITY PRUNING                   */
-	/* ********************************************************* */
 
 	std::vector<Move> moveList = moveGeneration(p);
 	moveList = pruneIllegal(moveList, p);
@@ -170,54 +157,85 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 }
 
 
-template<bool nullMove>
 const short pvs(Position const& p, short const& depth, short alpha, short beta, Move* pv)
 {
+	Move bestMove{}, subPV[MAX_PLY]{};
+	std::vector<Move> moveList = moveGeneration(p);
+	moveList = pruneIllegal(moveList, p);
+	pv[0] = 0;
+
+	if (moveList.size() == 0 && underCheck(p.getTurn(), p))
+		return -MATE;
+	else if (moveList.size() == 0 && !underCheck(p.getTurn(), p))
+		return 0;
+
+	if (depth <= 0)
+		return quiescence(p, alpha, beta);
+
+
+	/* ********************************************************* */
+	/*															 */
+	/*  				  FUTILITY PRUNING                       */
+	/*                                                           */
+	/* ********************************************************* */
+	if (!underCheck(p.getTurn(), p) && !p.isEnding()) {
+		if ((depth == 1) && (lazyEval(p) + MARGIN < alpha))
+			return quiescence(p, alpha, beta);
+	}
+	/* ********************************************************* */
+	/*  				END FUTILITY PRUNING                     */
+	/* ********************************************************* */
+
+
+	// moveList = ordering(moveList, p);
 	Position copy = p;
-	Move subPV[MAX_PLY]{};
+	doMove(moveList[0], copy);
+	mySearch.nodes++;
+	short bestScore = -pvs(copy, depth - 1, -beta, -alpha, subPV);
+	undoMove(moveList[0], copy, p);
 
-	if (depth == 0)
-		return quiescence(copy, alpha, beta);
-
-	std::vector<Move> moveList = moveGeneration(copy);
-	moveList = pruneIllegal(moveList, copy);
-	// moveList = ordering(moves);
-
-
-	if (moveList.size() > 0) {
-		doMove(moveList[0], copy);
-		mySearch.nodes++;
-		short bestScore = -pvs<false>(copy, depth - 1, -beta, -alpha, subPV);
-		undoMove(moveList[0], copy, p);
-		mySearch.bestMove = moveList[0];
-		pv[0] = mySearch.bestMove;
+	if (bestScore > alpha) {
+		bestMove = moveList[0];
+		pv[0] = bestMove;
 		memcpy(pv + 1, subPV, 63 * sizeof(Move));
 		pv[63] = 0;
-		moveList.erase(moveList.begin());
+		
+		if (bestScore >= beta)
+			return bestScore;
+		
+		alpha = bestScore;
+	}
 
-		for (const auto& m : moveList) {
-			doMove(m, copy);
-			mySearch.nodes++;
-			short score = -pvs<false>(copy, depth - 1, -alpha - 1, -alpha, subPV);
+	for (ushort i = 1; i < moveList.size(); i++)
+	{
+		doMove(moveList[i], copy);
+		mySearch.nodes++;
+		short score = -pvs(copy, depth - 1, -alpha - 1, -alpha, subPV);
 
-			if (score > alpha && score < beta)
-				score = -pvs<false>(copy, depth - 1, -beta, -alpha, subPV);
 
-			undoMove(m, copy, p);
+		if (score > alpha && score < beta) {
+			score = -pvs(copy, depth - 1, -beta, -alpha, subPV);
 
-			if (score >= bestScore) {
-				bestScore = score;
-				mySearch.bestMove = m;
-				pv[0] = mySearch.bestMove;
-				memcpy(pv + 1, subPV, 63 * sizeof(Move));
-				pv[63] = 0;
-				if (score >= alpha) alpha = score;
-				if (score >= beta) break;
-			}
+			if (score > alpha)
+				alpha = score;
 		}
 
-		return bestScore;
+		undoMove(moveList[i], copy, p);
+
+		if (score > bestScore) {
+			if (score >= beta)
+				return score;
+			
+			bestMove = moveList[i];
+			bestScore = score;
+			pv[0] = bestMove;
+			memcpy(pv + 1, subPV, 63 * sizeof(Move));
+			pv[63] = 0;
+		}
 	}
+		
+	mySearch.bestMove = bestMove;
+	return bestScore;
 }
 
 
@@ -233,7 +251,6 @@ const short quiescence(Position const& p, short alpha, short beta)
 
 	std::vector<Move> moveList = moveGenQS(p);
 	moveList = pruneIllegal(moveList, p);
-	moveList = ordering(moveList);
 
 	for (const auto& m : moveList) {
 		Position copy = p;

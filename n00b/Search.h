@@ -21,7 +21,6 @@ struct Search {
 
 const Move iterativeSearch(Position& p, short const& depth);
 
-template<bool nullMove>
 const short pvs(Position const& p, short const& depth, short alpha, short beta, Move* pv);
 
 template<bool nullMove>

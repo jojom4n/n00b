@@ -3,7 +3,7 @@
 #include "enums.h"
 #include "evaluation.h"
 #include "makemove.h"
-#include "Search.h"
+#include "search.h"
 #include <map>
 
 extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and its header)

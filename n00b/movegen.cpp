@@ -194,109 +194,100 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 
 void enPassant(Position const &p, Square const &enPassant, Color const &c, std::vector<Move>& moveList)
 {
-	Bitboard moves{};
 	Move m{};
 
 	if (!(enPassant % 8) == FILE_A && !((enPassant % 8) == FILE_H))
 		switch (c) {
-		case WHITE: // is there a white pawn attacking the en-passant square?
+		case WHITE: { // is there a white pawn attacking the en-passant square?
 			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
-			
+
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 7);
-				Bitboard attacksToKing{}, occ = p.getPosition(),
-					oppKing = p.getPieces(WHITE, KING);
+				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			
+
 			probablePawn = p.idPiece(Square(enPassant - 9), c);
-			
+
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 9);
-				Bitboard attacksToKing{}, occ = p.getPosition(),
-					oppKing = p.getPieces(WHITE, KING);
+				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			break;
-		case BLACK: // is there a black pawn attacking the en-passant square?
-			probablePawn = p.idPiece(Square(enPassant + 7), c);
-			
+			break; }
+		case BLACK: { // is there a black pawn attacking the en-passant square?
+			PieceID probablePawn = p.idPiece(Square(enPassant + 7), c);
+
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 7);
-				Bitboard attacksToKing{}, occ = p.getPosition(), 
-					oppKing = p.getPieces(WHITE, KING);
-				attacksToKing|= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-			
-			probablePawn = p.idPiece(Square(enPassant + 9), c);
-			
-			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant + 9);
-				Bitboard attacksToKing{}, occ = p.getPosition(),
-					oppKing = p.getPieces(WHITE, KING);
+				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			break;
+
+			probablePawn = p.idPiece(Square(enPassant + 9), c);
+
+			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
+				Square squareFrom = Square(enPassant + 9);
+				Bitboard attacksToKing{}, occ = p.getPosition();
+				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
+				moveList.push_back(m);
+			}
+			break; }
 		} // end switch	
 
 	if ((enPassant %8) == FILE_A)
 		switch (c) {
-		case WHITE: // is there a white pawn attacking the en-passant square?
+		case WHITE: { // is there a white pawn attacking the en-passant square?
 			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 7);
-				Bitboard attacksToKing{}, occ = p.getPosition(),
-					oppKing = p.getPieces(WHITE, KING);
+				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			break;
-		case BLACK: // is there a black pawn attacking the en-passant square?
-			probablePawn = p.idPiece(Square(enPassant + 9), c);
+			break; }
+		case BLACK: { // is there a black pawn attacking the en-passant square?
+			PieceID probablePawn = p.idPiece(Square(enPassant + 9), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 9);
-				Bitboard attacksToKing{}, occ = p.getPosition(),
-					oppKing = p.getPieces(WHITE, KING);
+				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			break;
+			break; }
 		} // end switch	
 
 	if ((enPassant % 8 == FILE_H))
 		switch (c) {
-		case WHITE: // is there a white pawn attacking the en-passant square?
+		case WHITE: { // is there a white pawn attacking the en-passant square?
 			PieceID probablePawn = p.idPiece(Square(enPassant - 9), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 9);
-					Bitboard attacksToKing{}, occ = p.getPosition(),
-					oppKing = p.getPieces(WHITE, KING);
-					attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
-					m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-					moveList.push_back(m);
+				Bitboard attacksToKing{}, occ = p.getPosition();
+				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
+				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
+				moveList.push_back(m);
 			}
-			break;
-		case BLACK: // is there a black pawn attacking the en-passant square?
-			probablePawn = p.idPiece(Square(enPassant + 7), c);
+			break; }
+		case BLACK: { // is there a black pawn attacking the en-passant square?
+			PieceID probablePawn = p.idPiece(Square(enPassant + 7), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 7);
-				Bitboard attacksToKing{}, occ = p.getPosition(),
-					oppKing = p.getPieces(WHITE, KING);
+				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
-			break;
+			break; }
 		} // end switch	
 }
 

@@ -162,8 +162,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	Move bestMove{}, subPV[MAX_PLY]{};
 	std::vector<Move> moveList = moveGeneration(p);
 	moveList = pruneIllegal(moveList, p);
-	pv[0] = 0;
-
+	
 	if (moveList.size() == 0)
 		if (underCheck(p.getTurn(), p))
 			return -MATE;
@@ -189,6 +188,13 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 
 
 	moveList = ordering(moveList, p);
+
+	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
+		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
+		std::rotate(moveList.begin(), it, it + 1);
+	}
+
+	pv[0] = 0;
 	Position copy = p;
 	doMove(moveList[0], copy);
 	mySearch.nodes++;

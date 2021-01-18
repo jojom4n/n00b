@@ -20,14 +20,15 @@ const Move iterativeSearch(Position& p, short const& depth)
 	std::vector<Move> moveList = moveGeneration(mySearch.pos);
 	moveList = pruneIllegal(moveList, mySearch.pos);
 	
-	if (moveList.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
-		std::cout << "\nIt's STALEMATE!" << std::endl;
-		return 0;
-	}
-
-	if ((moveList.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
-		mySearch.pos.setCheckmate(true); // just in case position is examined for the first time
-		std::cout << "\nIt's CHECKMATE!" << std::endl;
+	if (moveList.size() == 0) {
+		
+		if (!underCheck(mySearch.pos.getTurn(), mySearch.pos))
+			std::cout << "\nIt's STALEMATE!" << std::endl;
+		else if (underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+			mySearch.pos.setCheckmate(true); // just in case position is examined for the first time
+			std::cout << "\nIt's CHECKMATE!" << std::endl;
+		}
+		
 		return 0;
 	}
 
@@ -55,7 +56,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 				
-				if (!(mySearch.bestScore == MATE)) {
+				if (!(mySearch.bestScore == MATE) && !(mySearch.bestScore == -MATE)) {
 					
 					float score = static_cast<float>(mySearch.bestScore / 100.00);
 					
@@ -109,52 +110,52 @@ const Move iterativeSearch(Position& p, short const& depth)
 }
 
 
-template<bool nullMove>
-const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv)
-{
-	Move bestMove{}, subPV[64]{};
-	short bestScore = -SHRT_INFINITY;
-	
-	if (depth == 0)
-		return quiescence(p, ALPHA, BETA);
-
-
-	std::vector<Move> moveList = moveGeneration(p);
-	moveList = pruneIllegal(moveList, p);
-
-	// at PV node, first search best move from previous iteration
-	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
-		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
-		std::rotate(moveList.begin(), it, it + 1);
-	}
-
-	if (moveList.size() == 0 && underCheck(p.getTurn(), p))
-		return -MATE;
-	else if (moveList.size() == 0 && !underCheck(p.getTurn(), p))
-		return 0;
-	
-
-	for (const auto& m : moveList) {
-		Position copy = p;
-		doMove(m, copy);
-		mySearch.nodes++;
-		short score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, subPV);
-		undoMove(m, copy, p);
-
-		if (score >= bestScore) {
-			bestScore = score;
-			bestMove = m;
-
-			if (score > alpha)
-				alpha = score;
-		}
-
-		if (score >= beta || score == MATE)
-			break;
-	}
-	mySearch.bestMove = bestMove;
-	return bestScore;
-}
+//template<bool nullMove>
+//const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv)
+//{
+//	Move bestMove{}, subPV[64]{};
+//	short bestScore = -SHRT_INFINITY;
+//	
+//	if (depth == 0)
+//		return quiescence(p, ALPHA, BETA);
+//
+//
+//	std::vector<Move> moveList = moveGeneration(p);
+//	moveList = pruneIllegal(moveList, p);
+//
+//	// at PV node, first search best move from previous iteration
+//	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
+//		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
+//		std::rotate(moveList.begin(), it, it + 1);
+//	}
+//
+//	if (moveList.size() == 0 && underCheck(p.getTurn(), p))
+//		return -MATE;
+//	else if (moveList.size() == 0 && !underCheck(p.getTurn(), p))
+//		return 0;
+//	
+//
+//	for (const auto& m : moveList) {
+//		Position copy = p;
+//		doMove(m, copy);
+//		mySearch.nodes++;
+//		short score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, subPV);
+//		undoMove(m, copy, p);
+//
+//		if (score >= bestScore) {
+//			bestScore = score;
+//			bestMove = m;
+//
+//			if (score > alpha)
+//				alpha = score;
+//		}
+//
+//		if (score >= beta || score == MATE)
+//			break;
+//	}
+//	mySearch.bestMove = bestMove;
+//	return bestScore;
+//}
 
 
 const short pvs(Position const& p, short const& depth, short alpha, short beta, Move* pv)
@@ -162,7 +163,8 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	Move bestMove{}, subPV[MAX_PLY]{};
 	std::vector<Move> moveList = moveGeneration(p);
 	moveList = pruneIllegal(moveList, p);
-	
+	pv[0] = 0;
+
 	if (moveList.size() == 0)
 		if (underCheck(p.getTurn(), p))
 			return -MATE;
@@ -170,7 +172,8 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 			return 0;
 
 	if (depth <= 0)
-		return quiescence(p, alpha, beta);
+		// return quiescence(p, alpha, beta);
+		return lazyEval(p);
 
 
 	/* ********************************************************* */
@@ -181,7 +184,8 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	if (depth == 1)
 		if (lazyEval(p) + MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
-				return quiescence(p, alpha, beta);
+				return lazyEval(p);
+				// return quiescence(p, alpha, beta);
 	/* ********************************************************* */
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
@@ -194,7 +198,6 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		std::rotate(moveList.begin(), it, it + 1);
 	}
 
-	pv[0] = 0;
 	Position copy = p;
 	doMove(moveList[0], copy);
 	mySearch.nodes++;
@@ -223,6 +226,10 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		if (score > alpha && score < beta) {
 			score = -pvs(copy, depth - 1, -beta, -alpha, subPV);
 
+			ushort index{};
+			for (index = 0; subPV[index] != 0; index++)
+				std::cout << displayMove(copy, subPV[index]) << " \n";
+
 			if (score > alpha)
 				alpha = score;
 		}
@@ -232,7 +239,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		if (score > bestScore) {
 			if (score >= beta)
 				return score;
-			
+
 			bestMove = moveList[i];
 			bestScore = score;
 			pv[0] = bestMove;
@@ -240,7 +247,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 			pv[63] = 0;
 		}
 	}
-		
+
 	mySearch.bestMove = bestMove;
 	return bestScore;
 }

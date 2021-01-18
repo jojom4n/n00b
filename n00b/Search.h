@@ -23,8 +23,8 @@ const Move iterativeSearch(Position& p, short const& depth);
 
 const short pvs(Position const& p, short const& depth, short alpha, short beta, Move* pv);
 
-template<bool nullMove>
-const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv);
+/* template<bool nullMove>
+const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv); */
 
 const short quiescence(Position const& p, short alpha, short beta, ushort qsDepth = QS_DEPTH);
 

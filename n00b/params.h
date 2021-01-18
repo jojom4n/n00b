@@ -8,6 +8,7 @@ constexpr unsigned long long TT_SIZE = 16 * TT_BIT; // megabytes dedicated to TT
 
 #define R 2 // for null-move pruning
 #define MARGIN 200 // for futility pruning
-#define MAX_PLY 99
+#define MAX_PLY 128
+#define QS_DEPTH 5
 
 #endif

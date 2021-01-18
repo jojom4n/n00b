@@ -116,7 +116,7 @@ const short negamaxAB(Position const& p, short const& depth, short alpha, short 
 	short bestScore = -SHRT_INFINITY;
 	
 	if (depth == 0)
-		return quiescence(p, alpha, beta);
+		return quiescence(p, ALPHA, BETA);
 
 
 	std::vector<Move> moveList = moveGeneration(p);
@@ -164,10 +164,11 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	moveList = pruneIllegal(moveList, p);
 	pv[0] = 0;
 
-	if (moveList.size() == 0 && underCheck(p.getTurn(), p))
-		return -MATE;
-	else if (moveList.size() == 0 && !underCheck(p.getTurn(), p))
-		return 0;
+	if (moveList.size() == 0)
+		if (underCheck(p.getTurn(), p))
+			return -MATE;
+		else if (!underCheck(p.getTurn(), p))
+			return 0;
 
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
@@ -178,16 +179,16 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	/*  				  FUTILITY PRUNING                       */
 	/*                                                           */
 	/* ********************************************************* */
-	if (!underCheck(p.getTurn(), p) && !p.isEnding()) {
-		if ((depth == 1) && (lazyEval(p) + MARGIN < alpha))
-			return quiescence(p, alpha, beta);
-	}
+	if (depth == 1)
+		if (lazyEval(p) + MARGIN < alpha)
+			if (!underCheck(p.getTurn(), p) && !p.isEnding())
+				return quiescence(p, alpha, beta);
 	/* ********************************************************* */
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
 
 
-	// moveList = ordering(moveList, p);
+	moveList = ordering(moveList, p);
 	Position copy = p;
 	doMove(moveList[0], copy);
 	mySearch.nodes++;
@@ -254,6 +255,9 @@ const short quiescence(Position const& p, short alpha, short beta, ushort qsDept
 
 	std::vector<Move> moveList = moveGenQS(p);
 	moveList = pruneIllegal(moveList, p);
+	
+	if (moveList.size() > 0)
+		moveList = mvv_lva(moveList);
 
 	for (const auto& m : moveList) {
 		Position copy = p;

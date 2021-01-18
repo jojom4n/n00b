@@ -424,7 +424,7 @@ const std::vector<Move> moveGenQS(Position const& p)
 
 		while (bb) { // loop until the bitboard has a piece on it
 			Square squareFrom = Square(bitscan_reset(bb)); // find the square(s) with the particular piece;
-			Bitboard m{}, pawnmove{};
+			Bitboard m{};
 
 			// get move bitboard for the piece, given its square
 			switch (piece) {
@@ -445,18 +445,16 @@ const std::vector<Move> moveGenQS(Position const& p)
 				m = g_MoveTables.bishop(squareFrom, occ);
 				break;
 			case PAWN:
-				(sideToMove == WHITE) ? pawnmove |= g_MoveTables.whitePawn(C64(1) << squareFrom, own) & occ
-					: pawnmove |= g_MoveTables.blackPawn(C64(1) << squareFrom, own) & occ;
+				(sideToMove == WHITE) ? m |= g_MoveTables.whitePawn(C64(1) << squareFrom, occ) 
+					: m |= g_MoveTables.blackPawn(C64(1) << squareFrom, occ);
 				break;
 			}
 	
 			// now let's add captures to movelist
-			if (m) {
-				m &= occ; // select only bits corresponding to captures
-				m &= ~own; // exclude own pieces from moves
-			}			
+			m &= occ; // select only bits corresponding to captures
+			m &= ~own; // exclude own pieces from moves			
 
-			while (pawnmove) { // scan collected captures and add them to list
+			while (m) { // scan collected captures and add them to list
 				Square squareTo = Square(bitscan_reset(m));
 				Piece captured = p.idPiece(squareTo, Color(!sideToMove)).piece;
 

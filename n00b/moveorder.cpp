@@ -10,11 +10,11 @@ extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and it
 
 std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p)
 {
-	std::vector<Move> orderedList = shallowSort(moves, p);
+	/* std::vector<Move> orderedList = shallowSort(moves, p);
 
-	return orderedList;
+	return orderedList; */
 
-	/* std::vector<Move> moveList{}, moveTemp{};
+	std::vector<Move> moveList{}, moveTemp{};
 	
 	moveTemp = mvv_lva(moves);
 	moveList.insert(moveList.begin(), moveTemp.begin(), moveTemp.end());
@@ -25,7 +25,7 @@ std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p)
 			moveList.push_back(elem);
 	}
 
-	return moveList; */
+	return moveList;
 }
 
 

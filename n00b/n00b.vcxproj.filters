@@ -31,9 +31,6 @@
     <ClCompile Include="movegen.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="search.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="evaluation.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
@@ -53,6 +50,9 @@
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="moveorder.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="search.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>

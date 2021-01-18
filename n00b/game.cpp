@@ -77,7 +77,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
 		
-		if (depth > 0) {
+		if (depth > 0 && !(depth > MAX_PLY)) {
 			Move m = iterativeSearch(board, depth);
 			if (m) {
 				doMove(m, board);
@@ -92,7 +92,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 5) == "perft" && inputStream.str().substr(5, 1) == " "
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(6));
-		if (depth > 0) {
+		if (depth > 0 && !(depth > MAX_PLY)) {
 			auto t1 = Clock::now();
 			std::cout << perft(depth, board) << std::endl;
 			auto t2 = Clock::now();
@@ -105,7 +105,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if (inputStream.str().substr(0, 6) == "divide" && inputStream.str().substr(6, 1) == " " 
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(7));
-		if (depth > 0) {
+		if (depth > 0 && !(depth > MAX_PLY)) {
 			auto t1 = Clock::now();
 			std::cout << divide<true>(depth, board) << std::endl;
 			auto t2 = Clock::now();

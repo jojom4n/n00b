@@ -2,13 +2,20 @@
 #include "moveorder.h"
 #include "enums.h"
 #include "evaluation.h"
+#include "makemove.h"
+#include "search.h"
 #include <map>
 
 extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and its header)
 
-std::vector<Move> ordering(std::vector<Move> const& moves)
+std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p)
 {
-	std::vector<Move> moveList{}, moveTemp{};
+	std::vector<Move> orderedList = shallowSort(moves, p);
+
+	return orderedList;
+
+	/* std::vector<Move> moveList{}, moveTemp{};
+	
 	moveTemp = mvv_lva(moves);
 	moveList.insert(moveList.begin(), moveTemp.begin(), moveTemp.end());
 
@@ -18,8 +25,29 @@ std::vector<Move> ordering(std::vector<Move> const& moves)
 			moveList.push_back(elem);
 	}
 
-	return moveList;
+	return moveList; */
 }
+
+
+std::vector<Move> shallowSort(std::vector<Move> const& moves, Position const& p)
+{
+	Position copy = p;
+
+	std::vector<Move> orderedList{};
+	std::multimap<short, Move, std::less<int>> sortedMap{};
+
+	for (auto const& elem : moves) {
+		doMove(elem, copy);
+		sortedMap.insert(std::pair<short, Move>(quiescence(copy, ALPHA, BETA), elem));
+		undoMove(elem, copy, p);
+	}
+
+	for (std::multimap<short, Move>::iterator it = sortedMap.begin(); it != sortedMap.end(); ++it)
+		orderedList.push_back((*it).second);
+
+	return orderedList;
+}
+
 
 std::vector<Move> mvv_lva(std::vector<Move> const& moves) 
 {

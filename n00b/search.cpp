@@ -10,22 +10,22 @@
 #include <iostream>
 
 extern std::array<TTEntry, TT_SIZE> TT::table;
-struct Search mySearch({});
+struct Search mySearch{};
 
 const Move iterativeSearch(Position& p, short const& depth)
 {
 	mySearch.pos = p;
 	unsigned int totalTime{};
 
-	std::vector<Move> moves = moveGeneration(mySearch.pos);
-	moves = pruneIllegal(moves, mySearch.pos);
+	std::vector<Move> moveList = moveGeneration(mySearch.pos);
+	moveList = pruneIllegal(moveList, mySearch.pos);
 	
-	if (moves.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
+	if (moveList.size() == 0 && !underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
 		std::cout << "\nIt's STALEMATE!" << std::endl;
 		return 0;
 	}
 
-	if ((moves.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
+	if ((moveList.size() == 0 && underCheck(mySearch.pos.getTurn(), mySearch.pos))) {
 		mySearch.pos.setCheckmate(true); // just in case position is examined for the first time
 		std::cout << "\nIt's CHECKMATE!" << std::endl;
 		return 0;
@@ -36,13 +36,12 @@ const Move iterativeSearch(Position& p, short const& depth)
 		for (short ply = 1; ply <= depth; ply++) {
 			mySearch.nodes = 0;
 			mySearch.depth = ply;
-			mySearch.bestScore = -SHRT_INFINITY;
 			mySearch.ttHits = 0;
 			mySearch.ttUseful = 0;
 
 			auto depthTimeStart = Clock::now();
 			// mySearch.bestScore = negamaxAB<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
-			mySearch.bestScore = pvs<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
+			mySearch.bestScore = pvs(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -56,27 +55,34 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 				
-				float score = static_cast<float>(mySearch.bestScore / 100.00);
-
-				switch (mySearch.pos.getTurn()) {
-				case WHITE:
-					if (score > 0.0f)
-						std::cout << "+";
-					else if (score < 0.0f)
-						std::cout << "-";
-					break;
-				case BLACK:
-					if (score > 0.0f)
-						std::cout << "-";
-					else if (score < 0.0f)
-						std::cout << "+";
-					break;
-				default:
-					break;
+				if (!(mySearch.bestScore == MATE)) {
+					
+					float score = static_cast<float>(mySearch.bestScore / 100.00);
+					
+					switch (mySearch.pos.getTurn()) {
+					case WHITE:
+						if (score > 0.0f)
+							std::cout << "+";
+						else if (score < 0.0f)
+							std::cout << "-";
+							break;
+					case BLACK:
+						if (score > 0.0f)
+							std::cout << "-";
+						else if (score < 0.0f)
+							std::cout << "+";
+						break;
+					default:
+						break;
+					}
+					
+					std::cout << std::setprecision(3) << fabs(score);
 				}
-
-				mySearch.bestScore == MATE ? std::cout << "#" << (ply / 2)
-					: std::cout << std::setprecision(3) << fabs(score);
+				else {
+					ushort index{};
+					for (index = 0; mySearch.pv[index] != 0; index++);
+					std::cout << "#" << (index / 2 + 1);
+				}
 
 				std::cout << " pv:";
 
@@ -104,44 +110,67 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 
 template<bool nullMove>
+const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv)
+{
+	Move bestMove{}, subPV[64]{};
+	short bestScore = -SHRT_INFINITY;
+	
+	if (depth == 0)
+		return quiescence(p, alpha, beta);
+
+
+	std::vector<Move> moveList = moveGeneration(p);
+	moveList = pruneIllegal(moveList, p);
+
+	// at PV node, first search best move from previous iteration
+	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
+		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
+		std::rotate(moveList.begin(), it, it + 1);
+	}
+
+	if (moveList.size() == 0 && underCheck(p.getTurn(), p))
+		return -MATE;
+	else if (moveList.size() == 0 && !underCheck(p.getTurn(), p))
+		return 0;
+	
+
+	for (const auto& m : moveList) {
+		Position copy = p;
+		doMove(m, copy);
+		mySearch.nodes++;
+		short score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, subPV);
+		undoMove(m, copy, p);
+
+		if (score >= bestScore) {
+			bestScore = score;
+			bestMove = m;
+
+			if (score > alpha)
+				alpha = score;
+		}
+
+		if (score >= beta || score == MATE)
+			break;
+	}
+	mySearch.bestMove = bestMove;
+	return bestScore;
+}
+
+
 const short pvs(Position const& p, short const& depth, short alpha, short beta, Move* pv)
 {
-	Position copy = p;
-	Move bestMove{}, subPV[64]{};
+	Move bestMove{}, subPV[MAX_PLY]{};
+	std::vector<Move> moveList = moveGeneration(p);
+	moveList = pruneIllegal(moveList, p);
 	pv[0] = 0;
-	short bestScore = -MATE + (mySearch.depth - depth), alphaOrig = alpha;
-	uint32_t key = static_cast<uint32_t>(copy.getZobrist());
-	TTEntry TTEntry{};
 
-	
-	/* ********************************************************* */
-	/*                                                           */
-	/*                  TRANSPOSITION TABLE                      */
-	/*                                                           */
-	/* ********************************************************* */
-	if (TT::table[key % TT_SIZE].key == key && nullMove == false) {
-		TTEntry = TT::table[key % TT_SIZE];
-		mySearch.ttHits++;
+	if (moveList.size() == 0 && underCheck(p.getTurn(), p))
+		return -MATE;
+	else if (moveList.size() == 0 && !underCheck(p.getTurn(), p))
+		return 0;
 
-		if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
-
-			mySearch.ttUseful++;
-
-			switch (TTEntry.nodeType) {
-			case EXACT:
-				return TTEntry.score;
-				break;
-			case LOWER_BOUND:
-				if (alpha < TTEntry.score)
-					alpha = TTEntry.score;
-				break;
-			case UPPER_BOUND:
-				if (beta > TTEntry.score)
-					beta = TTEntry.score;
-				break;
-			}
-		}
-	} 
+	if (depth <= 0)
+		return quiescence(p, alpha, beta);
 
 
 	/* ********************************************************* */
@@ -149,324 +178,88 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	/*  				  FUTILITY PRUNING                       */
 	/*                                                           */
 	/* ********************************************************* */
-	if (!underCheck(copy.getTurn(), copy) && !copy.isEnding()) {
-		if ((depth == 1) && (lazyEval(copy) + MARGIN < alpha))
-			return quiescence(copy, alpha, beta);
+	if (!underCheck(p.getTurn(), p) && !p.isEnding()) {
+		if ((depth == 1) && (lazyEval(p) + MARGIN < alpha))
+			return quiescence(p, alpha, beta);
 	}
-
-
-	if (depth <= 0)
-		return quiescence(copy, alpha, beta);
-
-
 	/* ********************************************************* */
-	/*                  NULL-MOVE PRUNING                        */
-	/*                                                           */
-	/* We only use it if side is not under check and if game is  */
-	/* not in ending state (to avoid zugzwang issues)            */
-	/*                                                           */
+	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
-	if (!underCheck(copy.getTurn(), copy) && !copy.isEnding()) {
-
-		// let's do a dummy (null-) move, then proceed with pruning
-		if (copy.getTurn() == BLACK)
-			copy.setMoveNumber(copy.getMoveNumber() + 1);
-
-		copy.updateZobrist(copy.getTurn());
-
-		if (copy.getTurn() == WHITE)
-			copy.setTurn(BLACK);
-		else
-			copy.setTurn(WHITE);
-
-		copy.updateZobrist(copy.getTurn());
-
-		if (copy.getEnPassant() != SQ_EMPTY) {
-			copy.updateZobrist(copy.getEnPassant());
-			copy.setEnPassant(SQ_EMPTY);
-			copy.updateZobrist(copy.getEnPassant());
-		}
-
-		short score = -pvs<true>(copy, depth - R - 1, -beta, -beta + 1, subPV);
-
-		if (score >= beta)
-			return score;
-	}
-
-	
-	copy = p;
-	std::vector<Move> moves = moveGeneration(copy), moveList{};
-	moves = pruneIllegal(moves, copy);
-	moveList = ordering(moves);
-
-	/* Is there an hash move with minor depth than current one? That's our PV */
-	if (TT::table[key % TT_SIZE].key == key && nullMove == false) {
-		TTEntry = TT::table[key % TT_SIZE];
-
-		if (TTEntry.move) {
-			if (std::find(moveList.begin(), moveList.end(), TTEntry.move) != moveList.end()) {
-				std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), TTEntry.move);
-				std::rotate(moveList.begin(), it, it + 1);
-			}
-		}
-	}
 
 
-	/* ********************************************************* */
-	/*                        PV NODE                            */
-	/*                                                           */
-	/*              Ordinary search in PV node                   */
-	/*                                                           */
-	/* ********************************************************* */
-	if (moveList.size() > 1) {
-		doMove(moveList[0], copy);
-		mySearch.nodes++;
+	// moveList = ordering(moveList, p);
+	Position copy = p;
+	doMove(moveList[0], copy);
+	mySearch.nodes++;
+	short bestScore = -pvs(copy, depth - 1, -beta, -alpha, subPV);
+	undoMove(moveList[0], copy, p);
+
+	if (bestScore > alpha) {
 		bestMove = moveList[0];
-		bestScore = -pvs<false>(copy, depth - 1, -beta, -alpha, subPV);
-		undoMove(moveList[0], copy, p);
-
-		if (bestScore > alpha) {
-			
-			if (bestScore >= beta)
-				return bestScore;
-				
-			pv[0] = moveList[0];
-			memcpy(pv + 1, subPV, 63 * sizeof(Move));
-			pv[63] = 0;
-			alpha = bestScore;
-		}
-
-		moveList.erase(moveList.begin());
-	}
-	
-
-	/* ********************************************************* */
-	/*                      NON-PV NODES                         */
-	/*                                                           */
-	/*              Ordinary search in non-PV nodes              */
-	/*                                                           */
-	/* ********************************************************* */	
-	for (const auto& m : moveList) {
-		doMove(m, copy);
-		mySearch.nodes++;
+		pv[0] = bestMove;
+		memcpy(pv + 1, subPV, 63 * sizeof(Move));
+		pv[63] = 0;
 		
-		short score = -pvs<false>(copy, depth - 1, -alpha - 1, -alpha, subPV);
+		if (bestScore >= beta)
+			return bestScore;
+		
+		alpha = bestScore;
+	}
 
-		if ((score > alpha) && (score < beta)) {
-			score = -pvs<false>(copy, depth - 1, -beta, -alpha, subPV);
-			
-			if (score > alpha) 
+	for (ushort i = 1; i < moveList.size(); i++)
+	{
+		doMove(moveList[i], copy);
+		mySearch.nodes++;
+		short score = -pvs(copy, depth - 1, -alpha - 1, -alpha, subPV);
+
+
+		if (score > alpha && score < beta) {
+			score = -pvs(copy, depth - 1, -beta, -alpha, subPV);
+
+			if (score > alpha)
 				alpha = score;
 		}
 
-		undoMove(m, copy, p);
+		undoMove(moveList[i], copy, p);
 
 		if (score > bestScore) {
-
-			pv[0] = m;
+			if (score >= beta)
+				return score;
+			
+			bestMove = moveList[i];
+			bestScore = score;
+			pv[0] = bestMove;
 			memcpy(pv + 1, subPV, 63 * sizeof(Move));
 			pv[63] = 0;
-
-			if (score >= beta) {
-				bestScore = score;
-				bestMove = m;
-				goto exit_loop;
-			}
-
-			bestScore = score;
-			bestMove = m;
 		}
-	exit_loop:;
 	}
-
-	
-	/* ********************************************************* */
-	/*                 UPDATE TRANSPOSITION TABLE                */
-	/*                                                           */
-	/* we only update TT if there is a best move.In other words, */
-	/* if it's mate and therefore there is not any best move (or */
-	/* hence any move at all), we do not want to update TT,      */
-	/* because otherwise we would have a dummy entry with score  */
-	/* about MATE or -MATE and move = 0, polluting TT!           */
-	/*                                                           */
-	/* ********************************************************* */
-	if (bestMove) {
-		TTEntry.score = bestScore;
-		if (bestScore <= alphaOrig)
-			TTEntry.nodeType = UPPER_BOUND;
-		else if (bestScore >= beta)
-			TTEntry.nodeType = LOWER_BOUND;
-		else
-			TTEntry.nodeType = EXACT;
-
-		TTEntry.age = static_cast<uint8_t>(copy.getMoveNumber());
-		TTEntry.depth = static_cast<uint8_t>(depth);
-		TTEntry.key = static_cast<uint32_t>(copy.getZobrist());
-		TTEntry.move = bestMove;
-		TT::Store(TTEntry);
-	}
-
-	// return result - end function
+		
 	mySearch.bestMove = bestMove;
 	return bestScore;
 }
 
 
-template<bool nullMove>
-const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv)
+const short quiescence(Position const& p, short alpha, short beta, ushort qsDepth)
 {
-	Position copy = p;
-	Move bestMove{}, subPV[64]{};
-	pv[0] = 0;
-	short bestScore = -MATE + (mySearch.depth - depth), alphaOrig = alpha;
-	uint32_t key = static_cast<uint32_t>(copy.getZobrist());
-	TTEntry TTEntry{};
+	if (qsDepth <= 0)
+		return lazyEval(p);
 
-	if (TT::table[key % TT_SIZE].key == key && nullMove == false) {
-		TTEntry = TT::table[key % TT_SIZE];
-		mySearch.ttHits++;
-
-		if (TT::isLegalEntry(TTEntry, copy) && TTEntry.depth >= depth) {
-
-			mySearch.ttUseful++;
-
-			switch (TTEntry.nodeType) {
-			/* case EXACT:
-				return TTEntry.score;
-				break; */
-			case LOWER_BOUND:
-				if (alpha < TTEntry.score)
-					alpha = TTEntry.score;
-				break;
-			case UPPER_BOUND:
-				if (beta > TTEntry.score)
-					beta = TTEntry.score;
-				break;
-			default:
-				break;
-			}
-
-			if (alpha >= beta) {
-				return TTEntry.score;
-			}
-		}
-	} 
-
-	if (depth <= 0)
-		return quiescence(copy, alpha, beta);
-	
-	// position is not in TT, or we received only upper- or lower-bound values
-	std::vector<Move> moves = moveGeneration(copy), moveList{};
-	moves = pruneIllegal(moves, copy);
-	moveList = ordering(moves);
-
-	// null-move pruning. We only use it if side is not under check and if game
-	// is not in ending state (to avoid zugzwang issues with null-move pruning)
-	if (!underCheck(copy.getTurn(), copy) && !copy.isEnding()) {
-
-		// let's do a dummy (null-) move, then proceed with pruning
-		if (copy.getTurn() == BLACK)
-			copy.setMoveNumber(copy.getMoveNumber() + 1);
-
-		copy.updateZobrist(copy.getTurn());
-
-		if (copy.getTurn() == WHITE)
-			copy.setTurn(BLACK);
-		else
-			copy.setTurn(WHITE);
-		
-		copy.updateZobrist(copy.getTurn());
-
-		if (copy.getEnPassant() != SQ_EMPTY) {
-			copy.updateZobrist(copy.getEnPassant());
-			copy.setEnPassant(SQ_EMPTY);
-			copy.updateZobrist(copy.getEnPassant());
-		}
-
-		short score = -negamaxAB<true>(copy, depth - R - 1, -beta, -beta + 1, subPV);
-
-		if (score >= beta) 
-			return score;
-	}
-
-
-	/* we found an hash move with minor depth than current one, so we cannot directly use it?
-	Nonetheless, let's try the hash move first for our ordinary search  */
-	if (TTEntry.move) {
-		if (std::find(moveList.begin(), moveList.end(), TTEntry.move) != moveList.end()) {
-			std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), TTEntry.move);
-			std::rotate(moveList.begin(), it, it + 1);
-		}
-	}
-
-	for (const auto& m : moveList) {
-		doMove(m, copy);
-		mySearch.nodes++;
-		short score = -negamaxAB<false>(copy, depth - 1, -beta, -alpha, subPV);
-		undoMove(m, copy, p);
-
-		if (score >= beta) {
-			bestScore = score;
-			bestMove = m;
-			break;
-		}	
-		
-		if (score > bestScore) { // Beware: unlike negamaxRoot(), here it seems better only 'greather than'
-			bestScore = score;
-			bestMove = m;
-			pv[0] = bestMove;
-			memcpy(pv + 1, subPV, 63 * sizeof(Move));
-			pv[63] = 0;
-
-			if (score > alpha)
-				alpha = score;
-		}
-	}
-
-	/* we only update TT if there is a best move. In other words, if it's mate and therefore
-	there is not any best move (or, hence, any move at all), we do not want to update
-	TT, because otherwise we would have a dummy entry with score MATE or -MATE and move = 0, polluting TT! */
-	if (bestMove) {
-		TTEntry.score = bestScore;
-		if (bestScore <= alphaOrig)
-			TTEntry.nodeType = UPPER_BOUND;
-		else if (bestScore >= beta)
-			TTEntry.nodeType = LOWER_BOUND;
-		else
-			TTEntry.nodeType = EXACT;
-
-		TTEntry.age = static_cast<uint8_t>(copy.getMoveNumber());
-		TTEntry.depth = static_cast<uint8_t>(depth);
-		TTEntry.key = static_cast<uint32_t>(copy.getZobrist());
-		TTEntry.move = bestMove;
-		TT::Store(TTEntry);
-	}
-
-	mySearch.bestMove = bestMove; 
-	return bestScore;
-}
-
-
-const short quiescence(Position const& p, short alpha, short beta)
-{
 	short stand_pat = lazyEval(p);
-	
+
 	if (stand_pat >= beta)
 		return beta;
 
 	if (alpha < stand_pat)
 		alpha = stand_pat;
 
-	Position copy = p;
-	
-	std::vector<Move> moves = moveGenQS(copy), moveList{};
-	moves = pruneIllegal(moves, copy);
-	moveList = ordering(moves);
+	std::vector<Move> moveList = moveGenQS(p);
+	moveList = pruneIllegal(moveList, p);
 
 	for (const auto& m : moveList) {
+		Position copy = p;
 		doMove(m, copy);
 		mySearch.nodes++;
-		short score = -quiescence(copy, -beta, -alpha);
+		short score = -quiescence(copy, -beta, -alpha, qsDepth -1);
 		undoMove(m, copy, p);
 
 		if (score >= beta)

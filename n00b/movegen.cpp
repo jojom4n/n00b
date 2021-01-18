@@ -416,76 +416,57 @@ const std::vector<Move> moveGenQS(Position const& p)
 	if (underCheck(sideToMove, p) > 1)
 		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
 
-	const Bitboard occupancy = p.getPosition();
-	const Bitboard ownPieces = p.getPosition(sideToMove);
+	const Bitboard occ = p.getPosition();
+	const Bitboard own = p.getPosition(sideToMove);
 
 	for (Piece piece = KING; piece <= PAWN; piece++) {
 		Bitboard bb = p.getPieces(sideToMove, piece);
 
 		while (bb) { // loop until the bitboard has a piece on it
 			Square squareFrom = Square(bitscan_reset(bb)); // find the square(s) with the particular piece;
-			Bitboard moves{}, promo_moves{};
+			Bitboard m{}, pawnmove{};
 
 			// get move bitboard for the piece, given its square
 			switch (piece) {
 			case KING:
-				moves = g_MoveTables.king[squareFrom];
+				m = g_MoveTables.king[squareFrom];
 				break;
 			case QUEEN:
-				moves = g_MoveTables.bishop(squareFrom, occupancy)
-					| g_MoveTables.rook(squareFrom, occupancy);
+				m = g_MoveTables.bishop(squareFrom, occ)
+					| g_MoveTables.rook(squareFrom, occ);
 				break;
 			case ROOK:
-				moves = g_MoveTables.rook(squareFrom, occupancy);
+				m = g_MoveTables.rook(squareFrom, occ);
 				break;
 			case KNIGHT:
-				moves = g_MoveTables.knight[squareFrom];
+				m = g_MoveTables.knight[squareFrom];
 				break;
 			case BISHOP:
-				moves = g_MoveTables.bishop(squareFrom, occupancy);
+				m = g_MoveTables.bishop(squareFrom, occ);
 				break;
 			case PAWN:
-				/* For pawns, it's a bit more complicated, because they have no lookup tables.
-				For readibility, better pass the params to an appropriate function */
-				promo_moves = pawnMoves(p, squareFrom);
-				moves = promo_moves;
+				(sideToMove == WHITE) ? pawnmove |= g_MoveTables.whitePawn(C64(1) << squareFrom, own) & occ
+					: pawnmove |= g_MoveTables.blackPawn(C64(1) << squareFrom, own) & occ;
 				break;
 			}
-
-			//let's add promotions to queen to movelist first
-			if (promo_moves)
-				promo_moves &= ~occupancy;
-
-			while (promo_moves) {
-				Square squareTo = Square(bitscan_reset(promo_moves));
-				Piece captured = p.idPiece(squareTo, Color(!sideToMove)).piece;
-				MoveType type = setType(piece, occupancy, sideToMove, squareFrom, squareTo);
-
-				if (type == PROMOTION) {
-					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN);
-					moveList.push_back(m);
-				}
-
-			}
-
+	
 			// now let's add captures to movelist
-			if (moves) {
-				moves &= occupancy; // select only bits corresponding to captures
-				
-				if (!(piece == PAWN)) 
-					moves &= ~ownPieces; // exclude own pieces from moves
-			}	
+			if (m) {
+				m &= occ; // select only bits corresponding to captures
+				m &= ~own; // exclude own pieces from moves
+			}			
 
-			while (moves) { // scan collected captures and add them to list
-				Square squareTo = Square(bitscan_reset(moves));
+			while (pawnmove) { // scan collected captures and add them to list
+				Square squareTo = Square(bitscan_reset(m));
 				Piece captured = p.idPiece(squareTo, Color(!sideToMove)).piece;
 
 				if (captured == KING) break; // captured can't be enemy king
 
-				Move m = composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0);
-				moveList.push_back(m);
+				moveList.push_back(composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0));
 				
 			} // end while (moves)
+
+
 		} // end while (bb)
 	} // end for loop
 

@@ -239,10 +239,13 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 }
 
 
-const short quiescence(Position const& p, short alpha, short beta)
+const short quiescence(Position const& p, short alpha, short beta, ushort qsDepth)
 {
+	if (qsDepth <= 0)
+		return lazyEval(p);
+
 	short stand_pat = lazyEval(p);
-	
+
 	if (stand_pat >= beta)
 		return beta;
 
@@ -256,7 +259,7 @@ const short quiescence(Position const& p, short alpha, short beta)
 		Position copy = p;
 		doMove(m, copy);
 		mySearch.nodes++;
-		short score = -quiescence(copy, -beta, -alpha);
+		short score = -quiescence(copy, -beta, -alpha, qsDepth -1);
 		undoMove(m, copy, p);
 
 		if (score >= beta)

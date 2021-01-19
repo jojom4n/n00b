@@ -56,7 +56,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 				
-				if (!(mySearch.bestScore == (MATE)) && !(mySearch.bestScore == -MATE)) {
+				if (!(mySearch.bestScore == (MATE + ply)) && !(mySearch.bestScore == -MATE - ply)) {
 					
 					float score = static_cast<float>(mySearch.bestScore / 100.00);
 					
@@ -166,12 +166,8 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	pv[0] = 0;
 
 	if (moveList.size() == 0) {
-		if (underCheck(p.getTurn(), p)) {
-			if (p.getTurn() == WHITE)
-				return -(MATE - depth);
-			else
-				return (MATE - depth);
-		}
+		if (underCheck(p.getTurn(), p)) 
+				return -(MATE + depth);
 		else if (!underCheck(p.getTurn(), p))
 			return 0;
 	}
@@ -184,10 +180,10 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	/*  				  FUTILITY PRUNING                       */
 	/*                                                           */
 	/* ********************************************************* */
-	/* if (depth == 1)
+	if (depth == 1)
 		if (lazyEval(p) + MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
-				return quiescence(p, alpha, beta); */
+				return quiescence(p, alpha, beta);
 	/* ********************************************************* */
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
@@ -254,10 +250,10 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 
 const short quiescence(Position const& p, short alpha, short beta, ushort qsDepth)
 {
-	if (qsDepth <= 0)
-		return lazyEval(p);
-
 	short stand_pat = lazyEval(p);
+	
+	if (qsDepth <= 0)
+		return stand_pat;
 
 	if (stand_pat >= beta)
 		return beta;

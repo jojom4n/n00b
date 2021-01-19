@@ -56,7 +56,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 				
-				if (!(mySearch.bestScore == MATE) && !(mySearch.bestScore == -MATE)) {
+				if (!(mySearch.bestScore == (MATE)) && !(mySearch.bestScore == -MATE)) {
 					
 					float score = static_cast<float>(mySearch.bestScore / 100.00);
 					
@@ -165,27 +165,29 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	moveList = pruneIllegal(moveList, p);
 	pv[0] = 0;
 
-	if (moveList.size() == 0)
-		if (underCheck(p.getTurn(), p))
-			return -MATE;
+	if (moveList.size() == 0) {
+		if (underCheck(p.getTurn(), p)) {
+			if (p.getTurn() == WHITE)
+				return -(MATE - depth);
+			else
+				return (MATE - depth);
+		}
 		else if (!underCheck(p.getTurn(), p))
 			return 0;
+	}
 
 	if (depth <= 0)
-		// return quiescence(p, alpha, beta);
-		return lazyEval(p);
-
+		return quiescence(p, alpha, beta);
 
 	/* ********************************************************* */
 	/*															 */
 	/*  				  FUTILITY PRUNING                       */
 	/*                                                           */
 	/* ********************************************************* */
-	if (depth == 1)
+	/* if (depth == 1)
 		if (lazyEval(p) + MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
-				return lazyEval(p);
-				// return quiescence(p, alpha, beta);
+				return quiescence(p, alpha, beta); */
 	/* ********************************************************* */
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
@@ -210,7 +212,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		memcpy(pv + 1, subPV, 63 * sizeof(Move));
 		pv[63] = 0;
 		
-		if (bestScore >= beta)
+		if (bestScore >= beta)			
 			return bestScore;
 		
 		alpha = bestScore;
@@ -226,10 +228,6 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		if (score > alpha && score < beta) {
 			score = -pvs(copy, depth - 1, -beta, -alpha, subPV);
 
-			ushort index{};
-			for (index = 0; subPV[index] != 0; index++)
-				std::cout << displayMove(copy, subPV[index]) << " \n";
-
 			if (score > alpha)
 				alpha = score;
 		}
@@ -237,9 +235,10 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 		undoMove(moveList[i], copy, p);
 
 		if (score > bestScore) {
+
 			if (score >= beta)
 				return score;
-
+			
 			bestMove = moveList[i];
 			bestScore = score;
 			pv[0] = bestMove;

@@ -56,7 +56,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 				
-				if (!(mySearch.bestScore == (MATE + ply)) && !(mySearch.bestScore == -MATE - ply)) {
+				if (!(mySearch.bestScore == (MATE + (depth - ply))) && !(mySearch.bestScore == -MATE - (depth - ply))) {
 					
 					float score = static_cast<float>(mySearch.bestScore / 100.00);
 					

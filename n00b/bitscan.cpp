@@ -81,11 +81,11 @@ const ushort bitscan_rvs(Bitboard const &b)
 #endif
 
 
-const ushort bitscan_reset(Bitboard &b, bool reverse)
+const ushort bitscan_reset(Bitboard &b, const bool reverse)
 {
 	ushort index{};
 
-	if (reverse == true) {
+	if (reverse) {
 		index = bitscan_rvs(b);
 		b &= ~(C64(1) << index);
 	}
@@ -96,15 +96,3 @@ const ushort bitscan_reset(Bitboard &b, bool reverse)
 
 	return index;
 }
-
-
-//const ushort popcount(Bitboard const& b)
-//{
-//	uint64_t count = b;
-//	count -= (count >> 1) & c1;
-//	count = ((count >> 2) & c2) + (count & c2);
-//	count = (count + (count >> 4)) & c4;
-//	count *= UINT64_C(0x0101010101010101);
-//	count = count >> 56;
-//	return (ushort)count;
-//}

@@ -175,6 +175,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
 
+
 	/* ********************************************************* */
 	/*															 */
 	/*  				  FUTILITY PRUNING                       */

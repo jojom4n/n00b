@@ -6,7 +6,6 @@
 #include <vector>
 
 std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p);
-std::vector<Move> shallowSort(std::vector<Move> const& moves, Position const& p);
 std::vector<Move> mvv_lva(std::vector<Move> const& moves);
 
 #endif

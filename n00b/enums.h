@@ -3,7 +3,7 @@
 
 #include "defs.h"
 
-enum Piece : const short { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
+enum Piece : const ushort { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN, NO_PIECE };
 enum Color : const ushort { BLACK, WHITE, ALL_COLOR };
 
 enum Square : const short

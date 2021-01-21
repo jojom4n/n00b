@@ -44,6 +44,7 @@ public:
 	void setCheckmate(bool const& b) { checkmate_ = b; }
 
 	constexpr Castle getCastle(Color const& color) const { return castle_[color]; }
+	
 	void setCastle(Color const& color, Castle const& castle)
 	{
 		(color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle;
@@ -54,6 +55,7 @@ public:
 	void update(Color const& color);
 		
 	constexpr Bitboard getPosition() const { return allPieces_; }
+	
 	constexpr Bitboard getPosition(Color const& color) const
 	{
 		return (color == WHITE) ? whitePieces_ : blackPieces_;

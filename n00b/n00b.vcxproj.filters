@@ -126,6 +126,9 @@
     <ClInclude Include="moveorder.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
+    <ClInclude Include="libpopcnt.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="File di intestazione">

@@ -8,7 +8,7 @@ class Position;
 
 namespace Zobrist {
 	void init();
-	uint64_t fill(Position const p);
+	uint64_t fill(Position const &p);
 	uint64_t getKey(Color const& c, Piece const& p, Square const& sq);
 	uint64_t getKey(Square const& sq);
 	uint64_t getKey(Color const& c);

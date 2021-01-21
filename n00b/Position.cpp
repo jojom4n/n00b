@@ -137,31 +137,23 @@ const PieceID Position::idPiece(Square const &square, Color const &color) const
 // see https://www.chessprogramming.org/Population_Count
 const ushort Position::count(Color const &color) const 
 {
-	uint64_t count;
-
-	if (color == WHITE)
-		count = whitePieces_;
-	else if (color == BLACK)
-		count = blackPieces_;
-	else 
-		count = allPieces_;
-	
-	count = count - ((count >> 1) & k1);
-	count = (count & k2) + ((count >> 2)  & k2);
-	count = (count + (count >> 4)) & k4;
-	count = (count * kf) >> 56;
-	return (ushort)count;
+	switch (color) {
+	case WHITE:
+		return ushort(popcnt(&whitePieces_, sizeof(whitePieces_)));
+		break;
+	case BLACK:
+		return ushort(popcnt(&blackPieces_, sizeof(blackPieces_)));
+		break;
+	default:
+		return ushort(popcnt(&blackPieces_, sizeof(blackPieces_)));
+		break;
+	}
 }
 
 
 const ushort Position::countPieceType(Color const &color, Piece const &piece) const
 {
-	Bitboard count = board_[color][piece];
-	count = count - ((count >> 1) & k1);
-	count = (count & k2) + ((count >> 2)  & k2);
-	count = (count + (count >> 4)) & k4;
-	count = (count * kf) >> 56;
-	return (ushort)count;
+	return ushort(popcnt(&board_[color][piece], sizeof(board_[color][piece])));
 }
 
 

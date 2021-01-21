@@ -98,11 +98,13 @@ const ushort bitscan_reset(Bitboard &b, bool reverse)
 }
 
 
-const ushort popcount(Bitboard const &b) {
-	Bitboard count = b;
-	count = count - ((count >> 1) & k1);
-	count = (count & k2) + ((count >> 2)  & k2);
-	count = (count + (count >> 4)) & k4;
-	count = (count * kf) >> 56;
-	return (ushort)count;
-}
+//const ushort popcount(Bitboard const& b)
+//{
+//	uint64_t count = b;
+//	count -= (count >> 1) & c1;
+//	count = ((count >> 2) & c2) + (count & c2);
+//	count = (count + (count >> 4)) & c4;
+//	count *= UINT64_C(0x0101010101010101);
+//	count = count >> 56;
+//	return (ushort)count;
+//}

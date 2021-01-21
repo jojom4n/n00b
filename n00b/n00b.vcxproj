@@ -175,6 +175,7 @@
     <ClInclude Include="globals.h" />
     <ClInclude Include="display.h" />
     <ClInclude Include="fen.h" />
+    <ClInclude Include="libpopcnt.h" />
     <ClInclude Include="makemove.h" />
     <ClInclude Include="moveorder.h" />
     <ClInclude Include="perft.h" />

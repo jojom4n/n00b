@@ -15,6 +15,4 @@ unsigned long long perft(ushort depth, Position& p, bool init = false);
 template<size_t PERFT_CACHE_SIZE>
 static unsigned long long perft(ushort depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache);
 
-void perftInit();
-
 #endif

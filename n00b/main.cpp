@@ -4,7 +4,6 @@
 #include "zobrist.h"
 #include <iostream>
 
-
 int main()
 {
 	initAttacks();

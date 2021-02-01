@@ -59,14 +59,14 @@ static unsigned long long perft(ushort depth, Position& p, std::array<perftCache
 	if (depth == 0)
 		return 1;
 
-	/* if (depth > 1) {
+	if (depth > 1) {
 		if (cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key
 			== (p.getZobrist() ^ Zobrist::getKey(depth)))
 			nodes = cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes;
 
 		if (nodes > 0)
 			return nodes;
-	} */
+	}
 
 	if (depth == 1 || moveList.size() == 0)
 		return moveList.size();
@@ -78,23 +78,10 @@ static unsigned long long perft(ushort depth, Position& p, std::array<perftCache
 		p.restoreState(depth);
 	}
 
-	/* if (depth > 1) {
+	if (depth > 1) {
 			cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key = p.getZobrist() ^ Zobrist::getKey(depth);
 			cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes = nodes;
-		} */
+	}
 
 	return nodes;
-}
-
-
-void perftInit()
-{
-	unsigned long long tmpCache{};
-	Position perftCache;
-	perftCache.setNew();
-	tmpCache = perft(1, perftCache, true);
-	tmpCache = perft(2, perftCache, true);
-	tmpCache = perft(3, perftCache, true);
-	tmpCache = perft(4, perftCache, true);
-	tmpCache = perft(5, perftCache, true);
 }

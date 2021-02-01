@@ -70,6 +70,27 @@ void Position::resetPosition()
 }
 
 
+void Position::storeState(ushort const& depth)
+{
+	prvState[depth].prvTurn_ = turn_;
+	prvState[depth].prvMoveNumber_ = moveNumber_;
+	prvState[depth].prvHalfMove = halfMove_;
+	prvState[depth].prvEnPassantSquare_ = enPassantSquare_;
+	prvState[depth].prvCastle_ = castle_;
+	prvState[depth].prvZobristHash_ = zobristHash_;
+}
+
+
+void Position::restoreState(ushort const& depth)
+{
+	turn_ = prvState[depth].prvTurn_;
+	moveNumber_ = prvState[depth].prvMoveNumber_;
+	halfMove_ = prvState[depth].prvHalfMove;
+	enPassantSquare_ = prvState[depth].prvEnPassantSquare_;
+	castle_ = prvState[depth].prvCastle_;
+	zobristHash_ = prvState[depth].prvZobristHash_;
+}
+
 void Position::putPiece(Color const &color, Piece const &piece, Square const &square)
 {
 	board_[color][piece] |= C64(1) << square;
@@ -182,6 +203,7 @@ const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece c
 	
 	return squares;
 }
+
 
 const bool Position::isSquareAttackedBy(Color const &color, Square const &square) const
 {

@@ -42,6 +42,7 @@ void displayBoard(Position const &board)
 	std::string output = "+---+---+---+---+---+---+---+---+\n";
 
 	ushort i = 1;
+	Square square{};
 
 	/* Need to explain what we are going to do in the following for...loop.
 
@@ -65,7 +66,7 @@ void displayBoard(Position const &board)
 		
 		for (File f = FILE_A; f <= FILE_H; f++) {
 			
-			Square square = Square(r * r + ((r * i) + f));
+			square = Square(r * r + ((r * i) + f));
 			
 			if (board.occupiedSquare(square)) { // square not empty
 				output += "| ";
@@ -100,19 +101,19 @@ void displayBoard(Position const &board)
 void displayMoveList(Position const &board, std::vector<Move> const &m) {
 	std::cout << "Available moves: ";
 	std::string output = "";
+	Square squareFrom{}, squareTo{};
+	ushort promotedTo{};
 	
 	for (const auto& elem : m)
 	{
-		Square squareFrom{}, squareTo{};
 		squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 19));
 		squareTo = Square(((C64(1) << 6) - 1) & (elem >> 13));
-		ushort promotedTo = ((C64(1) << 3) - 1) & (elem);
+		promotedTo = ((C64(1) << 3) - 1) & (elem);
 
 		output += squareToStringMap[squareFrom];
 		output += squareToStringMap[squareTo];
 		
-		if (promotedTo)
-			switch (promotedTo) {
+		switch (promotedTo) {
 			case PAWN_TO_QUEEN:
 				output += "q";
 				break;
@@ -125,7 +126,9 @@ void displayMoveList(Position const &board, std::vector<Move> const &m) {
 			case PAWN_TO_BISHOP:
 				output += "b";
 				break;
-			}
+			default:
+				break;
+		}
 		
 		output += "\t";
 	}
@@ -136,7 +139,6 @@ void displayMoveList(Position const &board, std::vector<Move> const &m) {
 
 std::string displayMove(Position const& board, Move const& m) {
 	std::string output = "";
-
 	Square squareFrom{}, squareTo{};
 	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 19));
 	squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
@@ -145,8 +147,7 @@ std::string displayMove(Position const& board, Move const& m) {
 	output += squareToStringMap[squareFrom];
 	output += squareToStringMap[squareTo];
 
-	if (promotedTo)
-		switch (promotedTo) {
+	switch (promotedTo) {
 		case PAWN_TO_QUEEN:
 			output += "q";
 			break;
@@ -159,7 +160,9 @@ std::string displayMove(Position const& board, Move const& m) {
 		case PAWN_TO_BISHOP:
 			output += "b";
 			break;
-		}
+		default:
+			break;
+	}
 
 	return output;
 }

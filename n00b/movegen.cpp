@@ -10,12 +10,14 @@ extern struct LookupTable g_MoveTables; // see attack.cpp (and its header file)
 
 const std::vector<Move> moveGeneration(Position const &p)
 {
-	std::vector<Move> moveList{};
 	Color sideToMove = p.getTurn(); // which side are we generating moves for? 
 	
 	if (underCheck(sideToMove, p) > 1) {
-		return moveList = generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
+		return generateOnlyKing(sideToMove, p); // if King is under double attack, generate only king evasions
 	}
+
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
 
 	const Bitboard occupancy = p.getPosition();
 	const Bitboard ownPieces = p.getPosition(sideToMove);
@@ -65,7 +67,7 @@ const std::vector<Move> moveGeneration(Position const &p)
 
 				if (type == CAPTURE) {
 					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
-					moveList.push_back(m);
+					moveList.emplace_back(m);
 				}
 				else if (type == PROMOTION) { 
 					// compose one moves for each possible promotion
@@ -73,14 +75,14 @@ const std::vector<Move> moveGeneration(Position const &p)
 					Move m2 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN);
 					Move m3 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_ROOK);
 					Move m4 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_BISHOP);
-					moveList.push_back(m);
-					moveList.push_back(m2);
-					moveList.push_back(m3);
-					moveList.push_back(m4);
+					moveList.emplace_back(m);
+					moveList.emplace_back(m2);
+					moveList.emplace_back(m3);
+					moveList.emplace_back(m4);
 				}
 				else {
 					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
-					moveList.push_back(m);
+					moveList.emplace_back(m);
 				}
 			} // end while (moves)
 		} // end while (bb)
@@ -98,7 +100,8 @@ const std::vector<Move> moveGeneration(Position const &p)
 
 const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 {
-	std::vector<Move> moveList{};
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
 	const Bitboard occ = p.getPosition(), ownPieces = p.getPosition(c);
 	Bitboard moves{};
 	Square kingPos = p.getPieceOnSquare(c, KING)[0];
@@ -111,11 +114,11 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 
 		if (type == CAPTURE) {
 			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 		else {
 			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 	}
 
@@ -159,7 +162,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 			&& (	!(p.isSquareAttackedBy(Color(!c), D8))	)	)
 		{  
 			m = composeMove(E8, C8, c, KING, CASTLE_Q, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 
 		else if (	(p.idPiece(A1, c).piece == ROOK && p.idPiece(E1, c).piece == KING)  // rook and king in position
@@ -168,7 +171,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 			&& (	!(p.isSquareAttackedBy(Color(!c), D1))	)	)
 		{
 			m = composeMove(E1, C1, c, KING, CASTLE_Q, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 
 	if (p.getCastle(c) == Castle::KINGSIDE || p.getCastle(c) == Castle::ALL)
@@ -178,7 +181,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 			&& (	!(p.isSquareAttackedBy(Color(!c), G8))	)	)
 		{
 			m = composeMove(E8, G8, c, KING, CASTLE_K, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 
 		else if (	(p.idPiece(H1, c).piece == ROOK && p.idPiece(E1, c).piece == KING) // rook and king in position
@@ -187,7 +190,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 			&& (	!(p.isSquareAttackedBy(Color(!c), G1))	)	)
 		{
 			m = composeMove(E1, G1, c, KING, CASTLE_K, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 }
 
@@ -206,7 +209,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 
 			probablePawn = p.idPiece(Square(enPassant - 9), c);
@@ -216,7 +219,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 			break; }
 		case BLACK: { // is there a black pawn attacking the en-passant square?
@@ -227,7 +230,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 
 			probablePawn = p.idPiece(Square(enPassant + 9), c);
@@ -237,7 +240,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 			break; }
 		} // end switch	
@@ -251,7 +254,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 			break; }
 		case BLACK: { // is there a black pawn attacking the en-passant square?
@@ -261,7 +264,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 			break; }
 		} // end switch	
@@ -275,7 +278,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 			break; }
 		case BLACK: { // is there a black pawn attacking the en-passant square?
@@ -285,7 +288,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 				Bitboard attacksToKing{}, occ = p.getPosition();
 				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
+				moveList.emplace_back(m);
 			}
 			break; }
 		} // end switch	
@@ -383,22 +386,24 @@ short underCheck(Color const &c, Position const &p)
 }
 
 
-const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position const &p)
+const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position &p)
 {
-	Position copy = p; // do a copy of position, for undoing move purposes
+	p.storeState();
 
 	
 	for (auto it = moveList.begin(); it != moveList.end(); ) // scroll through the moveList
 	{
 		Color c = Color(((C64(1) << 1) - 1) & (*it >> 12)); // who's moving?
-		doMove(*it, copy); // do the move
+		doMove(*it, p); // do the move
 		
-		if (underCheck(c, copy)) { // if move is not legal...
-			undoMove(*it, copy, p); // undo the move...
+		if (underCheck(c, p)) { // if move is not legal...
+			undoMove(*it, p); // undo the move...
+			p.restoreState();
 			it = moveList.erase(it); // and erase it from moveList
 		}
 		else {
-			undoMove(*it, copy, p); // else undo move...
+			undoMove(*it, p); // else undo move...
+			p.restoreState();
 			it++; // ...retain the move, because it's valid, and check next one
 		} // end if
 	} // end for
@@ -460,7 +465,7 @@ const std::vector<Move> moveGenQS(Position const& p)
 
 				if (captured == KING) break; // captured can't be enemy king
 
-				moveList.push_back(composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0));
+				moveList.emplace_back(composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0));
 				
 			} // end while (moves)
 

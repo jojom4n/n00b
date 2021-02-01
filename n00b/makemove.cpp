@@ -310,7 +310,94 @@ void doMove(Move const &m, Position &p)
 }
 
 
-void undoMove(Move const &m, Position &p, Position const &backup)
+void undoMove(Move const &m, Position &p, Position const &backup) // OLD: TO REMOVE
 {
 	p = backup;
+}
+
+
+void undoMove(Move const& m, Position& p)
+{
+	Square squareFrom{}, squareTo{};
+	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
+	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 19));
+	squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
+	Color color = Color(((C64(1) << 1) - 1) & (m >> 12));
+	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 9));
+	Piece captured = Piece(((C64(1) << 3) - 1) & (m >> 3));
+	ushort promotedTo = ((C64(1) << 3) - 1) & (m);
+
+	switch (moveType)
+	{
+	case QUIET:
+		p.removePiece(color, piece, squareTo);
+		p.putPiece(color, piece, squareFrom);
+		break;
+	case CAPTURE:
+		p.removePiece(color, piece, squareTo);
+		p.putPiece(color, piece, squareFrom);
+		p.putPiece(Color(!color), captured, squareTo);
+		break;
+	case PROMOTION: {
+
+		switch (promotedTo) {
+		case PAWN_TO_KNIGHT:
+			p.removePiece(color, KNIGHT, squareTo);
+			break;
+		case PAWN_TO_QUEEN:
+			p.removePiece(color, QUEEN, squareTo);
+			break;
+		case PAWN_TO_BISHOP:
+			p.removePiece(color, BISHOP, squareTo);
+			break;
+		case PAWN_TO_ROOK:
+			p.removePiece(color, ROOK, squareTo);
+			break;
+		}
+
+		p.putPiece(color, piece, squareFrom);
+
+		if (!(captured == NO_PIECE))
+			p.putPiece(Color(!color), captured, squareTo);
+
+		break; }
+	case CASTLE_Q: {
+		p.removePiece(color, piece, squareTo);
+		
+		if (color == WHITE) {
+			p.removePiece(color, ROOK, D1);
+			p.putPiece(color, ROOK, A1);
+		}
+		else {
+			p.removePiece(color, ROOK, D8);
+			p.putPiece(color, ROOK, A8);
+		}
+			
+		p.putPiece(color, piece, squareFrom);
+		break;	}
+	case CASTLE_K: {
+		p.removePiece(color, piece, squareTo);
+		
+		if (color == WHITE) {
+			p.removePiece(color, ROOK, F1);
+			p.putPiece(color, ROOK, H1);
+		}
+		else {
+			p.removePiece(color, ROOK, F8);
+			p.putPiece(color, ROOK, H8);
+		}
+
+		p.putPiece(color, piece, squareFrom);
+		break; }
+	case EN_PASSANT:
+		p.removePiece(color, piece, squareTo);
+		
+		if (color == WHITE) 
+			p.putPiece(Color(!color), PAWN, Square(squareTo - 8));
+		else 
+			p.putPiece(Color(!color), PAWN, Square(squareTo + 8));
+
+		p.putPiece(color, piece, squareFrom);
+		break;
+	};
 }

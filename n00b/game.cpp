@@ -31,6 +31,8 @@ void newGame()
 
 		std::cout << std::endl;
 	} while (input != "quit");
+
+	delete Chessboard;
 }
 
 

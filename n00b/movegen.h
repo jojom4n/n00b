@@ -15,7 +15,7 @@ const MoveType setType(Piece const& piece, Bitboard const& occ, Color const& c, 
 const Move composeMove(Square const& from, Square const& to, Color const& c, ushort const& p, MoveType const& type,
 	Piece const& captured, ushort const& promoteTo);
 short underCheck(Color const& c, Position const& p);
-const std::vector<Move> pruneIllegal(std::vector<Move>& moveList, Position const& p);
+const std::vector<Move> pruneIllegal(std::vector<Move>& moveList, Position& p);
 const std::vector<Move> moveGenQS(Position const& p);
 
 #endif

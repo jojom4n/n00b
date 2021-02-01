@@ -158,7 +158,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 //}
 
 
-const short pvs(Position const& p, short const& depth, short alpha, short beta, Move* pv)
+const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
 {
 	Move bestMove{}, subPV[MAX_PLY]{};
 	std::vector<Move> moveList = moveGeneration(p);
@@ -249,7 +249,7 @@ const short pvs(Position const& p, short const& depth, short alpha, short beta, 
 }
 
 
-const short quiescence(Position const& p, short alpha, short beta, ushort qsDepth)
+const short quiescence(Position& p, short alpha, short beta, ushort qsDepth)
 {
 	short stand_pat = lazyEval(p);
 	

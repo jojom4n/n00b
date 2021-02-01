@@ -9,13 +9,16 @@
 #include <map>
 
 
-unsigned long long perft(ushort depth, Position& p, bool init)
+unsigned long long perft(ushort const& depth, Position& p, bool init)
 {
 	unsigned long long nodes{};
 	extern std::map<Square, std::string> squareToStringMap; // see display.cpp
-	std::vector<Move> moveList = moveGeneration(p);
-	Position copy = p;
-	moveList = pruneIllegal(moveList, copy);
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGeneration(p);
+	p.storeState(depth);
+	// Position copy = p;
+	moveList = pruneIllegal(moveList, p);
 
 	static std::array<perftCache, PERFT_CACHE_SIZE> cache;
 
@@ -26,37 +29,41 @@ unsigned long long perft(ushort depth, Position& p, bool init)
 		unsigned long long partialNodes;
 		Square squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 19));
 		Square squareTo = Square(((C64(1) << 6) - 1) & (elem >> 13));
-		doMove(elem, copy);
-		partialNodes = perft(depth - 1, copy, cache);
+		doMove(elem, p);
+		partialNodes = perft(depth - 1, p, cache);
 		nodes += partialNodes;
-		
+
 		if (!init) {
 			std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
 			std::cout << ": " << partialNodes << std::endl;
 		}
 
-		undoMove(elem, copy, p);
+		undoMove(elem, p);
+		p.restoreState(depth);
 	}
 
 	return nodes;
 }
 
 template<size_t PERFT_CACHE_SIZE>
-static unsigned long long perft(ushort depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
+static unsigned long long perft(ushort const& depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
 {
 	unsigned long long nodes{};
-	std::vector<Move> moveList = moveGeneration(p);
-	Position copy = p;
-	moveList = pruneIllegal(moveList, copy);
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGeneration(p);
+	p.storeState(depth);
+	// Position copy = p;
+	moveList = pruneIllegal(moveList, p);
 
 	if (depth == 0)
 		return 1;
 
 	if (depth > 1) {
-		if (cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key 
-			== (copy.getZobrist() ^ Zobrist::getKey(depth)))
-			nodes = cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes;
-		
+		if (cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key
+			== (p.getZobrist() ^ Zobrist::getKey(depth)))
+			nodes = cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes;
+
 		if (nodes > 0)
 			return nodes;
 	}
@@ -65,28 +72,16 @@ static unsigned long long perft(ushort depth, Position& p, std::array<perftCache
 		return moveList.size();
 
 	for (const auto& elem : moveList) {
-		doMove(elem, copy);
-		nodes += perft(depth - 1, copy, cache);
-		undoMove(elem, copy, p);
+		doMove(elem, p);
+		nodes += perft(depth - 1, p, cache);
+		undoMove(elem, p);
+		p.restoreState(depth);
 	}
 
 	if (depth > 1) {
-			cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key = copy.getZobrist() ^ Zobrist::getKey(depth);
-			cache[( copy.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes = nodes;
-		}
+			cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key = p.getZobrist() ^ Zobrist::getKey(depth);
+			cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes = nodes;
+	}
 
 	return nodes;
-}
-
-
-void perftInit()
-{
-	unsigned long long tmpCache{};
-	Position perftCache;
-	perftCache.setNew();
-	tmpCache = perft(1, perftCache, true);
-	tmpCache = perft(2, perftCache, true);
-	tmpCache = perft(3, perftCache, true);
-	tmpCache = perft(4, perftCache, true);
-	tmpCache = perft(5, perftCache, true);
 }

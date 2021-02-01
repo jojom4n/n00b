@@ -7,5 +7,6 @@ class Position;
 
 void doMove(Move const& m, Position& p);
 void undoMove(Move const& m, Position& p, Position const& backup);
+void undoMove(Move const& m, Position& p); // new undoMove
 
 #endif

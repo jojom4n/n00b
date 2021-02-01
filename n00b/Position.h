@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "enums.h"
+#include "params.h"
 #include "zobrist.h"
 #include <array>
 #include <vector>
@@ -20,6 +21,14 @@ class Position
 	std::array<Castle, 2> castle_{}; // castling rights for each player. Default to all
 	uint64_t zobristHash_{};
 
+	struct prvState { // for undoing moves
+		Color prvTurn_{};
+		ushort prvMoveNumber_{}, prvHalfMove{};
+		Square prvEnPassantSquare_{};
+		std::array<Castle, 2> prvCastle_{};
+		uint64_t prvZobristHash_{};
+	} prvState[MAX_PLY];
+
 
 public:
 	Position();
@@ -27,6 +36,8 @@ public:
 
 	void setNew();
 	void resetPosition();
+	void storeState(ushort const& depth = 0);
+	void restoreState(ushort const& depth = 0);
 
 	constexpr Color getTurn() const { return turn_; }
 	void setTurn(Color const& b) { turn_ = b; }

@@ -9,7 +9,7 @@
 #include <map>
 
 
-unsigned long long perft(ushort depth, Position& p, bool init)
+unsigned long long perft(ushort const& depth, Position& p, bool init)
 {
 	unsigned long long nodes{};
 	extern std::map<Square, std::string> squareToStringMap; // see display.cpp
@@ -46,7 +46,7 @@ unsigned long long perft(ushort depth, Position& p, bool init)
 }
 
 template<size_t PERFT_CACHE_SIZE>
-static unsigned long long perft(ushort depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
+static unsigned long long perft(ushort const& depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
 {
 	unsigned long long nodes{};
 	std::vector<Move> moveList;

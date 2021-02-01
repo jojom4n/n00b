@@ -6,7 +6,6 @@
 #define C64(constantuint64_t) constantuint64_t##ULL
 #define FILE_INDEX (square % 8)
 #define RANK_INDEX (square / 8)
-#define MOVES 500
 
 using Clock = std::chrono::high_resolution_clock;
 using ushort = unsigned short;

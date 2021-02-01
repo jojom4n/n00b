@@ -3,6 +3,7 @@
 
 #include "defs.h"
 #include "enums.h"
+#include "params.h"
 #include "zobrist.h"
 #include <array>
 #include <vector>
@@ -26,7 +27,7 @@ class Position
 		std::array<Castle, 2> prvCastle_{};
 		uint64_t prvZobristHash_{};
 		Color prvTurn_{};
-	} prvState;
+	} prvState[MAX_PLY];
 
 
 public:
@@ -35,8 +36,8 @@ public:
 
 	void setNew();
 	void resetPosition();
-	void storeState();
-	void restoreState();
+	void storeState(ushort const& depth);
+	void restoreState(ushort const& depth);
 
 	constexpr Color getTurn() const { return turn_; }
 	void setTurn(Color const& b) { turn_ = b; }

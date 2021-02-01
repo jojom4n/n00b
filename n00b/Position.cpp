@@ -70,25 +70,25 @@ void Position::resetPosition()
 }
 
 
-void Position::storeState()
+void Position::storeState(ushort const& depth)
 {
-	prvState.prvTurn_ = turn_;
-	prvState.prvMoveNumber_ = moveNumber_;
-	prvState.prvHalfMove = halfMove_;
-	prvState.prvEnPassantSquare_ = enPassantSquare_;
-	prvState.prvCastle_ = castle_;
-	prvState.prvZobristHash_ = zobristHash_;
+	prvState[depth].prvTurn_ = turn_;
+	prvState[depth].prvMoveNumber_ = moveNumber_;
+	prvState[depth].prvHalfMove = halfMove_;
+	prvState[depth].prvEnPassantSquare_ = enPassantSquare_;
+	prvState[depth].prvCastle_ = castle_;
+	prvState[depth].prvZobristHash_ = zobristHash_;
 }
 
 
-void Position::restoreState()
+void Position::restoreState(ushort const& depth)
 {
-	turn_ = prvState.prvTurn_;
-	moveNumber_ = prvState.prvMoveNumber_;
-	halfMove_ = prvState.prvHalfMove;
-	enPassantSquare_ = prvState.prvEnPassantSquare_;
-	castle_ = prvState.prvCastle_;
-	zobristHash_ = prvState.prvZobristHash_;
+	turn_ = prvState[depth].prvTurn_;
+	moveNumber_ = prvState[depth].prvMoveNumber_;
+	halfMove_ = prvState[depth].prvHalfMove;
+	enPassantSquare_ = prvState[depth].prvEnPassantSquare_;
+	castle_ = prvState[depth].prvCastle_;
+	zobristHash_ = prvState[depth].prvZobristHash_;
 }
 
 void Position::putPiece(Color const &color, Piece const &piece, Square const &square)

@@ -398,7 +398,5 @@ void undoMove(Move const& m, Position& p)
 
 		p.putPiece(color, piece, squareFrom);
 		break;
-	}
-
-	p.restoreState();
+	};
 }

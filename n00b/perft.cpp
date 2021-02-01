@@ -14,9 +14,9 @@ unsigned long long perft(ushort depth, Position& p, bool init)
 	unsigned long long nodes{};
 	extern std::map<Square, std::string> squareToStringMap; // see display.cpp
 	std::vector<Move> moveList;
-	moveList.reserve(MOVES);
+	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
-	p.storeState();
+	p.storeState(depth);
 	// Position copy = p;
 	moveList = pruneIllegal(moveList, p);
 
@@ -39,6 +39,7 @@ unsigned long long perft(ushort depth, Position& p, bool init)
 		}
 
 		undoMove(elem, p);
+		p.restoreState(depth);
 	}
 
 	return nodes;
@@ -49,9 +50,9 @@ static unsigned long long perft(ushort depth, Position& p, std::array<perftCache
 {
 	unsigned long long nodes{};
 	std::vector<Move> moveList;
-	moveList.reserve(MOVES);
+	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
-	p.storeState();
+	p.storeState(depth);
 	// Position copy = p;
 	moveList = pruneIllegal(moveList, p);
 
@@ -74,6 +75,7 @@ static unsigned long long perft(ushort depth, Position& p, std::array<perftCache
 		doMove(elem, p);
 		nodes += perft(depth - 1, p, cache);
 		undoMove(elem, p);
+		p.restoreState(depth);
 	}
 
 	/* if (depth > 1) {

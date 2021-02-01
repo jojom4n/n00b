@@ -347,27 +347,36 @@ short underCheck(Color const &c, Position const &p)
 	
 	// ROOK
 	opponent = p.getPieces(Color(!c), ROOK); // get rook's bitboard
-	attackedBy = g_MoveTables.rook(kingPos, occ); // does rook's attack mask...
-	if (attackedBy &= opponent) // ...intersect King's square?
-		attackers += 1; 
+	if (opponent) {
+		attackedBy = g_MoveTables.rook(kingPos, occ); // does rook's attack mask...
+		if (attackedBy &= opponent) // ...intersect King's square?
+			attackers += 1;
+	}
 	
 	// BISHOP
 	opponent = p.getPieces(Color(!c), BISHOP); // get bishop's bitboard
-	attackedBy = g_MoveTables.bishop(kingPos, occ); // does bishop's attack mask...
-	if (attackedBy &= opponent) // ...intersect King's square?
-		attackers += 1;
+	if (opponent) {
+		attackedBy = g_MoveTables.bishop(kingPos, occ); // does bishop's attack mask...
+		if (attackedBy &= opponent) // ...intersect King's square?
+			attackers += 1;
+	}
 
 	// QUEEN
 	opponent = p.getPieces(Color(!c), QUEEN); // get queen's bitboard
-	attackedBy = g_MoveTables.rook(kingPos, occ) | g_MoveTables.bishop(kingPos, occ); // does queen's attack mask...
-	if (attackedBy &= opponent) // ...intersect King's square?
-		attackers += 1;
+	if (opponent) {
+		attackedBy = g_MoveTables.rook(kingPos, occ) | g_MoveTables.bishop(kingPos, occ); // does queen's attack mask...
+		if (attackedBy &= opponent) // ...intersect King's square?
+			attackers += 1;
+	}
+
 
 	// KNIGHT
 	opponent = p.getPieces(Color(!c), KNIGHT); // get knight's bitboard
-	attackedBy = g_MoveTables.knight[kingPos]; // does knight's attack mask...
-	if (attackedBy &= opponent) // ...intersect King's square?
-		attackers += 1;
+	if (opponent) {
+		attackedBy = g_MoveTables.knight[kingPos]; // does knight's attack mask...
+		if (attackedBy &= opponent) // ...intersect King's square?
+			attackers += 1;
+	}
 
 	// KING
 	opponent = p.getPieces(Color(!c), KING); // get enemy king's bitboard
@@ -377,10 +386,12 @@ short underCheck(Color const &c, Position const &p)
 
 	//PAWNS
 	opponent = p.getPieces(Color(!c), PAWN); // get pawn's bitboard
-	// does enemy pawn's attack mask...
-	(c == WHITE) ? attackedBy = g_MoveTables.blackPawn(opponent, occ) : attackedBy = g_MoveTables.whitePawn(opponent, occ);
-	if (attackedBy &= kingBB) // ...intersect King's square?
-		attackers += 1;
+	if (opponent) {
+		// does enemy pawn's attack mask...
+		(c == WHITE) ? attackedBy = g_MoveTables.blackPawn(opponent, occ) : attackedBy = g_MoveTables.whitePawn(opponent, occ);
+		if (attackedBy &= kingBB) // ...intersect King's square?
+			attackers += 1;
+	}
 
 	return attackers; // return number of pieces attacking the King
 }

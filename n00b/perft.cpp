@@ -17,7 +17,6 @@ unsigned long long perft(ushort const& depth, Position& p, bool init)
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
 	p.storeState(depth);
-	// Position copy = p;
 	moveList = pruneIllegal(moveList, p);
 
 	static std::array<perftCache, PERFT_CACHE_SIZE> cache;
@@ -53,7 +52,6 @@ static unsigned long long perft(ushort const& depth, Position& p, std::array<per
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
 	p.storeState(depth);
-	// Position copy = p;
 	moveList = pruneIllegal(moveList, p);
 
 	if (depth == 0)

@@ -22,11 +22,11 @@ class Position
 	uint64_t zobristHash_{};
 
 	struct prvState { // for undoing moves
-		Square prvEnPassantSquare_{};
+		Color prvTurn_{};
 		ushort prvMoveNumber_{}, prvHalfMove{};
+		Square prvEnPassantSquare_{};
 		std::array<Castle, 2> prvCastle_{};
 		uint64_t prvZobristHash_{};
-		Color prvTurn_{};
 	} prvState[MAX_PLY];
 
 
@@ -36,8 +36,8 @@ public:
 
 	void setNew();
 	void resetPosition();
-	void storeState(ushort const& depth);
-	void restoreState(ushort const& depth);
+	void storeState(ushort const& depth = 0);
+	void restoreState(ushort const& depth = 0);
 
 	constexpr Color getTurn() const { return turn_; }
 	void setTurn(Color const& b) { turn_ = b; }

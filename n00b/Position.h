@@ -20,6 +20,14 @@ class Position
 	std::array<Castle, 2> castle_{}; // castling rights for each player. Default to all
 	uint64_t zobristHash_{};
 
+	struct prvState { // for undoing moves
+		Square prvEnPassantSquare_{};
+		ushort prvMoveNumber_{}, prvHalfMove{};
+		std::array<Castle, 2> prvCastle_{};
+		uint64_t prvZobristHash_{};
+		Color prvTurn_{};
+	} prvState;
+
 
 public:
 	Position();
@@ -27,6 +35,8 @@ public:
 
 	void setNew();
 	void resetPosition();
+	void storeState();
+	void restoreState();
 
 	constexpr Color getTurn() const { return turn_; }
 	void setTurn(Color const& b) { turn_ = b; }

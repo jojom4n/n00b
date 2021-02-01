@@ -18,6 +18,7 @@ void newGame()
 	Position *Chessboard = new Position();
 	Chessboard->setNew();
 	displayBoard(*Chessboard);
+	std::cout << sizeof(Position) << std::endl;
 	
 	do 
 	{

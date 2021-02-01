@@ -70,6 +70,27 @@ void Position::resetPosition()
 }
 
 
+void Position::storeState()
+{
+	prvState.prvTurn_ = turn_;
+	prvState.prvMoveNumber_ = moveNumber_;
+	prvState.prvHalfMove = halfMove_;
+	prvState.prvEnPassantSquare_ = enPassantSquare_;
+	prvState.prvCastle_ = castle_;
+	prvState.prvZobristHash_ = zobristHash_;
+}
+
+
+void Position::restoreState()
+{
+	turn_ = prvState.prvTurn_;
+	moveNumber_ = prvState.prvMoveNumber_;
+	halfMove_ = prvState.prvHalfMove;
+	enPassantSquare_ = prvState.prvEnPassantSquare_;
+	castle_ = prvState.prvCastle_;
+	zobristHash_ = prvState.prvZobristHash_;
+}
+
 void Position::putPiece(Color const &color, Piece const &piece, Square const &square)
 {
 	board_[color][piece] |= C64(1) << square;

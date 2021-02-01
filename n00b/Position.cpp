@@ -183,6 +183,7 @@ const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece c
 	return squares;
 }
 
+
 const bool Position::isSquareAttackedBy(Color const &color, Square const &square) const
 {
 	Bitboard sq{}, occ = getPosition(), enemy{}, mask{};

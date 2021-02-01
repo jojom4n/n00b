@@ -3,6 +3,7 @@
 
 #include "enums.h"
 #include <vector>
+#include <vector>
 
 class Position;
 

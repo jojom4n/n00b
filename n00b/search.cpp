@@ -17,7 +17,9 @@ const Move iterativeSearch(Position& p, short const& depth)
 	mySearch.pos = p;
 	unsigned int totalTime{};
 
-	std::vector<Move> moveList = moveGeneration(mySearch.pos);
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGeneration(mySearch.pos);
 	moveList = pruneIllegal(moveList, mySearch.pos);
 	
 	if (moveList.size() == 0) {
@@ -160,21 +162,9 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
 {
-	Move bestMove{}, subPV[MAX_PLY]{};
-	std::vector<Move> moveList = moveGeneration(p);
-	moveList = pruneIllegal(moveList, p);
-	pv[0] = 0;
-
-	if (moveList.size() == 0) {
-		if (underCheck(p.getTurn(), p)) 
-				return -(MATE + depth);
-		else if (!underCheck(p.getTurn(), p))
-			return 0;
-	}
-
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
-
+		
 
 	/* ********************************************************* */
 	/*															 */
@@ -190,6 +180,21 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	/* ********************************************************* */
 
 
+	Move bestMove{}, subPV[MAX_PLY]{};
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGeneration(p);
+	moveList = pruneIllegal(moveList, p);
+	pv[0] = 0;
+
+	if (moveList.size() == 0) {
+		if (underCheck(p.getTurn(), p))
+			return -(MATE + depth);
+		else if (!underCheck(p.getTurn(), p))
+			return 0;
+	}
+
+
 	moveList = ordering(moveList, p);
 
 	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
@@ -197,11 +202,12 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		std::rotate(moveList.begin(), it, it + 1);
 	}
 
-	Position copy = p;
-	doMove(moveList[0], copy);
+	p.storeState(depth);
+	doMove(moveList[0], p);
 	mySearch.nodes++;
-	short bestScore = -pvs(copy, depth - 1, -beta, -alpha, subPV);
-	undoMove(moveList[0], copy, p);
+	short bestScore = -pvs(p, depth - 1, -beta, -alpha, subPV);
+	undoMove(moveList[0], p);
+	p.restoreState(depth);
 
 	if (bestScore > alpha) {
 		bestMove = moveList[0];
@@ -217,19 +223,21 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 	for (ushort i = 1; i < moveList.size(); i++)
 	{
-		doMove(moveList[i], copy);
+		p.storeState(depth);
+		doMove(moveList[i], p);
 		mySearch.nodes++;
-		short score = -pvs(copy, depth - 1, -alpha - 1, -alpha, subPV);
+		short score = -pvs(p, depth - 1, -alpha - 1, -alpha, subPV);
 
 
 		if (score > alpha && score < beta) {
-			score = -pvs(copy, depth - 1, -beta, -alpha, subPV);
+			score = -pvs(p, depth - 1, -beta, -alpha, subPV);
 
 			if (score > alpha)
 				alpha = score;
 		}
 
-		undoMove(moveList[i], copy, p);
+		undoMove(moveList[i], p);
+		p.restoreState(depth);
 
 		if (score > bestScore) {
 
@@ -249,7 +257,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 }
 
 
-const short quiescence(Position& p, short alpha, short beta, ushort qsDepth)
+const short quiescence(Position p, short alpha, short beta, ushort qsDepth)
 {
 	short stand_pat = lazyEval(p);
 	
@@ -262,18 +270,21 @@ const short quiescence(Position& p, short alpha, short beta, ushort qsDepth)
 	if (alpha < stand_pat)
 		alpha = stand_pat;
 
-	std::vector<Move> moveList = moveGenQS(p);
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGenQS(p);
 	moveList = pruneIllegal(moveList, p);
 	
 	if (moveList.size() > 0)
 		moveList = mvv_lva(moveList);
 
 	for (const auto& m : moveList) {
-		Position copy = p;
-		doMove(m, copy);
+		p.storeState(qsDepth);
+		doMove(m, p);
 		mySearch.nodes++;
-		short score = -quiescence(copy, -beta, -alpha, qsDepth -1);
-		undoMove(m, copy, p);
+		short score = -quiescence(p, -beta, -alpha, qsDepth -1);
+		undoMove(m, p);
+		p.restoreState(qsDepth);
 
 		if (score >= beta)
 			return beta;

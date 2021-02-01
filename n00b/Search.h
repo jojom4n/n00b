@@ -26,7 +26,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 /* template<bool nullMove>
 const short negamaxAB(Position const& p, short const& depth, short alpha, short beta, Move* pv); */
 
-const short quiescence(Position& p, short alpha, short beta, ushort qsDepth = QS_DEPTH);
+const short quiescence(Position p, short alpha, short beta, ushort qsDepth = QS_DEPTH);
 
 
 #endif

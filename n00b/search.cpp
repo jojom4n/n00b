@@ -162,22 +162,11 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
 {	
-	Move bestMove{}, subPV[MAX_PLY]{};
-	std::vector<Move> moveList;
-	moveList.reserve(MAX_PLY);
-	moveList = moveGeneration(p);
-	pruneIllegal(moveList, p);
 	pv[0] = 0;
-
-	if (moveList.size() == 0) {
-		if (underCheck(p.getTurn(), p))
-			return -(MATE + depth);
-		else if (!underCheck(p.getTurn(), p))
-			return 0;
-	}
 	
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
+		// return lazyEval(p);
 		
 
 	/* ********************************************************* */
@@ -193,23 +182,57 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
 
+
+	Move bestMove{}, subPV[MAX_PLY]{};
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGeneration(p);
+	// pruneIllegal(moveList, p);
+
+	/* if (moveList.size() == 0) {
+		if (underCheck(p.getTurn(), p))
+			return -(MATE + depth);
+		else if (!underCheck(p.getTurn(), p))
+			return 0;
+	} */
+
+	
 	moveList = ordering(moveList, p);
 
 	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
 		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
-		std::rotate(moveList.begin(), it, it + 1);
+		std::rotate(moveList.begin(), it, it + 1); // PERFORMANCE CRITICAL. TODO CHANGE
 	}
 
 	p.storeState(depth);
-	doMove(moveList[0], p);
+	ushort idx, legalMoves = ushort(moveList.size());
+
+	for (idx = 0; idx < moveList.size(); idx++, legalMoves--) {
+		Color c = Color(((C64(1) << 1) - 1) & (moveList[idx] >> 12)); // who is going to move?
+		doMove(moveList[idx], p);
+
+		if (!underCheck(c, p))   // move is legal, let's go out of the loop
+			break;
+		
+		undoMove(moveList[idx], p);  // move is illegal, let's restore position and try next one
+		p.restoreState(depth);
+	}
+	
+	if (legalMoves == 0) {
+		if (underCheck(p.getTurn(), p))
+			return -(MATE + depth);
+		else if (!underCheck(p.getTurn(), p))
+			return 0;
+	}
+
 	mySearch.nodes++;
 	short bestScore = -pvs(p, depth - 1, -beta, -alpha, subPV);
-	undoMove(moveList[0], p);
+	undoMove(moveList[idx], p);
 	p.restoreState(depth);
 	
 
 	if (bestScore > alpha) {
-		bestMove = moveList[0];
+		bestMove = moveList[idx];
 		pv[0] = bestMove;
 		memcpy(pv + 1, subPV, 63 * sizeof(Move));
 		pv[63] = 0;
@@ -220,12 +243,21 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		alpha = bestScore;
 	}
 
-	for (ushort i = 1; i < moveList.size(); i++)
+	for (ushort i = idx + 1; i < moveList.size(); i++)
 	{
+		short score{};
 		p.storeState(depth);
+		Color c = Color(((C64(1) << 1) - 1) & (moveList[i] >> 12)); // who is going to move?
 		doMove(moveList[i], p);
+
+		if (underCheck(c, p)) {  // move is not legal, let's continue to search
+			undoMove(moveList[i], p);
+			p.restoreState(depth);
+			goto OUTER;
+		}
+
 		mySearch.nodes++;
-		short score = -pvs(p, depth - 1, -alpha - 1, -alpha, subPV);
+		score = -pvs(p, depth - 1, -alpha - 1, -alpha, subPV);
 
 
 		if (score > alpha && score < beta) {
@@ -249,6 +281,9 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 			memcpy(pv + 1, subPV, 63 * sizeof(Move));
 			pv[63] = 0;
 		}
+
+	OUTER: continue;
+
 	}
 
 	mySearch.bestMove = bestMove;

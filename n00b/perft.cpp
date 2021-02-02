@@ -17,7 +17,7 @@ unsigned long long perft(ushort const& depth, Position& p, bool init)
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
 	p.storeState(depth);
-	moveList = pruneIllegal(moveList, p);
+	// moveList = pruneIllegal(moveList, p);
 
 	static std::array<perftCache, PERFT_CACHE_SIZE> cache;
 
@@ -28,13 +28,18 @@ unsigned long long perft(ushort const& depth, Position& p, bool init)
 		unsigned long long partialNodes;
 		Square squareFrom = Square(((C64(1) << 6) - 1) & (elem >> 19));
 		Square squareTo = Square(((C64(1) << 6) - 1) & (elem >> 13));
+		Color c = Color(((C64(1) << 1) - 1) & (elem >> 12));
 		doMove(elem, p);
-		partialNodes = perft(depth - 1, p, cache);
-		nodes += partialNodes;
+		
+		if (underCheck(c, p) == 0) { // if move is legal...
 
-		if (!init) {
-			std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
-			std::cout << ": " << partialNodes << std::endl;
+			partialNodes = perft(depth - 1, p, cache);
+			nodes += partialNodes;
+
+			if (!init) {
+				std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
+				std::cout << ": " << partialNodes << std::endl;
+			}
 		}
 
 		undoMove(elem, p);

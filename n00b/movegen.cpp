@@ -401,23 +401,22 @@ void pruneIllegal (std::vector<Move> &moveList, Position &p)
 {
 	p.storeState();
 
-	for (ushort i = 0; i < moveList.size(); i++)
+	for (auto it = moveList.begin(); it != moveList.end(); ) // scroll through the moveList
 	{
-		Color c = Color(((C64(1) << 1) - 1) & (moveList[i] >> 12)); // who's moving?
-		doMove(moveList[i], p); // do the move
+		Color c = Color(((C64(1) << 1) - 1) & (*it >> 12)); // who's moving?
+		doMove(*it, p); // do the move
 
 		if (underCheck(c, p)) { // if move is not legal...
-			undoMove(moveList[i], p); // undo the move...
+			undoMove(*it, p); // undo the move...
 			p.restoreState();
-			std::iter_swap(moveList.begin() + i, moveList.end() - 1);
-			moveList.pop_back();
+			it = moveList.erase(it); // and erase it from moveList
 		}
 		else {
-			undoMove(moveList[i], p); // else undo move...
+			undoMove(*it, p); // else undo move...
 			p.restoreState();
+			it++; // ...retain the move, because it's valid, and check next one
 		} // end if
-
-	}
+	} // end for
 
 }
 

@@ -161,7 +161,21 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 
 const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
-{
+{	
+	Move bestMove{}, subPV[MAX_PLY]{};
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGeneration(p);
+	pruneIllegal(moveList, p);
+	pv[0] = 0;
+
+	if (moveList.size() == 0) {
+		if (underCheck(p.getTurn(), p))
+			return -(MATE + depth);
+		else if (!underCheck(p.getTurn(), p))
+			return 0;
+	}
+	
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
 		
@@ -179,23 +193,6 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
 
-
-	Move bestMove{}, subPV[MAX_PLY]{};
-	std::vector<Move> moveList;
-	short bestScore = ALPHA;
-	moveList.reserve(MAX_PLY);
-	moveList = moveGeneration(p);
-	pruneIllegal(moveList, p);
-	pv[0] = 0;
-
-	if (moveList.size() == 0) {
-		if (underCheck(p.getTurn(), p))
-			return -(MATE + depth);
-		else if (!underCheck(p.getTurn(), p))
-			return 0;
-	}
-
-
 	moveList = ordering(moveList, p);
 
 	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
@@ -206,7 +203,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	p.storeState(depth);
 	doMove(moveList[0], p);
 	mySearch.nodes++;
-	bestScore = -pvs(p, depth - 1, -beta, -alpha, subPV);
+	short bestScore = -pvs(p, depth - 1, -beta, -alpha, subPV);
 	undoMove(moveList[0], p);
 	p.restoreState(depth);
 	

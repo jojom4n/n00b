@@ -397,29 +397,28 @@ short underCheck(Color const &c, Position const &p)
 }
 
 
-const std::vector<Move> pruneIllegal (std::vector<Move> &moveList, Position &p)
+void pruneIllegal (std::vector<Move> &moveList, Position &p)
 {
 	p.storeState();
 
-	
-	for (auto it = moveList.begin(); it != moveList.end(); ) // scroll through the moveList
+	for (ushort i = 0; i < moveList.size(); i++)
 	{
-		Color c = Color(((C64(1) << 1) - 1) & (*it >> 12)); // who's moving?
-		doMove(*it, p); // do the move
-		
+		Color c = Color(((C64(1) << 1) - 1) & (moveList[i] >> 12)); // who's moving?
+		doMove(moveList[i], p); // do the move
+
 		if (underCheck(c, p)) { // if move is not legal...
-			undoMove(*it, p); // undo the move...
+			undoMove(moveList[i], p); // undo the move...
 			p.restoreState();
-			it = moveList.erase(it); // and erase it from moveList
+			std::iter_swap(moveList.begin() + i, moveList.end() - 1);
+			moveList.pop_back();
 		}
 		else {
-			undoMove(*it, p); // else undo move...
+			undoMove(moveList[i], p); // else undo move...
 			p.restoreState();
-			it++; // ...retain the move, because it's valid, and check next one
 		} // end if
-	} // end for
 
-	return moveList;
+	}
+
 }
 
 

@@ -43,7 +43,6 @@ const Move iterativeSearch(Position& p, short const& depth)
 			mySearch.ttUseful = 0;
 
 			auto depthTimeStart = Clock::now();
-			// mySearch.bestScore = negamaxAB<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
 			mySearch.bestScore = pvs(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
@@ -163,10 +162,40 @@ const Move iterativeSearch(Position& p, short const& depth)
 const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
 {	
 	pv[0] = 0;
+	uint32_t key = static_cast<uint32_t>(p.getZobrist());
+	auto alphaOrig = alpha;
+	TTEntry TTEntry{};
+	
+
+	/* ********************************************************* */
+	/*                                                           */
+	/*                  TRANSPOSITION TABLE                      */
+	/*                                                           */
+	/* ********************************************************* */
+	if (TT::table[key % TT_SIZE].key == key) {
+		TTEntry = TT::table[key % TT_SIZE];
+		mySearch.ttHits++;
+
+		if (TT::isLegalEntry(TTEntry, p) && TTEntry.depth >= depth) {
+
+			mySearch.ttUseful++;
+
+			switch (TTEntry.nodeType) {
+			case LOWER_BOUND:
+				if (alpha < TTEntry.score)
+					alpha = TTEntry.score;
+				break;
+			case UPPER_BOUND:
+				if (beta > TTEntry.score)
+					beta = TTEntry.score;
+				break;
+			}
+		}
+	}
+	
 	
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
-		// return lazyEval(p);
 		
 
 	/* ********************************************************* */
@@ -187,16 +216,6 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
-	// pruneIllegal(moveList, p);
-
-	/* if (moveList.size() == 0) {
-		if (underCheck(p.getTurn(), p))
-			return -(MATE + depth);
-		else if (!underCheck(p.getTurn(), p))
-			return 0;
-	} */
-
-	
 	moveList = ordering(moveList, p);
 
 	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
@@ -219,9 +238,10 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	}
 	
 	if (legalMoves == 0) {
-		if (underCheck(p.getTurn(), p))
+		ushort check = underCheck(p.getTurn(), p);
+		if (check)
 			return -(MATE + depth);
-		else if (!underCheck(p.getTurn(), p))
+		else if (!check)
 			return 0;
 	}
 
@@ -286,6 +306,33 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 	}
 
+
+	/* ********************************************************* */
+	/*                 UPDATE TRANSPOSITION TABLE                */
+	/*                                                           */
+	/* we only update TT if there is a best move.In other words, */
+	/* if it's mate and therefore there is not any best move (or */
+	/* hence any move at all), we do not want to update TT,      */
+	/* because otherwise we would have a dummy entry with score  */
+	/* about MATE or -MATE and move = 0, polluting TT!           */
+	/*                                                           */
+	/* ********************************************************* */
+	if (bestMove) {
+		TTEntry.score = bestScore;
+		if (bestScore <= alphaOrig)
+			TTEntry.nodeType = UPPER_BOUND;
+		else if (bestScore >= beta)
+			TTEntry.nodeType = LOWER_BOUND;
+		else
+			TTEntry.nodeType = EXACT;
+
+		TTEntry.age = static_cast<uint8_t>(p.getMoveNumber());
+		TTEntry.depth = static_cast<uint8_t>(depth);
+		TTEntry.key = static_cast<uint32_t>(p.getZobrist());
+		TTEntry.move = bestMove;
+		TT::Store(TTEntry);
+	}
+
 	mySearch.bestMove = bestMove;
 	return bestScore;
 }
@@ -293,6 +340,8 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 const short quiescence(Position p, short alpha, short beta, ushort qsDepth)
 {
+	uint32_t key = static_cast<uint32_t>(p.getZobrist());
+	TTEntry TTEntry;
 	short stand_pat = lazyEval(p);
 	
 	if (qsDepth <= 0)

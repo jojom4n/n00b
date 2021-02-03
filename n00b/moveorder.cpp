@@ -10,7 +10,8 @@ extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and it
 
 std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p)
 {
-	std::vector<Move> moveList{};
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
 
 	moveList = mvv_lva(moves);
 	
@@ -26,7 +27,8 @@ std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p)
 
 std::vector<Move> mvv_lva(std::vector<Move> const& moves) 
 {
-	std::vector<Move> captures{};
+	std::vector<Move> captures;
+	captures.reserve(MAX_PLY);
 	std::multimap<short, Move, std::greater<int>> sortedMap{};
 
 	for (auto const& elem : moves) {

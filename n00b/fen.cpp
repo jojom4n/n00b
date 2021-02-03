@@ -11,7 +11,7 @@
 
 
 extern std::map<std::string, Square> stringToSquareMap; // see display.cpp
-extern std::array<TTEntry, TT_SIZE> TT::table;
+extern std::vector<TTEntry> TT::table;
 
 
 const bool fenValidate(std::stringstream &fen)
@@ -282,6 +282,6 @@ void fenParser(std::stringstream &fen, Position &board)
 		board.setCheckmate(true);
 	
 	board.setZobrist();
-	TT::table.fill({}); // clear TT
+	TT::table.clear(); // clear TT
 	displayBoard(board);
 }

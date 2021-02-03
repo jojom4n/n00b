@@ -6,7 +6,7 @@
 #include "tt.h"
 
 extern struct LookupTable g_MoveTables; // see attack.cpp (and its header file)
-extern std::array<TTEntry, TT_SIZE> TT::table;
+extern std::vector<TTEntry> TT::table;
 
 
 Position::Position()
@@ -58,7 +58,7 @@ void Position::setNew()
 
 	setZobrist();
 	
-	TT::table.fill({}); // clear TT
+	TT::table.clear(); // clear TT
 }
 
 

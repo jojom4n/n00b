@@ -14,7 +14,7 @@ struct TTEntry {
 };
 
 namespace TT {
-	extern std::array<TTEntry, TT_SIZE> table;
+	extern std::vector<TTEntry> table;
 	void Store(TTEntry const& entry);
 	bool isLegalEntry(TTEntry const& entry, Position p);
 }

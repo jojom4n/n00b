@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <iostream>
 
-extern std::array<TTEntry, TT_SIZE> TT::table;
+extern std::vector<TTEntry> TT::table;
 struct Search mySearch{};
 
 const Move iterativeSearch(Position& p, short const& depth)

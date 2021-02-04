@@ -15,24 +15,23 @@ std::string input = " ";
 
 void newGame()
 {	
-	Position *Chessboard = new Position();
-	Chessboard->setNew();
-	displayBoard(*Chessboard);
+	Position Chessboard;
+	Chessboard.setNew();
+	displayBoard(Chessboard);
 	
 	do 
 	{
-		(Chessboard->getTurn() == WHITE) ? 
+		(Chessboard.getTurn() == WHITE) ? 
 			std::cout << "\nwhite>> " : std::cout << "\nblack>> ";
 
 		std::getline(std::cin, input);
 		std::stringstream lineStream(input);
 
-		readCommand(lineStream, *Chessboard);
+		readCommand(lineStream, Chessboard);
 
 		std::cout << std::endl;
 	} while (input != "quit");
 
-	delete Chessboard;
 }
 
 

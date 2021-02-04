@@ -404,7 +404,7 @@ void pruneIllegal (std::vector<Move> &moveList, Position &p)
 {
 	p.storeState();
 
-	for (ushort i = 0; i < moveList.size(); i++)
+	for (short i = 0; i < moveList.size(); i++)
 	{
 		Move m = moveList[i];
 		Color c = Color(((C64(1) << 1) - 1) & (m >> 12)); // who's moving?
@@ -413,6 +413,7 @@ void pruneIllegal (std::vector<Move> &moveList, Position &p)
 		if (underCheck(c, p)) { // if move is not legal...
 			std::swap(moveList[i], moveList.back());
 			moveList.pop_back(); // and erase it from moveList
+			i--; // we must examine again the same index because of the swap
 		}
 		
 		undoMove(m, p);

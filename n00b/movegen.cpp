@@ -341,12 +341,12 @@ const Move composeMove(Square const &from, Square const &to, Color const &c, ush
 }
 
 
-short underCheck(Color const &c, Position const &p)
+inline ushort underCheck(Color const &c, Position const &p)
 {
 	Square kingPos = p.getPieceOnSquare(c, KING)[0]; //get King's square
 	Bitboard kingBB = p.getPieces(c, KING);
-	Bitboard opponent{}, attackedBy{}, occ = p.getPosition();
-	short attackers{};
+	Bitboard opponent, attackedBy, occ = p.getPosition();
+	ushort attackers{};
 	
 	// ROOK
 	opponent = p.getPieces(Color(!c), ROOK); // get rook's bitboard

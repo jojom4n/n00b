@@ -50,6 +50,13 @@ Piece operator++(Piece &p, int) {
 }
 
 
+Piece operator--(Piece &p, int) {
+	Piece temp = p;
+	p = static_cast<Piece>((static_cast<int>(p) - 1));
+	return temp;
+}
+
+
 Color operator++(Color& c, int) {
 	Color temp = c;
 	c = static_cast<Color>((static_cast<int>(c) + 1));

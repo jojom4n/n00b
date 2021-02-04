@@ -10,6 +10,7 @@ File operator--(File& f, int);
 Rank operator++(Rank& r, int);
 Rank operator--(Rank& r, int);
 Piece operator++(Piece& p, int);
+Piece operator--(Piece &p, int);
 Color operator++(Color& c, int);
 
 #endif

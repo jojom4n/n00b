@@ -23,7 +23,7 @@ const std::vector<Move> moveGeneration(Position const &p)
 	const Bitboard occupancy = p.getPosition();
 	const Bitboard ownPieces = p.getPosition(sideToMove);
 	
-	for (Piece piece = KING; piece <= PAWN; piece++) {
+	for (Piece piece = PAWN; piece > KING; piece--) {
 		Bitboard bb = p.getPieces(sideToMove, piece);
 		
 		while (bb) { // loop until the bitboard has a piece on it
@@ -435,7 +435,7 @@ const std::vector<Move> moveGenQS(Position const& p)
 	const Bitboard occ = p.getPosition();
 	const Bitboard own = p.getPosition(sideToMove);
 
-	for (Piece piece = KING; piece <= PAWN; piece++) {
+	for (Piece piece = PAWN; piece > KING; piece--) {
 		Bitboard bb = p.getPieces(sideToMove, piece);
 
 		while (bb) { // loop until the bitboard has a piece on it

@@ -8,25 +8,34 @@
 #include <cstdint>
 
 template<bool Root>
-uint64_t divide(short depth, Position& p)
+uint64_t divide(short depth, Position &p)
 {
 	std::vector<Move> moveList = moveGeneration(p);
+	moveList.reserve(MAX_PLY);
 	extern std::map<Square, std::string> squareToStringMap;
 	uint64_t cnt, nodes = 0;
 	Position copy = p;
-	pruneIllegal(moveList, copy);
+	p.storeState(depth);
+	// pruneIllegal(moveList, p);
 	const bool leaf = (depth == 1);
 
 	for (const auto& m : moveList)
-	{
+	{	
 		if (Root && depth == 0)
 			cnt = 1, nodes++;
 
 		else {
-			doMove(m, copy);
-			cnt = leaf ? 1 : divide<false>(depth - 1, copy);
-			nodes += cnt;
-			undoMove(m, copy, p);
+			Color c = Color(((C64(1) << 1) - 1) & (m >> 12));
+			doMove(m, p);
+
+			if (underCheck(c, p) == 0) { // if move is legal...
+				cnt = leaf ? 1 : divide<false>(depth - 1, p);
+				nodes += cnt;
+			}
+
+			// undoMove(m, copy, p);
+			undoMove(m, p);
+			p.restoreState(depth);
 		}
 
 		if (Root) {

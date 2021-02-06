@@ -59,17 +59,13 @@ const std::vector<Move> moveGeneration(Position const &p)
 				moves &= ~ownPieces; // exclude own pieces from moves
 			
 			while (moves) { // scan collected moves, determine their type and add them to list
-				Piece captured = NO_PIECE;
 				Square squareTo = Square(bitscan_reset(moves));
+				Piece captured = p.idPiece(squareTo, Color(!(sideToMove))).piece;
 				MoveType type = setType(piece, occupancy, sideToMove, squareFrom, squareTo);
 
-				if (type == CAPTURE) {
-					captured = p.idPiece(squareTo, Color(!(sideToMove))).piece;
-					
-					if (!(captured == KING)) { // captured can't be enemy king
-						Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
-						moveList.push_back(m);
-					}
+				if (type == CAPTURE && captured != KING) {
+					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
+					moveList.push_back(m);
 				}
 				else if (type == PROMOTION) { 
 					// compose one moves for each possible promotion
@@ -341,7 +337,7 @@ const Move composeMove(Square const &from, Square const &to, Color const &c, ush
 }
 
 
-inline ushort underCheck(Color const &c, Position const &p)
+ushort underCheck(Color const &c, Position const &p)
 {
 	Square kingPos = p.getPieceOnSquare(c, KING)[0]; //get King's square
 	Bitboard kingBB = p.getPieces(c, KING);

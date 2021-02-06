@@ -95,8 +95,7 @@ void Position::putPiece(Color const &color, Piece const &piece, Square const &sq
 {
 	board_[color][piece] |= C64(1) << square;
 	color == WHITE ? whitePieces_ |= C64(1) << square : blackPieces_ |= C64(1) << square;
-
-	allPieces_ = whitePieces_ | blackPieces_;
+	allPieces_ |= C64(1) << square;
 }
 
 
@@ -104,8 +103,7 @@ void Position::removePiece(Color const &color, Piece const &piece, Square const 
 {
 	board_[color][piece] &= ~(C64(1) << square);
 	color == WHITE ? whitePieces_ &= ~(C64(1) << square) : blackPieces_ &= ~(C64(1) << square);
-
-	allPieces_ = whitePieces_ | blackPieces_;
+	allPieces_ &= ~(C64(1) << square);
 }
 
 

@@ -70,7 +70,6 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		return;
 	
 	else if (inputStream.str().substr(0) == "new") {
-		delete &board;
 		newGame();
 	}
 	

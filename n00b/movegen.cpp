@@ -161,8 +161,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 	if (p.getCastle(c) == Castle::QUEENSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(A8, c).piece == ROOK && p.idPiece(E8, c).piece == KING) // rook and king in position
 			&& (	(g_MoveTables.rook(A8, occ) >> E8) & C64(1)	) // no pieces between rook and king
-			&& (	!(p.isSquareAttackedBy(Color(!c), C8))	)   // C8 and D8 must not be under attack
-			&& (	!(p.isSquareAttackedBy(Color(!c), D8))	)	)
+			&& (	!(p.isSquareAttacked(Color(!c), C8))	)   // C8 and D8 must not be under attack
+			&& (	!(p.isSquareAttacked(Color(!c), D8))	)	)
 		{  
 			m = composeMove(E8, C8, c, KING, CASTLE_Q, NO_PIECE, 0);
 			moveList.push_back(m);
@@ -170,8 +170,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 
 		else if (	(p.idPiece(A1, c).piece == ROOK && p.idPiece(E1, c).piece == KING)  // rook and king in position
 			&& (	(g_MoveTables.rook(A1, occ) >> E1) & C64(1)	)  // no pieces between rook and king
-			&& (	!(p.isSquareAttackedBy(Color(!c), C1))	)   // C1 and D1 must not be under attack
-			&& (	!(p.isSquareAttackedBy(Color(!c), D1))	)	)
+			&& (	!(p.isSquareAttacked(Color(!c), C1))	)   // C1 and D1 must not be under attack
+			&& (	!(p.isSquareAttacked(Color(!c), D1))	)	)
 		{
 			m = composeMove(E1, C1, c, KING, CASTLE_Q, NO_PIECE, 0);
 			moveList.push_back(m);
@@ -180,8 +180,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 	if (p.getCastle(c) == Castle::KINGSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(H8, c).piece == ROOK && p.idPiece(E8, c).piece == KING)  // rook and king in position
 			&& (	(g_MoveTables.rook(H8, occ) >> E8) & C64(1)	)  // no pieces between rook and king
-			&& (	!(p.isSquareAttackedBy(Color(!c), F8))	)   // F8 and G8 must not be under attack
-			&& (	!(p.isSquareAttackedBy(Color(!c), G8))	)	)
+			&& (	!(p.isSquareAttacked(Color(!c), F8))	)   // F8 and G8 must not be under attack
+			&& (	!(p.isSquareAttacked(Color(!c), G8))	)	)
 		{
 			m = composeMove(E8, G8, c, KING, CASTLE_K, NO_PIECE, 0);
 			moveList.push_back(m);
@@ -189,8 +189,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 
 		else if (	(p.idPiece(H1, c).piece == ROOK && p.idPiece(E1, c).piece == KING) // rook and king in position
 			&& (	(g_MoveTables.rook(H1, occ) >> E1) & C64(1)	)   // no pieces between rook and king
-			&& (	!(p.isSquareAttackedBy(Color(!c), F1))	)   // F1 and G1 must not be under attack
-			&& (	!(p.isSquareAttackedBy(Color(!c), G1))	)	)
+			&& (	!(p.isSquareAttacked(Color(!c), F1))	)   // F1 and G1 must not be under attack
+			&& (	!(p.isSquareAttacked(Color(!c), G1))	)	)
 		{
 			m = composeMove(E1, G1, c, KING, CASTLE_K, NO_PIECE, 0);
 			moveList.push_back(m);

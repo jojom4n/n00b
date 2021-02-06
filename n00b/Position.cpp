@@ -205,9 +205,9 @@ const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece c
 }
 
 
-const bool Position::isSquareAttackedBy(Color const &color, Square const &square) const
+const bool Position::isSquareAttacked(Color const &color, Square const &square) const
 {
-	Bitboard sq{}, occ = getPosition(), enemy{}, mask{};
+	Bitboard sq{}, occ = getPosition(), enemy, mask;
 	
 	sq |= C64(1) << square;
 

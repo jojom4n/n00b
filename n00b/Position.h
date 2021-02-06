@@ -63,6 +63,7 @@ public:
 
 	void putPiece(Color const &color, Piece const &piece, Square const &square);
 	void removePiece(Color const &color, Piece const &piece, Square const &square);
+	void Position::update(Color const& color);
 		
 	constexpr Bitboard getPosition() const { return allPieces_; }
 	

@@ -16,7 +16,7 @@ uint64_t divide(short depth, Position &p)
 	uint64_t cnt, nodes = 0;
 	Position copy = p;
 	p.storeState(depth);
-	// pruneIllegal(moveList, p);
+	pruneIllegal(moveList, p);
 	const bool leaf = (depth == 1);
 
 	for (const auto& m : moveList)
@@ -26,14 +26,14 @@ uint64_t divide(short depth, Position &p)
 
 		else {
 			Color c = Color(((C64(1) << 1) - 1) & (m >> 12));
+			// check = underCheck(c, p);
 			doMove(m, p);
 
-			if (underCheck(c, p) == 0) { // if move is legal...
+			// if (!check) { // if move is legal...
 				cnt = leaf ? 1 : divide<false>(depth - 1, p);
 				nodes += cnt;
-			}
+			// }
 
-			// undoMove(m, copy, p);
 			undoMove(m, p);
 			p.restoreState(depth);
 		}

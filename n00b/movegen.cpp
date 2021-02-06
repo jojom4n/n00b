@@ -61,9 +61,10 @@ const std::vector<Move> moveGeneration(Position const &p)
 			while (moves) { // scan collected moves, determine their type and add them to list
 				Square squareTo = Square(bitscan_reset(moves));
 				Piece captured = p.idPiece(squareTo, Color(!(sideToMove))).piece;
+				if (captured == KING) break;
 				MoveType type = setType(piece, occupancy, sideToMove, squareFrom, squareTo);
 
-				if (type == CAPTURE && captured != KING) {
+				if (type == CAPTURE) {
 					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
 					moveList.push_back(m);
 				}

@@ -94,30 +94,17 @@ void Position::restoreState(ushort const& depth)
 void Position::putPiece(Color const &color, Piece const &piece, Square const &square)
 {
 	board_[color][piece] |= C64(1) << square;
-	update(color);
+	color == WHITE ? whitePieces_ |= C64(1) << square : blackPieces_ |= C64(1) << square;
+
+	allPieces_ = whitePieces_ | blackPieces_;
 }
 
 
 void Position::removePiece(Color const &color, Piece const &piece, Square const &square)
 {
 	board_[color][piece] &= ~(C64(1) << square);
-	update(color);
-}
+	color == WHITE ? whitePieces_ &= ~(C64(1) << square) : blackPieces_ &= ~(C64(1) << square);
 
-
-void Position::update(Color const& color)
-{
-	if (color == WHITE) {
-		whitePieces_ = 0;
-		for (ushort i = 0; i < 6; i++)
-			whitePieces_ |= board_[WHITE][i];
-	}
-	else if (color == BLACK) {
-		blackPieces_ = 0;
-		for (ushort i = 0; i < 6; i++)
-			blackPieces_ |= board_[BLACK][i];
-	}
-		
 	allPieces_ = whitePieces_ | blackPieces_;
 }
 
@@ -129,24 +116,24 @@ const PieceID Position::idPiece(Square const &square, Color const &color) const
 	switch (color)
 	{
 	case WHITE:
-		for (ushort y = 0; y <= PAWN; y++)
+		for (Piece y = KING; y <= PAWN; y++)
 			if (board_[WHITE][y] & (C64(1) << square)) {
-				ushort x = WHITE;
-				return PieceID{ (Color)x, (Piece)y };
+				Color x = WHITE;
+				return PieceID{ x, y };
 			}
 		break;
 	case BLACK:
-		for (ushort y = 0; y <= PAWN; y++)
+		for (Piece y = KING; y <= PAWN; y++)
 			if (board_[BLACK][y] & (C64(1) << square)) {
-				ushort x = BLACK;
-				return PieceID{ (Color)x, (Piece)y };
+				Color x = BLACK;
+				return PieceID{ x, y };
 			}
 		break;
 	case ALL_COLOR:
-		for (ushort x = 0; x <= WHITE; x++)
-			for (ushort y = 0; y <= PAWN; y++) {
+		for (Color x = BLACK; x <= WHITE; x++)
+			for (Piece y = KING; y <= PAWN; y++) {
 				if (board_[x][y] & (C64(1) << square))
-					return PieceID{ (Color)x, (Piece)y };
+					return PieceID{ x, y };
 			}
 		break;
 	}

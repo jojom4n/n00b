@@ -82,7 +82,7 @@ const std::vector<Move> moveGeneration(Position const &p)
 	} // end for loop
 
 	if (!check) // if King is not under check, calculate castles too
-		castleMoves(p, moveList);
+		castleMoves(p, moveList, sideToMove, occupancy);
 
 	Square ep = p.getEnPassant();
 	if (!(ep == SQ_EMPTY))
@@ -143,12 +143,10 @@ const Bitboard pawnMoves(Position const &p, Square const &from, Color const &c, 
 }
 
 
-void castleMoves(Position const &p, std::vector<Move> &moveList)
+void castleMoves(Position const &p, std::vector<Move> &moveList, Color const &c, Bitboard const &occ)
 {
 	Move m{};
-	Color c = p.getTurn();
-	Bitboard occ = p.getPosition();
-
+	
 	if (p.getCastle(c) == Castle::QUEENSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(A8, c).piece == ROOK && p.idPiece(E8, c).piece == KING) // rook and king in position
 			&& (	(g_MoveTables.rook(A8, occ) >> E8) & C64(1)	) // no pieces between rook and king

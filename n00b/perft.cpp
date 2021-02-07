@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 
+unsigned long long debug_nodes{};
 
 unsigned long long perft(ushort const& depth, Position& p, bool init)
 {
@@ -16,6 +17,7 @@ unsigned long long perft(ushort const& depth, Position& p, bool init)
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
+	debug_nodes += moveList.size();
 	p.storeState(depth);
 	// moveList = pruneIllegal(moveList, p);
 
@@ -35,11 +37,6 @@ unsigned long long perft(ushort const& depth, Position& p, bool init)
 
 				partialNodes = perft(depth - 1, p, cache);
 				nodes += partialNodes;
-
-				if (!init) {
-					std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
-					std::cout << ": " << partialNodes << std::endl;
-				}
 			}
 
 			undoMove(elem, p);
@@ -56,6 +53,7 @@ static unsigned long long perft(ushort const& depth, Position& p, std::array<per
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
+	debug_nodes += moveList.size();
 	p.storeState(depth);
 	pruneIllegal(moveList, p);
 

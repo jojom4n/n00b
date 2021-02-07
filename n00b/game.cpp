@@ -13,6 +13,8 @@
 
 std::string input = " ";
 
+extern unsigned long long debug_nodes;
+
 void newGame()
 {	
 	Position Chessboard;
@@ -93,10 +95,13 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(6));
 		if (depth > 0 && !(depth > MAX_PLY)) {
-			auto t1 = Clock::now();
-			std::cout << perft(depth, board) << std::endl;
-			auto t2 = Clock::now();
-			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
+			unsigned long long nodes;
+			const auto t1 = Clock::now();
+			nodes = perft(depth, board);
+			const auto t2 = Clock::now();
+			std::cout << "Total moves: " << nodes;
+			std::cout << "\tTime elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms\n";;
+			std::cout << "Total mg() generations: " << debug_nodes << std::endl;
 		}
 		else
 			std::cout << "Invalid depth.\n";
@@ -109,7 +114,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 			auto t1 = Clock::now();
 			std::cout << divide<true>(depth, board) << std::endl;
 			auto t2 = Clock::now();
-			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms" << std::endl;
+			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms\n";
 		}
 		else
 			std::cout << "Invalid depth.\n";

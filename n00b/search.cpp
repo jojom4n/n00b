@@ -172,7 +172,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	/*                  TRANSPOSITION TABLE                      */
 	/*                                                           */
 	/* ********************************************************* */
-	if (TT::table[key % TT_SIZE].key == key) {
+	/* if (TT::table[key % TT_SIZE].key == key) {
 		TTEntry = TT::table[key % TT_SIZE];
 		mySearch.ttHits++;
 
@@ -191,7 +191,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 				break;
 			}
 		}
-	}
+	} */
 	
 	
 	if (depth <= 0)

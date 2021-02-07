@@ -28,35 +28,33 @@ const std::vector<Move> moveGeneration(Position const &p)
 		
 		while (bb) { // loop until the bitboard has a piece on it
 			Square squareFrom = Square(bitscan_reset(bb)); // find the square(s) with the particular piece;
-			Bitboard moves{};
+			Bitboard moves;
 			
 			// get move bitboard for the piece, given its square
 			switch (piece) {
 			case KING:
-				moves = g_MoveTables.king[squareFrom];
+				moves = g_MoveTables.king[squareFrom] & ~ownPieces;
 				break;
 			case QUEEN:
-				moves = g_MoveTables.bishop(squareFrom, occupancy)
-					| g_MoveTables.rook(squareFrom, occupancy);
+				moves = (g_MoveTables.bishop(squareFrom, occupancy)
+					| g_MoveTables.rook(squareFrom, occupancy)) & ~ownPieces;
 				break;
 			case ROOK:
-				moves = g_MoveTables.rook(squareFrom, occupancy);
+				moves = g_MoveTables.rook(squareFrom, occupancy) & ~ownPieces;
 				break;
 			case KNIGHT:
-				moves = g_MoveTables.knight[squareFrom];
+				moves = g_MoveTables.knight[squareFrom] & ~ownPieces;
 				break;
 			case BISHOP:
-				moves = g_MoveTables.bishop(squareFrom, occupancy);
+				moves = g_MoveTables.bishop(squareFrom, occupancy) & ~ownPieces;
 				break;
 			case PAWN: 
 				/* For pawns, it's a bit more complicated, because they have no lookup tables.
 				For readibility, better pass the params to an appropriate function */
-				moves = pawnMoves(p, squareFrom);	
+				moves = pawnMoves(p, squareFrom, sideToMove, occupancy, ownPieces);	
 				break;
 			}
 
-			if (!(piece == PAWN))
-				moves &= ~ownPieces; // exclude own pieces from moves
 			
 			while (moves) { // scan collected moves, determine their type and add them to list
 				Square squareTo = Square(bitscan_reset(moves));
@@ -64,11 +62,7 @@ const std::vector<Move> moveGeneration(Position const &p)
 				if (captured == KING) break;
 				MoveType type = setType(piece, occupancy, sideToMove, squareFrom, squareTo);
 
-				if (type == CAPTURE) {
-					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
-					moveList.push_back(m);
-				}
-				else if (type == PROMOTION) { 
+				if (type == PROMOTION) { 
 					// compose one moves for each possible promotion
 					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_KNIGHT);
 					Move m2 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN);
@@ -90,8 +84,9 @@ const std::vector<Move> moveGeneration(Position const &p)
 	if (!check) // if King is not under check, calculate castles too
 		castleMoves(p, moveList);
 
-	if (!(p.getEnPassant() == SQ_EMPTY))
-		enPassant(p, p.getEnPassant(), sideToMove, moveList);
+	Square ep = p.getEnPassant();
+	if (!(ep == SQ_EMPTY))
+		enPassant(p, ep, sideToMove, moveList);
 
 	return moveList;
 }
@@ -126,10 +121,9 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 }
 
 
-const Bitboard pawnMoves(Position const &p, Square const &from)
+const Bitboard pawnMoves(Position const &p, Square const &from, Color const &c, Bitboard const &occ, Bitboard const &own)
 {
-	Color c = p.getTurn();
-	Bitboard m{}, occ = p.getPosition(), own = p.getPosition(c);
+	Bitboard m{};
 	
 	(c == WHITE) ? m |= ((C64(1) << from) << 8) & ~occ
 		: m |= ((C64(1) << from) >> 8) & ~occ;
@@ -158,8 +152,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 	if (p.getCastle(c) == Castle::QUEENSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(A8, c).piece == ROOK && p.idPiece(E8, c).piece == KING) // rook and king in position
 			&& (	(g_MoveTables.rook(A8, occ) >> E8) & C64(1)	) // no pieces between rook and king
-			&& (	!(p.isSquareAttacked(Color(!c), C8))	)   // C8 and D8 must not be under attack
-			&& (	!(p.isSquareAttacked(Color(!c), D8))	)	)
+			&& (	!(p.isSquareAttacked(C8))	)   // C8 and D8 must not be under attack
+			&& (	!(p.isSquareAttacked(D8))	)	)
 		{  
 			m = composeMove(E8, C8, c, KING, CASTLE_Q, NO_PIECE, 0);
 			moveList.push_back(m);
@@ -167,8 +161,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 
 		else if (	(p.idPiece(A1, c).piece == ROOK && p.idPiece(E1, c).piece == KING)  // rook and king in position
 			&& (	(g_MoveTables.rook(A1, occ) >> E1) & C64(1)	)  // no pieces between rook and king
-			&& (	!(p.isSquareAttacked(Color(!c), C1))	)   // C1 and D1 must not be under attack
-			&& (	!(p.isSquareAttacked(Color(!c), D1))	)	)
+			&& (	!(p.isSquareAttacked(C1))	)   // C1 and D1 must not be under attack
+			&& (	!(p.isSquareAttacked(D1))	)	)
 		{
 			m = composeMove(E1, C1, c, KING, CASTLE_Q, NO_PIECE, 0);
 			moveList.push_back(m);
@@ -177,8 +171,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 	if (p.getCastle(c) == Castle::KINGSIDE || p.getCastle(c) == Castle::ALL)
 		if (	(p.idPiece(H8, c).piece == ROOK && p.idPiece(E8, c).piece == KING)  // rook and king in position
 			&& (	(g_MoveTables.rook(H8, occ) >> E8) & C64(1)	)  // no pieces between rook and king
-			&& (	!(p.isSquareAttacked(Color(!c), F8))	)   // F8 and G8 must not be under attack
-			&& (	!(p.isSquareAttacked(Color(!c), G8))	)	)
+			&& (	!(p.isSquareAttacked(F8))	)   // F8 and G8 must not be under attack
+			&& (	!(p.isSquareAttacked(G8))	)	)
 		{
 			m = composeMove(E8, G8, c, KING, CASTLE_K, NO_PIECE, 0);
 			moveList.push_back(m);
@@ -186,8 +180,8 @@ void castleMoves(Position const &p, std::vector<Move> &moveList)
 
 		else if (	(p.idPiece(H1, c).piece == ROOK && p.idPiece(E1, c).piece == KING) // rook and king in position
 			&& (	(g_MoveTables.rook(H1, occ) >> E1) & C64(1)	)   // no pieces between rook and king
-			&& (	!(p.isSquareAttacked(Color(!c), F1))	)   // F1 and G1 must not be under attack
-			&& (	!(p.isSquareAttacked(Color(!c), G1))	)	)
+			&& (	!(p.isSquareAttacked(F1))	)   // F1 and G1 must not be under attack
+			&& (	!(p.isSquareAttacked(G1))	)	)
 		{
 			m = composeMove(E1, G1, c, KING, CASTLE_K, NO_PIECE, 0);
 			moveList.push_back(m);
@@ -297,17 +291,13 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 
 const MoveType setType(Piece const &piece, Bitboard const &occ, Color const &c, Square const &from, Square const &to)
 {
-	MoveType type;
-	
 	if (	(piece == PAWN && c == WHITE && (from / 8) == RANK_7 && (to / 8) == RANK_8)	
 		||	(piece == PAWN && c == BLACK && (from / 8) == RANK_2 && (to / 8) == RANK_1)	)
-		type = PROMOTION; // is the move a pawn promotion?
+		return PROMOTION; // is the move a pawn promotion?
 	else if ((occ >> to) & 1ULL)
-		type = CAPTURE; // if destination square is occupied by enemy...
+		return CAPTURE; // if destination square is occupied by enemy...
 	else
-		type = QUIET;
-
-	return type;
+		return QUIET;
 }
 
 
@@ -341,7 +331,10 @@ const Move composeMove(Square const &from, Square const &to, Color const &c, ush
 ushort underCheck(Color const &c, Position const &p)
 {
 	Square kingPos = p.getPieceOnSquare(c, KING)[0]; //get King's square
-	Bitboard kingBB = p.getPieces(c, KING);
+	
+	return p.isSquareAttacked(kingPos) ? true : false;
+		
+	/* Bitboard kingBB = p.getPieces(c, KING);
 	Bitboard opponent, attackedBy, occ = p.getPosition();
 	ushort attackers{};
 	
@@ -393,7 +386,8 @@ ushort underCheck(Color const &c, Position const &p)
 			attackers += 1;
 	}
 
-	return attackers; // return number of pieces attacking the King
+	
+	return attackers; // return number of pieces attacking the King */
 }
 
 
@@ -471,7 +465,8 @@ const std::vector<Move> moveGenQS(Position const& p)
 				Square squareTo = Square(bitscan_reset(m));
 				Piece captured = p.idPiece(squareTo, Color(!sideToMove)).piece;
 
-				if (captured == KING) break; // captured can't be enemy king
+				if (captured == KING) // captured can't be enemy king
+					break; 
 
 				moveList.push_back(composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0));
 				

@@ -120,13 +120,13 @@
     <ClInclude Include="evaluation.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="search.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="moveorder.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="libpopcnt.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="search.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

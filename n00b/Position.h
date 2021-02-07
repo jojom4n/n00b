@@ -90,7 +90,7 @@ public:
 
 	const std::vector<Square> getPieceOnSquare(Color const &color, Piece const &piece) const;
 
-	const bool isSquareAttacked(Color const &color, Square const &square) const;
+	const ushort isSquareAttacked(Square const &square) const;
 
 	constexpr uint64_t getZobrist() const { return zobristHash_; }
 	void setZobrist() { zobristHash_ = Zobrist::fill(*this); }

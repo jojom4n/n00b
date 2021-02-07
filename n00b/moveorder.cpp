@@ -4,12 +4,14 @@
 #include "evaluation.h"
 #include "makemove.h"
 #include "search.h"
+#include <algorithm>
 #include <map>
 
 extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and its header)
 
-std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p)
+std::vector<Move> ordering(std::vector<Move> &moves, Position const& p)
 {
+	std::random_shuffle(moves.begin(), moves.end());
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);
 

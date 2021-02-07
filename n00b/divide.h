@@ -14,7 +14,6 @@ uint64_t divide(short depth, Position &p)
 	moveList.reserve(MAX_PLY);
 	extern std::map<Square, std::string> squareToStringMap;
 	uint64_t cnt, nodes = 0;
-	Position copy = p;
 	p.storeState(depth);
 	pruneIllegal(moveList, p);
 	const bool leaf = (depth == 1);

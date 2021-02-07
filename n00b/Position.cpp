@@ -107,33 +107,31 @@ void Position::removePiece(Color const &color, Piece const &piece, Square const 
 }
 
 
-const PieceID Position::idPiece(Square const &square, Color const &color) const
+const PieceID Position::idPiece(Square const& square, Color const& color) const
 {
 	/* let us AND the bit set in the square (1ULL << square) with the main bitboards,
 	until we find the one containing that bit */
-	switch (color)
-	{
-	case WHITE:
-		for (Piece y = KING; y <= PAWN; y++)
-			if (board_[WHITE][y] & (C64(1) << square)) {
-				Color x = WHITE;
-				return PieceID{ x, y };
-			}
-		break;
-	case BLACK:
-		for (Piece y = KING; y <= PAWN; y++)
-			if (board_[BLACK][y] & (C64(1) << square)) {
-				Color x = BLACK;
-				return PieceID{ x, y };
-			}
-		break;
-	case ALL_COLOR:
+
+	if (!(color == ALL_COLOR)) {
+		if (board_[color][PAWN] & (C64(1) << square))
+			return PieceID{ color, PAWN };
+		else if (board_[color][KNIGHT] & (C64(1) << square))
+			return PieceID{ color, KNIGHT };
+		else if (board_[color][BISHOP] & (C64(1) << square))
+			return PieceID{ color, BISHOP };
+		else if (board_[color][ROOK] & (C64(1) << square))
+			return PieceID{ color, ROOK };
+		else if (board_[color][QUEEN] & (C64(1) << square))
+			return PieceID{ color, QUEEN };
+		else if (board_[color][KING] & (C64(1) << square))
+			return PieceID{ color, KING };
+	}
+	else {
 		for (Color x = BLACK; x <= WHITE; x++)
 			for (Piece y = KING; y <= PAWN; y++) {
 				if (board_[x][y] & (C64(1) << square))
 					return PieceID{ x, y };
 			}
-		break;
 	}
 	
 	return { ALL_COLOR, NO_PIECE };  // no piece on square
@@ -183,55 +181,58 @@ const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece c
 	std::vector<Square> squares;
 	Bitboard temp = board_[color][piece];
 
-	while (temp > 0) 
+	while (temp) 
 		 squares.push_back(Square(bitscan_reset(temp)));
 	
 	return squares;
 }
 
 
-const bool Position::isSquareAttacked(Color const &color, Square const &square) const
+const ushort Position::isSquareAttacked(Square const &square) const
 {
-	Bitboard sq{}, occ = getPosition(), enemy, mask;
-	
-	sq |= C64(1) << square;
+	Bitboard mask;
+	Color enemyColor;
+	ushort attackers{};
+
+	if (whitePieces_ & (C64(1) << square))
+		enemyColor = BLACK;
+	else if (blackPieces_ & (C64(1) << square))
+		enemyColor = WHITE;
+	else
+		enemyColor = Color(!turn_); // no b/w on square, we are computing for castle, so let's see if opponent attacks it
 
 	// ROOK
-	enemy = getPieces(color, ROOK); // get rook's bitboard
-	mask = g_MoveTables.rook(square, occ); // does rook's attack mask...
-	if (mask &= enemy) // ...intersect the square?
-		return true;
+	mask = g_MoveTables.rook(square, allPieces_); // does rook's attack mask...
+	if (mask &= board_[enemyColor][ROOK]) // ...intersect the square?
+		attackers++;
 
 	// BISHOP
-	enemy = getPieces(color, BISHOP); // get bishop's bitboard
-	mask = g_MoveTables.bishop(square, occ); // does bishop's attack mask...
-	if (mask &= enemy) // ...intersect square?
-		return true;
+	mask = g_MoveTables.bishop(square, allPieces_); // does bishop's attack mask...
+	if (mask &= board_[enemyColor][BISHOP]) // ...intersect square?
+		attackers++;
 
 	// QUEEN
-	enemy = getPieces(color, QUEEN); // get queen's bitboard
-	mask = g_MoveTables.rook(square, occ) | g_MoveTables.bishop(square, occ); // does queen's attack mask...
-	if (mask &= enemy) // ...intersect square?
-		return true;
+	mask = g_MoveTables.rook(square, allPieces_) | g_MoveTables.bishop(square, allPieces_); // does queen's attack mask...
+	if (mask &= board_[enemyColor][QUEEN]) // ...intersect square?
+		attackers++;
 
 	// KNIGHT
-	enemy = getPieces(color, KNIGHT); // get knight's bitboard
 	mask = g_MoveTables.knight[square]; // does knight's attack mask...
-	if (mask &= enemy) // ...intersect square?
-		return true;
+	if (mask &= board_[enemyColor][KNIGHT]) // ...intersect square?
+		attackers++;
 
 	// KING
-	enemy = getPieces(color, KING); // get enemy king's bitboard
 	mask = g_MoveTables.king[square]; // does enemy king's attack mask...
-	if (mask &= enemy) // ...intersect square?
-		return true;
+	if (mask &= board_[enemyColor][KING]) // ...intersect square?
+		attackers++;
 
 	//PAWNS
-	enemy = getPieces(color, PAWN); // get pawn's bitboard
 	// does enemy pawn's attack mask...
-	(color == WHITE) ? mask = g_MoveTables.whitePawn(enemy, sq) : mask = g_MoveTables.blackPawn(enemy, sq);
-	if (mask &= sq) // ...intersect square?
-		return true;
-	
-	return false; // if all above fails, then square is not attacked
+	(enemyColor == WHITE) ? mask = g_MoveTables.whitePawn(board_[enemyColor][PAWN], C64(1) << square)
+		: mask = g_MoveTables.blackPawn(board_[enemyColor][PAWN], C64(1) << square);
+
+	if (mask &= C64(1) << square) // ...intersect square?
+		attackers++;
+
+	return attackers; // if all above fails, then square is not attacked
 }

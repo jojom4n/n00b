@@ -5,7 +5,7 @@
 #include "Position.h"
 #include <vector>
 
-std::vector<Move> ordering(std::vector<Move> const& moves, Position const& p);
+std::vector<Move> ordering(std::vector<Move> &moves, Position const& p);
 std::vector<Move> mvv_lva(std::vector<Move> const& moves);
 
 #endif

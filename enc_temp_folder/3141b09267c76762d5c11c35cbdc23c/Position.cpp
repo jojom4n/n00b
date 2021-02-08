@@ -189,6 +189,8 @@ const std::vector<Square> Position::getSquareOfPiece(Color const &color, Piece c
 
 const Square Position::getKingSquare(Color const& color) const
 {
+	// Bitboard temp = board_[color][KING];
+
 	return Square(bitscan_fwd(board_[color][KING]));
 }
 

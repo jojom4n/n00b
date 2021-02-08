@@ -65,7 +65,7 @@ void Position::resetPosition()
 }
 
 
-void Position::storeState(ushort const &depth)
+void Position::storeState(ushort const& depth)
 {
 	prvState[depth].prvTurn_ = turn_;
 	prvState[depth].prvMoveNumber_ = moveNumber_;
@@ -76,7 +76,7 @@ void Position::storeState(ushort const &depth)
 }
 
 
-void Position::restoreState(ushort const &depth)
+void Position::restoreState(ushort const& depth)
 {
 	turn_ = prvState[depth].prvTurn_;
 	moveNumber_ = prvState[depth].prvMoveNumber_;
@@ -102,7 +102,7 @@ void Position::removePiece(Color const &color, Piece const &piece, Square const 
 }
 
 
-const PieceID Position::idPiece(Square const &square, Color const &color) const
+const PieceID Position::idPiece(Square const& square, Color const& color) const
 {
 	/* let us AND the bit set in the square (1ULL << square) with the main bitboards,
 	until we find the one containing that bit */
@@ -182,7 +182,7 @@ const std::vector<Square> Position::getSquareOfPiece(Color const &color, Piece c
 	return squares;
 }
 
-const Square Position::getKingSquare(Color const &color) const
+const Square Position::getKingSquare(Color const& color) const
 {
 	return Square(bitscan_fwd(board_[color][KING]));
 }

@@ -3,11 +3,8 @@
 #include "attack.h"
 #include "bitscan.h"
 #include "overloading.h"
-#include "tt.h"
 
 extern struct LookupTable g_MoveTables; // see attack.cpp (and its header file)
-extern std::vector<TTEntry> TT::table;
-
 
 Position::Position()
 {
@@ -57,8 +54,6 @@ void Position::setNew()
 	castle_[BLACK] = Castle::ALL;
 
 	setZobrist();
-	
-	TT::table.clear(); // clear TT
 }
 
 

@@ -5,11 +5,9 @@
 #include "makemove.h"
 #include "movegen.h"
 #include "moveorder.h"
-#include "tt.h"
 #include <iomanip>
 #include <iostream>
 
-extern std::vector<TTEntry> TT::table;
 struct Search mySearch{};
 
 const Move iterativeSearch(Position& p, short const& depth)

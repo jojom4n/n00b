@@ -5,14 +5,11 @@
 #include "enums.h"
 #include "movegen.h"
 #include "Position.h"
-#include "tt.h"
 #include <algorithm>
 #include <vector>
 
 
 extern std::map<std::string, Square> stringToSquareMap; // see display.cpp
-extern std::vector<TTEntry> TT::table;
-
 
 const bool fenValidate(std::stringstream &fen)
 {
@@ -282,6 +279,5 @@ void fenParser(std::stringstream &fen, Position &board)
 		board.setCheckmate(true);
 	
 	board.setZobrist();
-	TT::table.clear(); // clear TT
 	displayBoard(board);
 }

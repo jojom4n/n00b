@@ -186,7 +186,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList, Color const &c,
 }
 
 
-void enPassant(Position const &p, Square const &enPassant, Color const &c, std::vector<Move> &moveList)
+void enPassant(Position const &p, Square const &enPassant, Color const &c, std::vector<Move>& moveList)
 {
 	Move m{};
 
@@ -408,7 +408,7 @@ void pruneIllegal (std::vector<Move> &moveList, Position &p)
 }
 
 
-const std::vector<Move> moveGenQS(Position const &p)
+const std::vector<Move> moveGenQS(Position const& p)
 {
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);

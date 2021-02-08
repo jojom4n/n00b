@@ -34,7 +34,6 @@ unsigned long long perft(ushort const& depth, Position& p, bool init)
 			doMove(elem, p);
 
 			if (underCheck(c, p) == 0) { // if move is legal...
-
 				partialNodes = perft(depth - 1, p, cache);
 				nodes += partialNodes;
 			}

@@ -97,9 +97,8 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);
 	const Bitboard occ = p.getPosition(), ownPieces = p.getPosition(c);
-	Bitboard moves{};
-	Square kingPos = p.getKingSquare(c);
-	moves = g_MoveTables.king[kingPos] & ~ownPieces;
+	const Square kingPos = p.getKingSquare(c);
+	Bitboard moves = g_MoveTables.king[kingPos] & ~ownPieces;
 
 	while (moves) { // scan collected moves, determine their type and add them to list
 		Piece captured = NO_PIECE;

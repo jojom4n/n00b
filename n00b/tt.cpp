@@ -5,7 +5,7 @@
 
 namespace TT
 {
-	std::vector<TTEntry> table;
+	std::vector<TTEntry> table(TT_SIZE);
 
 	void Store(TTEntry const& entry)
 	{

@@ -44,7 +44,7 @@ const short evMaterial (Position const &p)
 
 const short evPSQT(Position const &p)
 {
-	std::array<short, 2> scorePSQT{};
+	std::array<short, ALL_COLOR> scorePSQT{};
 
 	for (Color c = BLACK; c <= WHITE; c++) {
 		for (Piece piece = KING; piece <= PAWN; piece++)

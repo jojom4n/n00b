@@ -173,7 +173,7 @@ const bool Position::isEnding() const
 
 const std::vector<Square> Position::getSquareOfPiece(Color const &color, Piece const &piece) const
 {
-	std::vector<Square> squares(USEFUL_SQUARES);
+	std::vector<Square> squares;
 	Bitboard temp = board_[color][piece];
 
 	while (temp) 

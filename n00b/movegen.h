@@ -6,8 +6,8 @@
 
 class Position;
 
-const std::vector<Move> moveGeneration(Position const& p);
-const std::vector<Move> generateOnlyKing(Color const& c, Position const& p);
+const std::vector<Move> moveGeneration(Position const &p);
+const std::vector<Move> generateOnlyKing(Color const &c, Position const &p);
 const Bitboard pawnMoves(Position const& p, Square const& from, Color const &c, Bitboard const& occ, Bitboard const& own);
 void castleMoves(Position const& p, std::vector<Move>& moveList, Color const& c, Bitboard const& occ);
 void enPassant(Position const& p, Square const& enPassant, Color const& c, std::vector<Move>& moveList);

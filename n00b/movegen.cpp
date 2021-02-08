@@ -328,9 +328,7 @@ const Move composeMove(Square const &from, Square const &to, Color const &c, ush
 
 ushort underCheck(Color const &c, Position const &p)
 {
-	Square kingPos = p.getKingSquare(c); //get King's square
-	
-	return p.isSquareAttacked(kingPos) ? true : false;
+	return p.isSquareAttacked(p.getKingSquare(c)) ? true : false;
 		
 	/* Bitboard kingBB = p.getPieces(c, KING);
 	Bitboard opponent, attackedBy, occ = p.getPosition();

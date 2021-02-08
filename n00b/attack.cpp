@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "attack.h"
 #include "bitscan.h"
-#include "magic.h"
 #include "overloading.h"
 
 Mask g_Masks{};

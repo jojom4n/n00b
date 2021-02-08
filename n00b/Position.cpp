@@ -176,15 +176,22 @@ const bool Position::isEnding() const
 }
 
 
-const std::vector<Square> Position::getPieceOnSquare(Color const &color, Piece const &piece) const
+const std::vector<Square> Position::getSquareOfPiece(Color const &color, Piece const &piece) const
 {
-	std::vector<Square> squares;
+	std::vector<Square> squares(USEFUL_SQUARES);
 	Bitboard temp = board_[color][piece];
 
 	while (temp) 
 		 squares.push_back(Square(bitscan_reset(temp)));
 	
 	return squares;
+}
+
+const Square Position::getKingSquare(Color const& color) const
+{
+	Bitboard temp = board_[color][KING];
+
+	return Square(bitscan_reset(temp));
 }
 
 

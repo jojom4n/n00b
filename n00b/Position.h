@@ -88,7 +88,8 @@ public:
 	
 	const bool isEnding() const;
 
-	const std::vector<Square> getPieceOnSquare(Color const &color, Piece const &piece) const;
+	const std::vector<Square> getSquareOfPiece(Color const &color, Piece const &piece) const; // PERFORMANCE TROUBLE DUE TO INEFFICIENT VECTOR
+	const Square getKingSquare(Color const& color) const; 
 
 	const ushort isSquareAttacked(Square const &square) const;
 

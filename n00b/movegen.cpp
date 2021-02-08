@@ -98,7 +98,7 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 	moveList.reserve(MAX_PLY);
 	const Bitboard occ = p.getPosition(), ownPieces = p.getPosition(c);
 	Bitboard moves{};
-	Square kingPos = p.getPieceOnSquare(c, KING)[0];
+	Square kingPos = p.getKingSquare(c);
 	moves = g_MoveTables.king[kingPos] & ~ownPieces;
 
 	while (moves) { // scan collected moves, determine their type and add them to list
@@ -328,7 +328,7 @@ const Move composeMove(Square const &from, Square const &to, Color const &c, ush
 
 ushort underCheck(Color const &c, Position const &p)
 {
-	Square kingPos = p.getPieceOnSquare(c, KING)[0]; //get King's square
+	Square kingPos = p.getKingSquare(c); //get King's square
 	
 	return p.isSquareAttacked(kingPos) ? true : false;
 		

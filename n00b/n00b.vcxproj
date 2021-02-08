@@ -208,7 +208,10 @@
     <ClCompile Include="moveorder.cpp" />
     <ClCompile Include="overloading.cpp" />
     <ClCompile Include="perft.cpp" />
-    <ClCompile Include="Position.cpp" />
+    <ClCompile Include="Position.cpp">
+      <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Neither</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotSet</EnableEnhancedInstructionSet>
+    </ClCompile>
     <ClCompile Include="display.cpp" />
     <ClCompile Include="game.cpp" />
     <ClCompile Include="magic.cpp" />

@@ -310,12 +310,6 @@ void doMove(Move const &m, Position &p)
 }
 
 
-void undoMove(Move const &m, Position &p, Position const &backup) // OLD: TO REMOVE
-{
-	p = backup;
-}
-
-
 void undoMove(Move const& m, Position& p)
 {
 	Square squareFrom{}, squareTo{};

@@ -160,40 +160,9 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 
 const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
-{	
+{
 	pv[0] = 0;
-	uint32_t key = static_cast<uint32_t>(p.getZobrist());
-	auto alphaOrig = alpha;
-	TTEntry TTEntry{};
-	
-
-	/* ********************************************************* */
-	/*                                                           */
-	/*                  TRANSPOSITION TABLE                      */
-	/*                                                           */
-	/* ********************************************************* */
-	/* if (TT::table[key % TT_SIZE].key == key) {
-		TTEntry = TT::table[key % TT_SIZE];
-		mySearch.ttHits++;
-
-		if (TT::isLegalEntry(TTEntry, p) && TTEntry.depth >= depth) {
-
-			mySearch.ttUseful++;
-
-			switch (TTEntry.nodeType) {
-			case LOWER_BOUND:
-				if (alpha < TTEntry.score)
-					alpha = TTEntry.score;
-				break;
-			case UPPER_BOUND:
-				if (beta > TTEntry.score)
-					beta = TTEntry.score;
-				break;
-			}
-		}
-	} */
-	
-	
+		
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
 		
@@ -273,7 +242,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		if (underCheck(c, p)) {  // move is not legal, let's continue to search
 			undoMove(moveList[i], p);
 			p.restoreState(depth);
-			goto OUTER;
+			continue; // since move is not legal, let's skip this move and go to next iteration of for() loop
 		}
 
 		mySearch.nodes++;
@@ -301,36 +270,6 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 			memcpy(pv + 1, subPV, 63 * sizeof(Move));
 			pv[63] = 0;
 		}
-
-	OUTER: continue;
-
-	}
-
-
-	/* ********************************************************* */
-	/*                 UPDATE TRANSPOSITION TABLE                */
-	/*                                                           */
-	/* we only update TT if there is a best move.In other words, */
-	/* if it's mate and therefore there is not any best move (or */
-	/* hence any move at all), we do not want to update TT,      */
-	/* because otherwise we would have a dummy entry with score  */
-	/* about MATE or -MATE and move = 0, polluting TT!           */
-	/*                                                           */
-	/* ********************************************************* */
-	if (bestMove) {
-		TTEntry.score = bestScore;
-		if (bestScore <= alphaOrig)
-			TTEntry.nodeType = UPPER_BOUND;
-		else if (bestScore >= beta)
-			TTEntry.nodeType = LOWER_BOUND;
-		else
-			TTEntry.nodeType = EXACT;
-
-		TTEntry.age = static_cast<uint8_t>(p.getMoveNumber());
-		TTEntry.depth = static_cast<uint8_t>(depth);
-		TTEntry.key = static_cast<uint32_t>(p.getZobrist());
-		TTEntry.move = bestMove;
-		TT::Store(TTEntry);
 	}
 
 	mySearch.bestMove = bestMove;
@@ -340,8 +279,6 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 const short quiescence(Position p, short alpha, short beta, ushort qsDepth)
 {
-	uint32_t key = static_cast<uint32_t>(p.getZobrist());
-	TTEntry TTEntry;
 	short stand_pat = lazyEval(p);
 	
 	if (qsDepth <= 0)

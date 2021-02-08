@@ -11,7 +11,6 @@ extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and it
 
 std::vector<Move> ordering(std::vector<Move> &moves, Position const& p)
 {
-	std::random_shuffle(moves.begin(), moves.end());
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);
 

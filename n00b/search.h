@@ -16,7 +16,8 @@ struct Search {
 	Position pos;
 	short bestScore, depth;
 	unsigned long long nodes, ttHits, ttUseful;
-	Move bestMove, pv[MAX_PLY];
+	Move bestMove{}, pv[MAX_PLY];
+	std::array<std::array<Move, 3>, MAX_PLY> killerMoves;
 };
 
 const Move iterativeSearch(Position& p, short const& depth);

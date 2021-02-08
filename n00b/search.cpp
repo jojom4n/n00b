@@ -183,12 +183,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	std::vector<Move> moveList;
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
-	moveList = ordering(moveList, p);
-
-	if (std::find(moveList.begin(), moveList.end(), mySearch.bestMove) != moveList.end()) {
-		std::vector<Move>::iterator it = std::find(moveList.begin(), moveList.end(), mySearch.bestMove);
-		std::rotate(moveList.begin(), it, it + 1); // PERFORMANCE CRITICAL. TODO CHANGE
-	}
+	moveList = ordering(moveList, p, depth);
 
 	p.storeState(depth);
 	ushort idx, legalMoves = ushort(moveList.size());
@@ -233,6 +228,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	for (ushort i = idx + 1; i < moveList.size(); i++)
 	{
 		short score{};
+		ushort killerIndex{};
 		p.storeState(depth);
 		Color c = Color(((C64(1) << 1) - 1) & (moveList[i] >> 12)); // who is going to move?
 		doMove(moveList[i], p);
@@ -259,8 +255,15 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 		if (score > bestScore) {
 
-			if (score >= beta)
+			if (score >= beta) {
+			
+				if (mySearch.killerMoves[depth].size() < 2) {
+					mySearch.killerMoves[depth][killerIndex] = moveList[i];
+					killerIndex++;
+				}
+				
 				return score;
+			}
 			
 			bestMove = moveList[i];
 			bestScore = score;

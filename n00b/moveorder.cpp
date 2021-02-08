@@ -8,25 +8,36 @@
 #include <map>
 
 extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and its header)
+extern struct Search mySearch;
 
-std::vector<Move> ordering(std::vector<Move> &moves, Position const& p)
+
+std::vector<Move> ordering(std::vector<Move> const &moves, Position const &p, ushort const &depth)
 {
-	std::vector<Move> moveList;
+	std::vector<Move> moveList, captures;
 	moveList.reserve(MAX_PLY);
+	captures.reserve(MAX_PLY);
 
-	moveList = mvv_lva(moves);
-	
-	for (auto elem : moves) {
-		ushort moveType = ((C64(1) << 3) - 1) & (elem >> 6); //is move a capture?
-		if (!(moveType == CAPTURE))
-			moveList.push_back(elem);
+	for (const auto& m : moves) {
+		if (std::find(moves.begin(), moves.end(), mySearch.bestMove) != moves.end())
+			moveList.push_back(mySearch.bestMove);
+	}
+
+	captures = mvv_lva(moves);
+	moveList.insert(moveList.end(), captures.begin(), captures.end());
+
+	for (const auto &m : mySearch.killerMoves[depth])
+		if (m) { moveList.push_back(m); }
+
+	for (const auto &m : moves) {
+		if (std::find(moveList.begin(), moveList.end(), m) == moveList.end())
+			moveList.push_back(m);
 	}
 
 	return moveList;
 }
 
 
-std::vector<Move> mvv_lva(std::vector<Move> const& moves) 
+std::vector<Move> mvv_lva(std::vector<Move> const &moves) 
 {
 	std::vector<Move> captures;
 	captures.reserve(MAX_PLY);

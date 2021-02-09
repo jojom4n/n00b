@@ -394,7 +394,7 @@ void pruneIllegal (std::vector<Move> &moveList, Position &p)
 	{
 		Move m = moveList[i];
 		Color c = Color(((C64(1) << 1) - 1) & (m >> 12)); // who's moving?
-		doQuickMove(m, p); // do the move
+		doQuickMove(m, p); // do the move as quick as possible
 
 		if (underCheck(c, p)) { // if move is not legal...
 			std::swap(moveList[i], moveList.back());

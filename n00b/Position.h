@@ -57,9 +57,7 @@ public:
 	constexpr Castle getCastle(Color const &color) const { return castle_[color]; }
 	
 	void setCastle(Color const &color, Castle const &castle)
-	{
-		(color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle;
-	}
+		{ (color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle;	}
 
 	void putPiece(Color const &color, Piece const &piece, Square const &square);
 	void removePiece(Color const &color, Piece const &piece, Square const &square);
@@ -67,19 +65,13 @@ public:
 	constexpr Bitboard getPosition() const { return allPieces_; }
 	
 	constexpr Bitboard getPosition(Color const &color) const
-	{
-		return (color == WHITE) ? whitePieces_ : blackPieces_;
-	}
+	{ return (color == WHITE) ? whitePieces_ : blackPieces_; }
 
 	constexpr Bitboard getPieces(Color const &color, Piece const &piece) const
-	{
-		return board_[color][piece];
-	}
+	{ return board_[color][piece]; }
 
 	constexpr bool occupiedSquare(Square const &square) const
-	{
-		return (allPieces_ & (C64(1) << square)) ? true : false;
-	}
+	{ return (allPieces_ & (C64(1) << square)) ? true : false; }
 
 	const PieceID idPiece(Square const &square, Color const &color = ALL_COLOR) const;
 	
@@ -91,7 +83,7 @@ public:
 	const std::vector<Square> getSquareOfPiece(Color const &color, Piece const &piece) const; // PERFORMANCE TROUBLE DUE TO INEFFICIENT VECTOR
 	const Square getKingSquare(Color const& color) const; 
 
-	const ushort isSquareAttacked(Square const &square) const;
+	bool isSquareAttacked(Square const &square) const;
 
 	constexpr uint64_t getZobrist() const { return zobristHash_; }
 	void setZobrist() { zobristHash_ = Zobrist::fill(*this); }

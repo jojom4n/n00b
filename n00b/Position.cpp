@@ -188,11 +188,10 @@ const Square Position::getKingSquare(Color const &color) const
 }
 
 
-const ushort Position::isSquareAttacked(Square const &square) const
+bool Position::isSquareAttacked(Square const &square) const
 {
 	Bitboard mask;
 	Color enemyColor;
-	ushort attackers{};
 
 	if (whitePieces_ & (C64(1) << square))
 		enemyColor = BLACK;
@@ -204,27 +203,27 @@ const ushort Position::isSquareAttacked(Square const &square) const
 	// ROOK
 	mask = g_MoveTables.rook(square, allPieces_); // does rook's attack mask...
 	if (mask &= board_[enemyColor][ROOK]) // ...intersect the square?
-		attackers++;
+		return true;
 
 	// BISHOP
 	mask = g_MoveTables.bishop(square, allPieces_); // does bishop's attack mask...
 	if (mask &= board_[enemyColor][BISHOP]) // ...intersect square?
-		attackers++;
+		return true;
 
 	// QUEEN
 	mask = g_MoveTables.rook(square, allPieces_) | g_MoveTables.bishop(square, allPieces_); // does queen's attack mask...
 	if (mask &= board_[enemyColor][QUEEN]) // ...intersect square?
-		attackers++;
+		return true;
 
 	// KNIGHT
 	mask = g_MoveTables.knight[square]; // does knight's attack mask...
 	if (mask &= board_[enemyColor][KNIGHT]) // ...intersect square?
-		attackers++;
+		return true;
 
 	// KING
 	mask = g_MoveTables.king[square]; // does enemy king's attack mask...
 	if (mask &= board_[enemyColor][KING]) // ...intersect square?
-		attackers++;
+		return true;
 
 	//PAWNS
 	// does enemy pawn's attack mask...
@@ -232,7 +231,7 @@ const ushort Position::isSquareAttacked(Square const &square) const
 		: mask = g_MoveTables.blackPawn(board_[enemyColor][PAWN], C64(1) << square);
 
 	if (mask &= C64(1) << square) // ...intersect square?
-		attackers++;
+		return true;
 
-	return attackers; // if all above fails, then square is not attacked
+	return false; // if all above fails, then square is not attacked
 }

@@ -273,6 +273,7 @@ void fenParser(std::stringstream &fen, Position &board)
 		board.setMoveNumber(1);
 
 	std::vector<Move> moveList = moveGeneration(board);
+	pruneIllegal(moveList, board);
 	if (!underCheck(board.getTurn(), board) && moveList.size() > 0)
 		board.setCheckmate(false);
 	else

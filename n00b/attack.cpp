@@ -217,15 +217,31 @@ void knightMask()
 
 const Bitboard LookupTable::rook(Square const &square, Bitboard const &blockers) const
 {
+#ifdef HAVE_BMI2
+#include <immintrin.h>
+
+	return g_MoveTables.rookMagic[square]
+		[(int)(_pext_u64(blockers, g_Masks.linesEx[square]))];
+#else
 	return g_MoveTables.rookMagic[square]
 		[((blockers & g_Masks.linesEx[square]) * MAGIC_ROOK[square]) >> SHIFT_ROOK[square]];
+#endif
 }
 
 
 const Bitboard LookupTable::bishop(Square const &square, Bitboard const &blockers) const
 {
+#ifdef HAVE_BMI2
+#include <immintrin.h>
+	
+	return g_MoveTables.bishopMagic[square]
+		[(int)(_pext_u64(blockers, g_Masks.diagonalsEx[square]))];
+
+#else
+	
 	return g_MoveTables.bishopMagic[square]
 		[((blockers & g_Masks.diagonalsEx[square]) * MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square]];
+#endif
 }
 
 const Bitboard LookupTable::whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const

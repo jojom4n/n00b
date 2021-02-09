@@ -22,8 +22,13 @@ void rookMagic()
 			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.linesEx[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
 			
-			uint64_t index = ((blockerboard[i] & g_Masks.linesEx[square]) 
+#ifdef HAVE_BMI2
+#include <immintrin.h>
+			uint64_t index = _pext_u64(blockerboard[i], g_Masks.linesEx[square]);
+#else
+			uint64_t index = ((blockerboard[i] & g_Masks.linesEx[square])
 				* MAGIC_ROOK[square]) >> SHIFT_ROOK[square];
+#endif
 			
 			g_MoveTables.rookMagic[square][ushort(index)] = tmp_rook;
 		}
@@ -45,8 +50,13 @@ void bishopMagic()
 			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.diagonalsEx[square]);
 			tmp_bishop = gen_b_attks(square, blockerboard[i]);
 
-			uint64_t index = ((blockerboard[i] & g_Masks.diagonalsEx[square]) 
+#ifdef HAVE_BMI2
+#include <immintrin.h>
+			uint64_t index = _pext_u64(blockerboard[i], g_Masks.diagonalsEx[square]);
+#else
+			uint64_t index = ((blockerboard[i] & g_Masks.diagonalsEx[square])
 				* MAGIC_BISHOP[square]) >> SHIFT_BISHOP[square];
+#endif
 
 			g_MoveTables.bishopMagic[square][ushort(index)] = tmp_bishop;
 		}

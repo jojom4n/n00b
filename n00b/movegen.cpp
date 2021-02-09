@@ -188,101 +188,14 @@ void castleMoves(Position const &p, std::vector<Move> &moveList, Color const &c,
 
 void enPassant(Position const &p, Square const &enPassant, Color const &c, std::vector<Move> &moveList)
 {
-	Move m{};
-
-	if (!(enPassant % 8) == FILE_A && !((enPassant % 8) == FILE_H))
-		switch (c) {
-		case WHITE: { // is there a white pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
-
-			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant - 7);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c)) & occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-
-			probablePawn = p.idPiece(Square(enPassant - 9), c);
-
-			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant - 9);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c)) & occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-			return; }
-		case BLACK: { // is there a black pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant + 7), c);
-
-			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant + 7);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c)) & occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-
-			probablePawn = p.idPiece(Square(enPassant + 9), c);
-
-			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant + 9);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c)) & occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-			return; }
-		} // end switch	
-
-	if ((enPassant %8) == FILE_A)
-		switch (c) {
-		case WHITE: { // is there a white pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
-			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant - 7);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c)) & occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-			return; }
-		case BLACK: { // is there a black pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant + 9), c);
-			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant + 9);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c)) & occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-			return; }
-		} // end switch	
-
-	if ((enPassant % 8 == FILE_H))
-		switch (c) {
-		case WHITE: { // is there a white pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant - 9), c);
-			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant - 9);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c))& occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-			return; }
-		case BLACK: { // is there a black pawn attacking the en-passant square?
-			PieceID probablePawn = p.idPiece(Square(enPassant + 7), c);
-			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
-				Square squareFrom = Square(enPassant + 7);
-				Bitboard attacksToEP{}, occ = p.getPosition();
-				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c))  & occ;
-				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
-				moveList.push_back(m);
-			}
-			return; }
-		} // end switch	
+	Square from;
+	Bitboard epMask, pawns = p.getPieces(c, PAWN);
+	c == WHITE ? epMask = g_MoveTables.blackPawn[enPassant] : epMask = g_MoveTables.whitePawn[enPassant];
+	
+	while (epMask &= pawns) {
+		from = Square(bitscan_reset(epMask &= pawns));
+		moveList.emplace_back(composeMove(from, enPassant, c, PAWN, EN_PASSANT, PAWN, 0));
+	}
 }
 
 

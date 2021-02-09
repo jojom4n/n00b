@@ -310,6 +310,94 @@ void doMove(Move const &m, Position &p)
 }
 
 
+void doQuickMove(Move const& m, Position &p) // only for pruneIllegal()
+{
+	Square squareFrom{}, squareTo{};
+	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
+	squareFrom = Square(((C64(1) << 6) - 1) & (m >> 19));
+	squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
+	Color color = Color(((C64(1) << 1) - 1) & (m >> 12));
+	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 9));
+	Piece captured = Piece(((C64(1) << 3) - 1) & (m >> 3));
+	ushort promotedTo = ((C64(1) << 3) - 1) & (m);
+
+	switch (moveType)
+	{
+	case QUIET:
+		p.removePiece(color, piece, squareFrom);
+		p.putPiece(color, piece, squareTo);
+		break;
+	case CAPTURE:
+		p.removePiece(color, piece, squareFrom);
+		p.removePiece(Color(!color), captured, squareTo);
+		p.putPiece(color, piece, squareTo);
+		break;
+	case PROMOTION:
+		p.removePiece(color, piece, squareFrom);
+		
+		if (!(captured == NO_PIECE)) 
+			p.removePiece(Color(!color), captured, squareTo);
+		
+		switch (promotedTo) {
+			case PAWN_TO_KNIGHT:
+				p.putPiece(color, KNIGHT, squareTo);
+				break;
+			case PAWN_TO_QUEEN:
+				p.putPiece(color, QUEEN, squareTo);
+				break;
+			case PAWN_TO_BISHOP:
+				p.putPiece(color, BISHOP, squareTo);
+				break;
+			case PAWN_TO_ROOK:
+				p.putPiece(color, ROOK, squareTo);
+				break;
+		}
+
+		break;
+	case CASTLE_Q: 
+		p.removePiece(color, piece, squareFrom);
+		
+		if (color == WHITE) {
+			p.removePiece(color, ROOK, A1);
+			p.putPiece(color, ROOK, D1);
+		}
+		else {
+			p.removePiece(color, ROOK, A8);
+			p.putPiece(color, ROOK, D8);
+		}
+		
+		p.putPiece(color, piece, squareTo);
+		
+		break;	
+	case CASTLE_K: 
+		p.removePiece(color, piece, squareFrom);
+
+		if (color == WHITE) {
+			p.removePiece(color, ROOK, H1);
+			p.putPiece(color, ROOK, F1);
+		}
+		else {
+			p.removePiece(color, ROOK, H8);
+			p.putPiece(color, ROOK, F8);
+		}
+
+		p.putPiece(color, piece, squareTo);
+		
+		break;
+	case EN_PASSANT:
+		p.removePiece(color, piece, squareFrom);
+		
+		if (color == WHITE)
+			p.removePiece(Color(!color), PAWN, Square(squareTo - 8));
+		else 
+			p.removePiece(Color(!color), PAWN, Square(squareTo + 8));
+
+		p.putPiece(color, piece, squareTo);
+
+		break;
+	}
+}
+
 void undoMove(Move const& m, Position& p)
 {
 	Square squareFrom{}, squareTo{};

@@ -32,7 +32,7 @@ void doMove(Move const &m, Position &p)
 			switch (color)
 			{
 			case WHITE: {
-				Bitboard ep = g_MoveTables.blackPawn(p.getPieces(BLACK, PAWN), C64(1) << (squareTo - 8));
+				Bitboard ep = g_MoveTables.blackPawn[squareTo - 8];
 				if (ep) {
 					p.updateZobrist(p.getEnPassant());
 					p.setEnPassant(Square(squareTo - 8));
@@ -40,7 +40,7 @@ void doMove(Move const &m, Position &p)
 				}
 				break; }
 			case BLACK: {
-				Bitboard ep = g_MoveTables.whitePawn(p.getPieces(WHITE, PAWN), C64(1) << (squareTo + 8));
+				Bitboard ep = g_MoveTables.whitePawn[squareTo + 8];
 				if (ep) {
 					p.updateZobrist(p.getEnPassant());
 					p.setEnPassant(Square(squareTo + 8));

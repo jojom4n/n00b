@@ -135,8 +135,8 @@ const Bitboard pawnMoves(Position const &p, Square const &from, Color const &c, 
 		
 	/* Set in an empty bitboard the bit corresponding to 'from' (i.e. where pawn is)
 	and compute if it can attack from there opponent's pieces*/
-	(c == WHITE) ? m |= g_MoveTables.whitePawn(C64(1) << from, ~own) & occ
-		: m |= g_MoveTables.blackPawn(C64(1) << from, ~own) & occ;
+	(c == WHITE) ? m |= (g_MoveTables.whitePawn[from] & ~own) & occ
+		: m |= (g_MoveTables.blackPawn[from] & ~own) & occ;
 
 	return m;
 }
@@ -197,8 +197,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 7);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c)) & occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -207,8 +207,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 9);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c)) & occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -218,8 +218,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 7);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c)) & occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -228,8 +228,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 9);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c)) & occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -242,8 +242,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 			PieceID probablePawn = p.idPiece(Square(enPassant - 7), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 7);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c)) & occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -252,8 +252,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 			PieceID probablePawn = p.idPiece(Square(enPassant + 9), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 9);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c)) & occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -266,8 +266,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 			PieceID probablePawn = p.idPiece(Square(enPassant - 9), c);
 			if (probablePawn.color == WHITE && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant - 9);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.whitePawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.whitePawn[enPassant] & ~p.getPosition(c))& occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -276,8 +276,8 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 			PieceID probablePawn = p.idPiece(Square(enPassant + 7), c);
 			if (probablePawn.color == BLACK && probablePawn.piece == PAWN) {
 				Square squareFrom = Square(enPassant + 7);
-				Bitboard attacksToKing{}, occ = p.getPosition();
-				attacksToKing |= g_MoveTables.blackPawn(C64(1) << enPassant, occ);
+				Bitboard attacksToEP{}, occ = p.getPosition();
+				attacksToEP |= (g_MoveTables.blackPawn[enPassant] & ~p.getPosition(c))  & occ;
 				m = composeMove(squareFrom, enPassant, c, PAWN, EN_PASSANT, PAWN, 0);
 				moveList.push_back(m);
 			}
@@ -447,8 +447,8 @@ const std::vector<Move> moveGenQS(Position const &p)
 				m = g_MoveTables.bishop(squareFrom, occ);
 				break;
 			case PAWN:
-				(sideToMove == WHITE) ? m |= g_MoveTables.whitePawn(C64(1) << squareFrom, occ) 
-					: m |= g_MoveTables.blackPawn(C64(1) << squareFrom, occ);
+				(sideToMove == WHITE) ? m |= g_MoveTables.whitePawn[squareFrom] 
+					: m |= g_MoveTables.blackPawn[squareFrom];
 				break;
 			}
 	

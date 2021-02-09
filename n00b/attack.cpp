@@ -19,6 +19,8 @@ void initAttacks()
 	knightMask();
 	rookMagic();
 	bishopMagic();
+	whitePawnMask();
+	blackPawnMask();
 }
 
 
@@ -244,7 +246,28 @@ const Bitboard LookupTable::bishop(Square const &square, Bitboard const &blocker
 #endif
 }
 
-const Bitboard LookupTable::whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const
+void whitePawnMask()
+{
+	g_MoveTables.whitePawn.fill({});
+
+	for (Square square = A1; square <= H7; square++) {
+		auto sqToBit = C64(1) << square;
+		g_MoveTables.whitePawn[square] = ((sqToBit << 7) & NOT_FILE_H) | ((sqToBit << 9) & NOT_FILE_A);
+	}
+}
+
+
+void blackPawnMask()
+{
+	g_MoveTables.blackPawn.fill({});
+
+	for (Square square = A2; square <= H8; square++) {
+		auto sqToBit = C64(1) << square;
+		g_MoveTables.blackPawn[square] = ((sqToBit >> 7) & NOT_FILE_A) | ((sqToBit >> 9) & NOT_FILE_H);
+	}
+}
+
+/* const Bitboard LookupTable::whitePawn(Bitboard const &pawn, Bitboard const &occupancy) const
 {
 	return (((pawn << 7) & NOT_FILE_H) | ((pawn << 9) & NOT_FILE_A)) & occupancy;
 }
@@ -252,4 +275,4 @@ const Bitboard LookupTable::whitePawn(Bitboard const &pawn, Bitboard const &occu
 const Bitboard LookupTable::blackPawn(Bitboard const &pawn, Bitboard const &occupancy) const
 {
 	return (((pawn >> 7) & NOT_FILE_A) | ((pawn >> 9) & NOT_FILE_H)) & occupancy;
-}
+} */

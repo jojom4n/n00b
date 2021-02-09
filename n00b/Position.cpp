@@ -227,10 +227,10 @@ bool Position::isSquareAttacked(Square const &square) const
 
 	//PAWNS
 	// does enemy pawn's attack mask...
-	(enemyColor == WHITE) ? mask = g_MoveTables.whitePawn(board_[enemyColor][PAWN], C64(1) << square)
-		: mask = g_MoveTables.blackPawn(board_[enemyColor][PAWN], C64(1) << square);
+	(enemyColor == WHITE) ? mask = g_MoveTables.blackPawn[square]
+		: mask = g_MoveTables.whitePawn[square];
 
-	if (mask &= C64(1) << square) // ...intersect square?
+	if (mask &= board_[enemyColor][PAWN]) // ...intersect square?
 		return true;
 
 	return false; // if all above fails, then square is not attacked

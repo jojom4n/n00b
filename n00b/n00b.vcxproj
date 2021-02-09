@@ -49,7 +49,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
     <PlatformToolset>v142</PlatformToolset>
     <PreferredToolArchitecture>
     </PreferredToolArchitecture>
@@ -143,26 +143,31 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <SDLCheck>
+      </SDLCheck>
+      <PreprocessorDefinitions>CONSOLE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <ConformanceMode>false</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>Default</LanguageStandard>
       <BufferSecurityCheck>true</BufferSecurityCheck>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
-      <StringPooling>true</StringPooling>
-      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <StringPooling>
+      </StringPooling>
+      <FloatingPointExceptions>
+      </FloatingPointExceptions>
       <OmitFramePointers>
       </OmitFramePointers>
-      <CompileAs>CompileAsCpp</CompileAs>
+      <CompileAs>Default</CompileAs>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -170,7 +175,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <Profile>false</Profile>
-      <LargeAddressAware>true</LargeAddressAware>
+      <LargeAddressAware>
+      </LargeAddressAware>
+      <GenerateMapFile />
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

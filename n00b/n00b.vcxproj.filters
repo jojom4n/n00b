@@ -137,5 +137,13 @@
     <Filter Include="File di origine">
       <UniqueIdentifier>{3c397e91-16c2-4348-aca5-c496eca6c257}</UniqueIdentifier>
     </Filter>
+    <Filter Include="File di risorse">
+      <UniqueIdentifier>{1a8c71e3-351a-4ac9-a863-1721b8ec587b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\TODO.txt">
+      <Filter>File di risorse</Filter>
+    </Text>
   </ItemGroup>
 </Project>

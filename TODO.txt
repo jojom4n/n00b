@@ -1,0 +1,5 @@
+TODO:
+
+--- Generazione di mosse per template<Pezzo>
+--- Generazione di CheckEvasions
+--- Risolvere la problematica con i timing di Clock (t1, t2 ... tn)

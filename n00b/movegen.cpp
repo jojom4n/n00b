@@ -68,14 +68,14 @@ const std::vector<Move> moveGeneration(Position const &p)
 					Move m2 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_QUEEN);
 					Move m3 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_ROOK);
 					Move m4 = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, PAWN_TO_BISHOP);
-					moveList.push_back(m);
-					moveList.push_back(m2);
-					moveList.push_back(m3);
-					moveList.push_back(m4);
+					moveList.emplace_back(m);
+					moveList.emplace_back(m2);
+					moveList.emplace_back(m3);
+					moveList.emplace_back(m4);
 				}
 				else {
 					Move m = composeMove(squareFrom, squareTo, sideToMove, piece, type, captured, 0);
-					moveList.push_back(m);
+					moveList.emplace_back(m);
 				}
 			} // end while (moves)
 		} // end while (bb)
@@ -108,11 +108,11 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 		if (type == CAPTURE) {
 			captured = p.idPiece(squareTo, Color(!p.getTurn())).piece;
 			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 		else {
 			Move m = composeMove(kingPos, squareTo, c, KING, type, captured, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 	}
 
@@ -153,7 +153,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList, Color const &c,
 			&& (	!(p.isSquareAttacked(D8))	)	)
 		{  
 			m = composeMove(E8, C8, c, KING, CASTLE_Q, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 
 		else if (	(p.idPiece(A1, c).piece == ROOK && p.idPiece(E1, c).piece == KING)  // rook and king in position
@@ -162,7 +162,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList, Color const &c,
 			&& (	!(p.isSquareAttacked(D1))	)	)
 		{
 			m = composeMove(E1, C1, c, KING, CASTLE_Q, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 
 	if (p.getCastle(c) == Castle::KINGSIDE || p.getCastle(c) == Castle::ALL)
@@ -172,7 +172,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList, Color const &c,
 			&& (	!(p.isSquareAttacked(G8))	)	)
 		{
 			m = composeMove(E8, G8, c, KING, CASTLE_K, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 
 		else if (	(p.idPiece(H1, c).piece == ROOK && p.idPiece(E1, c).piece == KING) // rook and king in position
@@ -181,7 +181,7 @@ void castleMoves(Position const &p, std::vector<Move> &moveList, Color const &c,
 			&& (	!(p.isSquareAttacked(G1))	)	)
 		{
 			m = composeMove(E1, G1, c, KING, CASTLE_K, NO_PIECE, 0);
-			moveList.push_back(m);
+			moveList.emplace_back(m);
 		}
 }
 
@@ -194,7 +194,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 	
 	while (epMask &= pawns) {
 		from = Square(bitscan_reset(epMask &= pawns));
-		moveList.push_back(composeMove(from, enPassant, c, PAWN, EN_PASSANT, PAWN, 0));
+		moveList.emplace_back(composeMove(from, enPassant, c, PAWN, EN_PASSANT, PAWN, 0));
 	}
 }
 
@@ -376,7 +376,7 @@ const std::vector<Move> moveGenQS(Position const &p)
 				if (captured == KING) // captured can't be enemy king
 					break; 
 
-				moveList.push_back(composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0));
+				moveList.emplace_back(composeMove(squareFrom, squareTo, sideToMove, piece, CAPTURE, captured, 0));
 				
 			} // end while (moves)
 

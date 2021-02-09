@@ -58,7 +58,7 @@ static unsigned long long perft(ushort const &depth, Position &p, std::array<per
 	if (depth == 0)
 		return 1;
 
-#ifdef PERFT_CACHE
+#ifndef NO_PERFT_CACHE
 	if (depth > 1) {
 		if (cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key
 			== (p.getZobrist() ^ Zobrist::getKey(depth)))
@@ -79,7 +79,7 @@ static unsigned long long perft(ushort const &depth, Position &p, std::array<per
 		p.restoreState(depth);
 	}
 
-#ifdef PERFT_CACHE
+#ifndef NO_PERFT_CACHE
 	if (depth > 1) {
 			cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].key = p.getZobrist() ^ Zobrist::getKey(depth);
 			cache[( p.getZobrist() ^ Zobrist::getKey(depth) ) % PERFT_CACHE_SIZE].nodes = nodes;

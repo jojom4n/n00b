@@ -1,5 +1,5 @@
 TODO:
 
 --- Generazione di mosse per template<Pezzo>
---- Generazione di CheckEvasions
+--- Generazione di CheckEvasions (e connessa tabella pezzi pinned?)
 --- Risolvere la problematica con i timing di Clock (t1, t2 ... tn)

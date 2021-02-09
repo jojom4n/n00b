@@ -69,8 +69,8 @@ static unsigned long long perft(ushort const &depth, Position &p, std::array<per
 	}
 #endif
 
-	if (depth == 1 || moveList.size() == 0)
-		return moveList.size();
+	/* if (depth == 1 || moveList.size() == 0)
+		return moveList.size(); */
 
 	p.storeState(depth);
 

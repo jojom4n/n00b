@@ -8,7 +8,7 @@
 #include <cstdint>
 
 template<bool Root>
-uint64_t divide(short depth, Position &p)
+uint64_t divide(short const &depth, Position &p)
 {
 	std::vector<Move> moveList = moveGeneration(p);
 	moveList.reserve(MAX_PLY);
@@ -24,15 +24,9 @@ uint64_t divide(short depth, Position &p)
 			cnt = 1, nodes++;
 
 		else {
-			Color c = Color(((C64(1) << 1) - 1) & (m >> 12));
-			// check = underCheck(c, p);
 			doMove(m, p);
-
-			// if (!check) { // if move is legal...
-				cnt = leaf ? 1 : divide<false>(depth - 1, p);
-				nodes += cnt;
-			// }
-
+			cnt = leaf ? 1 : divide<false>(depth - 1, p);
+			nodes += cnt;
 			undoMove(m, p);
 			p.restoreState(depth);
 		}

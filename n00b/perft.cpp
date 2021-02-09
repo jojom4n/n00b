@@ -10,7 +10,7 @@
 
 unsigned long long debug_nodes{};
 
-unsigned long long perft(ushort const& depth, Position& p, bool init)
+unsigned long long perft(ushort const &depth, Position &p)
 {
 	unsigned long long nodes{};
 	extern std::map<Square, std::string> squareToStringMap; // see display.cpp
@@ -45,7 +45,7 @@ unsigned long long perft(ushort const& depth, Position& p, bool init)
 }
 
 template<size_t PERFT_CACHE_SIZE>
-static unsigned long long perft(ushort const& depth, Position& p, std::array<perftCache, PERFT_CACHE_SIZE>& cache)
+static unsigned long long perft(ushort const &depth, Position &p, std::array<perftCache, PERFT_CACHE_SIZE> &cache)
 {
 	unsigned long long nodes{};
 	std::vector<Move> moveList;
@@ -72,8 +72,7 @@ static unsigned long long perft(ushort const& depth, Position& p, std::array<per
 	if (depth == 1 || moveList.size() == 0)
 		return moveList.size();
 
-	for (const auto& elem : moveList) {
-		Color c = Color(((C64(1) << 1) - 1) & (elem >> 12));
+	for (const auto &elem : moveList) {
 		doMove(elem, p);
 		nodes += perft(depth - 1, p, cache);
 		undoMove(elem, p);

@@ -49,8 +49,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		else std::cout << "Sorry, no FEN or invalid FEN position.\n";
 	
 	else if (inputStream.str().substr(0) == "movelist") {
-		std::vector<Move> moveList;
-		moveList = moveGeneration(board);
+		std::vector<Move> moveList = moveGeneration(board);
 		pruneIllegal(moveList, board);
 		
 		if (moveList.size() > 0) {

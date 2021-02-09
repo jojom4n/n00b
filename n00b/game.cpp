@@ -101,6 +101,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 			std::cout << "Total moves: " << nodes;
 			std::cout << "\tTime elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms\n";;
 			std::cout << "Total mg() generations: " << debug_nodes << std::endl;
+			debug_nodes = 0; // reset for another eventual iteration
 		}
 		else
 			std::cout << "Invalid depth.\n";

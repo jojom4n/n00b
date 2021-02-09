@@ -51,7 +51,7 @@ const std::vector<Move> moveGeneration(Position const &p)
 			case PAWN: 
 				/* For pawns, it's a bit more complicated, because they have no lookup tables.
 				For readibility, better pass the params to an appropriate function */
-				moves = pawnMoves(p, squareFrom, sideToMove, occupancy, ownPieces);	
+				moves = pawnMoves(squareFrom, sideToMove, occupancy, ownPieces);	
 				break;
 			}
 
@@ -120,7 +120,7 @@ const std::vector<Move> generateOnlyKing(Color const &c, Position const &p)
 }
 
 
-const Bitboard pawnMoves(Position const &p, Square const &from, Color const &c, Bitboard const &occ, Bitboard const &own)
+const Bitboard pawnMoves(Square const &from, Color const &c, Bitboard const &occ, Bitboard const &own)
 {
 	Bitboard m{};
 	
@@ -194,7 +194,7 @@ void enPassant(Position const &p, Square const &enPassant, Color const &c, std::
 	
 	while (epMask &= pawns) {
 		from = Square(bitscan_reset(epMask &= pawns));
-		moveList.emplace_back(composeMove(from, enPassant, c, PAWN, EN_PASSANT, PAWN, 0));
+		moveList.push_back(composeMove(from, enPassant, c, PAWN, EN_PASSANT, PAWN, 0));
 	}
 }
 

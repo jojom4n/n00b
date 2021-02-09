@@ -217,7 +217,7 @@ void knightMask()
 
 const Bitboard LookupTable::rook(Square const &square, Bitboard const &blockers) const
 {
-#ifdef HAVE_BMI2
+#ifdef USE_BMI2
 #include <immintrin.h>
 
 	return g_MoveTables.rookMagic[square]
@@ -231,7 +231,7 @@ const Bitboard LookupTable::rook(Square const &square, Bitboard const &blockers)
 
 const Bitboard LookupTable::bishop(Square const &square, Bitboard const &blockers) const
 {
-#ifdef HAVE_BMI2
+#ifdef USE_BMI2
 #include <immintrin.h>
 	
 	return g_MoveTables.bishopMagic[square]

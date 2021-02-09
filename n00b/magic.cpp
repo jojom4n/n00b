@@ -22,7 +22,7 @@ void rookMagic()
 			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.linesEx[square]);
 			tmp_rook = gen_r_attks(square, blockerboard[i]);
 			
-#ifdef HAVE_BMI2
+#ifdef USE_BMI2
 #include <immintrin.h>
 			uint64_t index = _pext_u64(blockerboard[i], g_Masks.linesEx[square]);
 #else
@@ -50,7 +50,7 @@ void bishopMagic()
 			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.diagonalsEx[square]);
 			tmp_bishop = gen_b_attks(square, blockerboard[i]);
 
-#ifdef HAVE_BMI2
+#ifdef USE_BMI2
 #include <immintrin.h>
 			uint64_t index = _pext_u64(blockerboard[i], g_Masks.diagonalsEx[square]);
 #else

@@ -1,5 +1,7 @@
 TODO:
 
 --- Generazione di mosse per template<Pezzo>
---- Generazione di CheckEvasions (e connessa tabella pezzi pinned?)
+--- Produrre mosse sulla base della tabella dei pezzi inchiodati; produrre, come uniche possibili mosse illegali, i movimenti del Re e le prese e.p. e controllare solo
+la legalità di queste due tipologie di mosse
+--- Generazione di CheckEvasions
 --- Risolvere la problematica con i timing di Clock (t1, t2 ... tn)

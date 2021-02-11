@@ -191,7 +191,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	for (idx = 0; idx < moveList.size(); idx++, legalMoves--) {
 		Color c = Color(((C64(1) << 1) - 1) & (moveList[idx] >> 12)); // who is going to move?
 		
-		if (doMove(moveList[idx], p))
+		if (doMove(moveList[idx], p)) // we have a legal PV node
 			break;
 		
 		undoMove(moveList[idx], p);  // move is illegal, let's restore position and try next one

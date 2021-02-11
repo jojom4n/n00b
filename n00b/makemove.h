@@ -5,8 +5,8 @@
 
 class Position;
 
-void doMove(Move const &m, Position &p);
-void doQuickMove(Move const &m, Position &p);
+bool doMove(Move const &m, Position &p);
+bool doQuickMove(Move const &m, Position &p);
 void undoMove(Move const &m, Position &p);
 
 #endif

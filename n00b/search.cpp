@@ -190,9 +190,8 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 	for (idx = 0; idx < moveList.size(); idx++, legalMoves--) {
 		Color c = Color(((C64(1) << 1) - 1) & (moveList[idx] >> 12)); // who is going to move?
-		doMove(moveList[idx], p);
-
-		if (!underCheck(c, p))   // move is legal, let's go out of the loop
+		
+		if (doQuickMove(moveList[idx], p))
 			break;
 		
 		undoMove(moveList[idx], p);  // move is illegal, let's restore position and try next one
@@ -200,10 +199,9 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	}
 	
 	if (legalMoves == 0) {
-		ushort check = underCheck(p.getTurn(), p);
-		if (check)
+		if (underCheck(p.getTurn(), p))
 			return -(MATE + depth);
-		else if (!check)
+		else
 			return 0;
 	}
 
@@ -231,9 +229,8 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		ushort killerIndex{};
 		p.storeState(depth);
 		Color c = Color(((C64(1) << 1) - 1) & (moveList[i] >> 12)); // who is going to move?
-		doMove(moveList[i], p);
-
-		if (underCheck(c, p)) {  // move is not legal, let's continue to search
+		
+		if (doMove(moveList[i], p) == false) { // move is not legal
 			undoMove(moveList[i], p);
 			p.restoreState(depth);
 			continue; // since move is not legal, let's skip this move and go to next iteration of for() loop

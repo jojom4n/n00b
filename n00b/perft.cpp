@@ -31,9 +31,8 @@ unsigned long long perft(ushort const &depth, Position &p)
 	for (const auto& elem : moveList) {
 			unsigned long long partialNodes;
 			Color c = Color(((C64(1) << 1) - 1) & (elem >> 12));
-			doMove(elem, p);
-
-			if (!underCheck(c, p)) { // if move is legal...
+			
+			if (doMove(elem, p)) {
 				partialNodes = perft(depth - 1, p, cache);
 				nodes += partialNodes;
 			}
@@ -56,7 +55,7 @@ static unsigned long long perft(ushort const &depth, Position &p, std::array<per
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
 	debug_nodes += moveList.size();
-	pruneIllegal(moveList, p);
+	// pruneIllegal(moveList, p);
 
 #ifndef NO_PERFT_CACHE
 	if (depth > 1) {
@@ -69,18 +68,17 @@ static unsigned long long perft(ushort const &depth, Position &p, std::array<per
 	}
 #endif
 
-	if (depth == 1 || moveList.size() == 0)
-		return moveList.size(); 
+	/* if (depth == 1 || moveList.size() == 0)
+		return moveList.size(); */
 
 	p.storeState(depth);
 
 	for (const auto &elem : moveList) {
 		Color c = Color(((C64(1) << 1) - 1) & (elem >> 12));
-		doMove(elem, p);
 		
-		// if (!underCheck(c, p)) // if move is legal...
+		if (doMove(elem, p))
 			nodes += perft(depth - 1, p, cache);
-
+		
 		undoMove(elem, p);
 		p.restoreState(depth);
 	}

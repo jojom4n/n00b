@@ -2,11 +2,12 @@
 #include "makemove.h"
 #include "attack.h"
 #include "enums.h"
+#include "movegen.h"
 #include "Position.h"
 
 extern struct LookupTable g_MoveTables; // see attack.cpp (and its header file)
 
-void doMove(Move const &m, Position &p)
+bool doMove(Move const &m, Position &p)
 {
 	Square squareFrom{}, squareTo{};
 	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
@@ -307,10 +308,15 @@ void doMove(Move const &m, Position &p)
 		p.setCastle(BLACK, Castle(p.getCastle(BLACK) - QUEENSIDE));
 		p.updateZobrist(BLACK, p.getCastle(BLACK));
 	}
+
+	if (underCheck(color, p))
+		return false;
+	else
+		return true;
 }
 
 
-void doQuickMove(Move const& m, Position &p) // only for pruneIllegal()
+bool doQuickMove(Move const& m, Position &p) // only for pruneIllegal()
 {
 	Square squareFrom{}, squareTo{};
 	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
@@ -396,6 +402,11 @@ void doQuickMove(Move const& m, Position &p) // only for pruneIllegal()
 
 		break;
 	}
+
+	if (underCheck(color, p))
+		return false;
+	else
+		return true;
 }
 
 void undoMove(Move const& m, Position& p)

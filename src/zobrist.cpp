@@ -38,7 +38,7 @@ namespace Zobrist {
 		for (Color i : {BLACK, WHITE})
 			zobristSideToMove[i] = randomNumbers(gen);
 
-		for (ushort i = 0; i < MAX_PLY; i++) // TODO - Why 10?
+		for (ushort i = 0; i < MAX_PLY; i++)
 			zobristDepth[i] = randomNumbers(gen);
 	}
 

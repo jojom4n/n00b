@@ -12,7 +12,7 @@ const ushort bitscan_fwd(Bitboard const &b)
 }
 
 
-const ushort bitscan_rvs(Bitboard const &b) const
+const ushort bitscan_rvs(Bitboard const &b)
 {
 	assert(b);
 	return ushort(63 ^ __builtin_clzll(b));

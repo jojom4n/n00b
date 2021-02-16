@@ -2,6 +2,7 @@
 #define DIVIDE_H
 
 #include "defs.h"
+#include "makemove.h"
 #include "movegen.h"
 #include "Position.h"
 #include <iostream>

@@ -2,6 +2,7 @@
 #define PERFT_H
 
 #include "defs.h"
+#include <array>
 
 class Position;
 

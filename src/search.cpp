@@ -5,6 +5,7 @@
 #include "makemove.h"
 #include "movegen.h"
 #include "moveorder.h"
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 

@@ -30,7 +30,6 @@ unsigned long long perft(ushort const &depth, Position &p)
 
 	for (const auto& elem : moveList) {
 			unsigned long long partialNodes;
-			Color c = Color(((C64(1) << 1) - 1) & (elem >> 12));
 			
 			if (doMove(elem, p)) {
 				partialNodes = perft(depth - 1, p, cache);
@@ -74,7 +73,6 @@ static unsigned long long perft(ushort const &depth, Position &p, std::array<per
 	p.storeState(depth);
 
 	for (const auto &elem : moveList) {
-		Color c = Color(((C64(1) << 1) - 1) & (elem >> 12));
 		
 		if (doMove(elem, p))
 			nodes += perft(depth - 1, p, cache);

@@ -66,7 +66,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 							std::cout << "+";
 						else if (score < 0.0f)
 							std::cout << "-";
-							break;
+						break;
 					case BLACK:
 						if (score > 0.0f)
 							std::cout << "-";
@@ -190,7 +190,6 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	ushort idx, legalMoves = ushort(moveList.size());
 
 	for (idx = 0; idx < moveList.size(); idx++, legalMoves--) {
-		Color c = Color(((C64(1) << 1) - 1) & (moveList[idx] >> 12)); // who is going to move?
 		
 		if (doMove(moveList[idx], p)) // we have a legal PV node
 			break;
@@ -229,7 +228,6 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		short score{};
 		ushort killerIndex{};
 		p.storeState(depth);
-		Color c = Color(((C64(1) << 1) - 1) & (moveList[i] >> 12)); // who is going to move?
 		
 		if (doMove(moveList[i], p) == false) { // move is not legal
 			undoMove(moveList[i], p);

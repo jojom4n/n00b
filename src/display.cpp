@@ -191,7 +191,7 @@ const char printPiece (PieceID const &ID)
 		return (ID.color == WHITE) ? 'P' : 'p';
 		break;
 	default:
-		return NULL; // some error occurred
+		return static_cast<char>(NULL); // some error occurred
 		break;
 	}
 }

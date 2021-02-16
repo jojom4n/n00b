@@ -7,8 +7,8 @@
 class Position;
 
 struct perftCache {
-	unsigned long long key;
-	unsigned long long nodes;
+	unsigned long long key{};
+	unsigned long long nodes{};
 };
 
 unsigned long long perft(ushort const &depth, Position &p);

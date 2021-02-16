@@ -27,28 +27,31 @@ bool doMove(Move const &m, Position &p)
 		p.updateZobrist(color, piece, squareFrom);
 		p.updateZobrist(color, piece, squareTo);
 
-		if ((piece == PAWN) && ((squareFrom / 8) == RANK_2) && ((squareTo / 8) == RANK_4)
-			|| (piece == PAWN) && ((squareFrom / 8) == RANK_7) && ((squareTo / 8) == RANK_5))
+		if (((piece == PAWN) && ((squareFrom / 8) == RANK_2) && ((squareTo / 8) == RANK_4))
+			|| ((piece == PAWN) && ((squareFrom / 8) == RANK_7) && ((squareTo / 8) == RANK_5))) {
+
+			Bitboard ep;
 			
 			switch (color)
 			{
-			case WHITE: {
-				Bitboard ep = g_MoveTables.blackPawn[squareTo - 8];
+			case WHITE:
+				ep = g_MoveTables.blackPawn[squareTo - 8];
 				if (ep) {
 					p.updateZobrist(p.getEnPassant());
 					p.setEnPassant(Square(squareTo - 8));
 					p.updateZobrist(p.getEnPassant());
 				}
-				break; }
-			case BLACK: {
-				Bitboard ep = g_MoveTables.whitePawn[squareTo + 8];
+				break;
+			case BLACK:
+				ep = g_MoveTables.whitePawn[squareTo + 8];
 				if (ep) {
 					p.updateZobrist(p.getEnPassant());
 					p.setEnPassant(Square(squareTo + 8));
 					p.updateZobrist(p.getEnPassant());
 				}
-				break; }
+				break;
 			}
+		}
 
 		if (color == BLACK)
 			p.setMoveNumber(p.getMoveNumber() + 1);

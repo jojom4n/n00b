@@ -94,7 +94,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		&& numWords == 2) {
 		short depth = stoi(inputStream.str().substr(6));
 		if (depth > 0 && !(depth > MAX_PLY)) {
-			unsigned long long nodes;
+			unsigned long long nodes = 0;
 			const auto t1 = Clock::now();
 			nodes = perft(depth, board);
 			const auto t2 = Clock::now();

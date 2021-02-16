@@ -31,7 +31,7 @@
       "variables": [
         {
           "name": "CMAKE_CXX_FLAGS_RELEASE",
-          "value": "/permissive- /GS /GL /W3 /Gy /Zc:wchar_t /Zi /Gm- /O2 /Zc:inline /fp:precise /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /errorReport:prompt /WX- /Zc:forScope /Gd /Oi /MT /std:c++17 /FC /EHsc /nologo /Ot /diagnostics:column",
+          "value": "/permissive- /GS /GL /W3 /Gy /Zc:wchar_t /Zi /Gm- /O2 /Zc:inline /fp:precise /D NDEBUG /D _CONSOLE /D _UNICODE /D UNICODE /errorReport:prompt /WX- /Zc:forScope /Gd /Oi /MT /std:c++17 /FC /EHsc /nologo /Ot /diagnostics:column /DUSE_BMI2",
           "type": "STRING"
         },
         {
@@ -54,12 +54,12 @@
       "variables": [
         {
           "name": "CMAKE_CXX_FLAGS_RELEASE",
-          "value": "/MD -O2 -g -DNDEBUG -flto",
+          "value": "/MT -g -O2 -DNDEBUG -DUSE_BMI2 -march=native -flto",
           "type": "STRING"
         },
         {
           "name": "CMAKE_EXE_LINKER_FLAGS_RELEASE",
-          "value": "/INCREMENTAL:NO -O2 -g",
+          "value": "/INCREMENTAL:NO",
           "type": "STRING"
         }
       ]

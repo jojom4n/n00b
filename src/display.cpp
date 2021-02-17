@@ -85,16 +85,15 @@ void displayBoard(Position const &board)
 	
 	output += "  A   B   C   D   E   F   G   H\n";
 	
-	std::cout << std::endl << output << std::endl;
+	std::cout << "\n" << output << "\n";
 	
 	(board.getTurn() == WHITE) ? std::cout << "\nSide to move: White\t" : std::cout << "Side to move: Black\t";
 	
 	std::string castleDisplayBlack = castleMap[board.getCastle(BLACK)];
 	std::transform(castleDisplayBlack.begin(), castleDisplayBlack.end(), castleDisplayBlack.begin(), ::tolower);
-	std::cout << "Castling rights: " << castleMap[board.getCastle(WHITE)] << castleDisplayBlack << std::endl;
+	std::cout << "Castling rights: " << castleMap[board.getCastle(WHITE)] << castleDisplayBlack << "\n";
 	std::cout << "En-passant square: " << squareToStringMap[board.getEnPassant()] << "\t";
-	std::cout << "Half-move: " << board.getHalfMove() << "\tMove number: " << board.getMoveNumber();
-	std::cout << std::endl;
+	std::cout << "Half-move: " << board.getHalfMove() << "\tMove number: " << board.getMoveNumber() << std::endl;
 }
 
 

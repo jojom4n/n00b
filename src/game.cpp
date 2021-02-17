@@ -112,7 +112,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		short depth = stoi(inputStream.str().substr(7));
 		if (depth > 0 && !(depth > MAX_PLY)) {
 			auto t1 = Clock::now();
-			std::cout << divide<true>(depth, board) << std::endl;
+			std::cout << divide<true>(depth, board) << "\n";
 			auto t2 = Clock::now();
 			std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() << " ms\n";
 		}
@@ -121,7 +121,7 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	}
 
 	else if ((inputStream.str().substr(0) == "eval")) {
-		std::cout << "Material evaluation is: " << evMaterial(board) << std::endl;
+		std::cout << "Material evaluation is: " << evMaterial(board) << "\n";
 		std::cout << "PSQT evaluation is: " << evPSQT(board);
 	}
 	

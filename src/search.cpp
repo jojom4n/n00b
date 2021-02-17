@@ -52,7 +52,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << (unsigned int)(depthTime.count()) <<
 					" total_ms:" << totalTime << " nps:" << (unsigned int)(mySearch.nodes / (depthTime.count() / 1000))
-					<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << std::endl;
+					<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << "\n";
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 				

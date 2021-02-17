@@ -55,7 +55,7 @@ uint64_t divide(short const &depth, Position &p)
 				}
 
 			std::cout << squareToStringMap[squareFrom] << squareToStringMap[squareTo];
-			std::cout << ": " << cnt << std::endl;
+			std::cout << ": " << cnt << "\n";
 		}
 	}
 	return nodes;

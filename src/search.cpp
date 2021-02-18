@@ -14,6 +14,7 @@ struct Search mySearch{};
 const Move iterativeSearch(Position& p, short const& depth)
 {
 	mySearch.pos = p;
+	mySearch.depth = depth;
 	unsigned int totalTime{};
 
 	std::vector<Move> moveList;
@@ -37,12 +38,11 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 		for (short ply = 1; ply <= depth; ply++) {
 			mySearch.nodes = 0;
-			mySearch.depth = ply;
 			mySearch.ttHits = 0;
 			mySearch.ttUseful = 0;
 
 			auto depthTimeStart = Clock::now();
-			mySearch.bestScore = pvs(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
+			mySearch.bestScore = pvs<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -158,6 +158,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 //}
 
 
+template <bool nullMove>
 const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
 {
 	pv[0] = 0;
@@ -171,10 +172,10 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	/*  				  FUTILITY PRUNING                       */
 	/*                                                           */
 	/* ********************************************************* */
-	if (depth == 1)
+	/* if (depth == 1)
 		if (lazyEval(p) + MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
-				return quiescence(p, alpha, beta);
+				return quiescence(p, alpha, beta); */
 	/* ********************************************************* */
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
@@ -206,7 +207,27 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	}
 
 	mySearch.nodes++;
-	short bestScore = -pvs(p, depth - 1, -beta, -alpha, subPV);
+
+	/* if (nullMove && depth > 3) {
+		Position copy = p;
+		copy.storeState(depth);
+		const ushort R_Null = determineR(depth, copy);
+		copy.setEnPassant(SQ_EMPTY);
+		
+		if (copy.getTurn() == BLACK)
+			copy.setMoveNumber(copy.getMoveNumber() + 1);
+		
+		copy.setHalfMove(copy.getHalfMove() + 1);
+		copy.setTurn(Color(!copy.getTurn()));
+
+		short nullScore = -pvs<false>(copy, depth - 1 - R_Null, -beta, -beta + 1, pv);
+		copy.restoreState(depth);
+		
+		if (nullScore >= beta)
+			return nullScore;
+	} */
+
+	short bestScore = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
 	undoMove(moveList[idx], p);
 	p.restoreState(depth);
 	
@@ -234,13 +255,12 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 			p.restoreState(depth);
 			continue; // since move is not legal, let's skip this move and go to next iteration of for() loop
 		}
-
+		
 		mySearch.nodes++;
-		score = -pvs(p, depth - 1, -alpha - 1, -alpha, subPV);
-
+		score = -pvs<true>(p, depth - 1, -alpha - 1, -alpha, subPV);
 
 		if (score > alpha && score < beta) {
-			score = -pvs(p, depth - 1, -beta, -alpha, subPV);
+			score = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
 
 			if (score > alpha)
 				alpha = score;
@@ -311,4 +331,16 @@ const short quiescence(Position p, short alpha, short beta, ushort qsDepth)
 	}
 
 	return alpha;
+}
+
+
+const ushort determineR(short const &depth, Position const &p)
+{
+	ushort deltaDepth = mySearch.depth - depth;
+	ushort piecesNo = p.count(WHITE) + p.count(BLACK);
+
+	if ((deltaDepth <= 6) || ((deltaDepth <= 8) && (piecesNo < 3)))
+		return 2;
+	else if ((deltaDepth > 8) || ((deltaDepth >= 6) && (piecesNo >= 3)))
+		return 3;
 }

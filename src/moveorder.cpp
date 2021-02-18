@@ -11,7 +11,7 @@ extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and it
 extern struct Search mySearch;
 
 
-std::vector<Move> ordering(std::vector<Move> const &moves, Position const &p, ushort const &depth)
+std::vector<Move> ordering(std::vector<Move> const &moves, Position const &p, short const &depth)
 {
 	std::vector<Move> moveList, captures;
 	moveList.reserve(MAX_PLY);

@@ -208,7 +208,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 	mySearch.nodes++;
 
-	/* if (nullMove && depth > 3) {
+	if (nullMove && !underCheck(p.getTurn(), p)) {
 		Position copy = p;
 		copy.storeState(depth);
 		const ushort R_Null = determineR(depth, copy);
@@ -225,7 +225,7 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		
 		if (nullScore >= beta)
 			return nullScore;
-	} */
+	} 
 
 	short bestScore = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
 	undoMove(moveList[idx], p);

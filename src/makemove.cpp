@@ -7,7 +7,7 @@
 
 extern struct LookupTable g_MoveTables; // see attack.cpp (and its header file)
 
-bool doMove(Move const &m, Position &p)
+bool doMove(Move const& m, Position& p)
 {
 	Square squareFrom{}, squareTo{};
 	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
@@ -319,7 +319,7 @@ bool doMove(Move const &m, Position &p)
 }
 
 
-bool doQuickMove(Move const& m, Position &p) // only for pruneIllegal()
+bool doQuickMove(Move const& m, Position& p) // only for pruneIllegal()
 {
 	Square squareFrom{}, squareTo{};
 	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
@@ -410,6 +410,24 @@ bool doQuickMove(Move const& m, Position &p) // only for pruneIllegal()
 		return false;
 	else
 		return true;
+}
+
+void doNullMove(short const& depth, Position& p)
+{
+	p.storeState(depth);
+
+	if (p.getTurn() == BLACK)
+		p.setMoveNumber(p.getMoveNumber() + 1);
+
+	p.setHalfMove(p.getHalfMove() + 1);
+
+	p.updateZobrist(p.getTurn());
+	p.setTurn(Color(!p.getTurn()));
+	p.updateZobrist(p.getTurn());
+
+	p.updateZobrist(p.getEnPassant());
+	p.setEnPassant(SQ_EMPTY);
+	p.updateZobrist(SQ_EMPTY);
 }
 
 void undoMove(Move const& m, Position& p)

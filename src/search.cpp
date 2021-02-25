@@ -166,20 +166,28 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
 		
+	/* ********************************************************* */
+	/*  				  NULL MOVE PRUNING                      */
+	/* ********************************************************* */
 	if (nullMove && !underCheck(p.getTurn(), p)) {
-		Position copy = p;
-		copy.storeState(depth);
-		const ushort R_Null = determineR(depth, copy);
-		copy.setEnPassant(SQ_EMPTY);
+		p.storeState(depth);
+		const ushort R_Null = determineR(depth, p);
+		
+		if (p.getTurn() == BLACK)
+			p.setMoveNumber(p.getMoveNumber() + 1);
+		
+		p.setHalfMove(p.getHalfMove() + 1);
+		
+		p.updateZobrist(p.getTurn());
+		p.setTurn(Color(!p.getTurn()));
+		p.updateZobrist(p.getTurn());
 
-		if (copy.getTurn() == BLACK)
-			copy.setMoveNumber(copy.getMoveNumber() + 1);
-
-		copy.setHalfMove(copy.getHalfMove() + 1);
-		copy.setTurn(Color(!copy.getTurn()));
-
-		short nullScore = -pvs<false>(copy, depth - 1 - R_Null, -beta, -beta + 1, pv);
-		copy.restoreState(depth);
+		p.updateZobrist(p.getEnPassant());
+		p.setEnPassant(SQ_EMPTY);
+		p.updateZobrist(SQ_EMPTY);
+		
+		short nullScore = -pvs<false>(p, depth - 1 - R_Null, -beta, -beta + 1, pv);
+		p.restoreState(depth);
 
 		if (nullScore >= beta)
 			return nullScore;
@@ -187,17 +195,13 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 
 
 	/* ********************************************************* */
-	/*															 */
 	/*  				  FUTILITY PRUNING                       */
-	/*                                                           */
 	/* ********************************************************* */
 	if (depth == 1)
 		if (lazyEval(p) + MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 				return quiescence(p, alpha, beta);
-	/* ********************************************************* */
-	/*  				END FUTILITY PRUNING                     */
-	/* ********************************************************* */
+	
 
 
 	Move bestMove{}, subPV[MAX_PLY]{};
@@ -343,4 +347,6 @@ const ushort determineR(short const &depth, Position const &p)
 		return 2;
 	else if ((deltaDepth > 8) || ((deltaDepth >= 6) && (piecesNo >= 3)))
 		return 3;
+	else
+		return 2;
 }

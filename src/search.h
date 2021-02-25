@@ -11,8 +11,8 @@
 #define MATE (std::numeric_limits<short>::max() / 2)
 #define ALPHA -SHRT_INFINITY
 #define BETA SHRT_INFINITY
-#define MARGIN 100 // for futility pruning
-#define EXTENDED_MARGIN 500 // for extended futility pruning
+#define MARGIN 50 // for futility pruning - MARGIN = half a pawn
+#define EXTENDED_MARGIN 500 // for extended futility pruning - EXTENDED_MARGIN = a rook
 
 struct Search {
 	Position pos;

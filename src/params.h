@@ -6,8 +6,7 @@
 constexpr unsigned long long PERFT_CACHE_SIZE = 1000000; // perft cache size (in number of positions)
 constexpr unsigned long long TT_SIZE = 64 * TT_BIT; // megabytes dedicated to TT
 
-#define MARGIN 200 // for futility pruning
+
 #define MAX_PLY 128
-#define QS_DEPTH 5
 
 #endif

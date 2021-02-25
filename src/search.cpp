@@ -50,7 +50,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 			if (mySearch.bestMove) {
 
-				std::cout << "\n*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << (unsigned int)(depthTime.count()) <<
+				std::cout << "*depth:" << ply << " nodes:" << mySearch.nodes << " ms:" << (unsigned int)(depthTime.count()) <<
 					" total_ms:" << totalTime << " nps:" << (unsigned int)(mySearch.nodes / (depthTime.count() / 1000))
 					<< " TT_hits:" << mySearch.ttHits << " TT_useful:" << mySearch.ttUseful << "\n";
 
@@ -91,6 +91,8 @@ const Move iterativeSearch(Position& p, short const& depth)
 				{
 					std::cout << displayMove(mySearch.pos, mySearch.pv[i]) << " ";
 				}
+
+				std::cout << std::endl;
 			}
 
 			else if (!underCheck(mySearch.pos.getTurn(), mySearch.pos)) {
@@ -167,27 +169,13 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		return quiescence(p, alpha, beta);
 		
 	/* ********************************************************* */
-	/*  				  NULL MOVE PRUNING                      */
+	/*  				  ADAPTIVE NULL MOVE PRUNING             */
 	/* ********************************************************* */
 	if (nullMove && !underCheck(p.getTurn(), p)) {
-		p.storeState(depth);
 		const ushort R_Null = determineR(depth, p);
-		
-		if (p.getTurn() == BLACK)
-			p.setMoveNumber(p.getMoveNumber() + 1);
-		
-		p.setHalfMove(p.getHalfMove() + 1);
-		
-		p.updateZobrist(p.getTurn());
-		p.setTurn(Color(!p.getTurn()));
-		p.updateZobrist(p.getTurn());
-
-		p.updateZobrist(p.getEnPassant());
-		p.setEnPassant(SQ_EMPTY);
-		p.updateZobrist(SQ_EMPTY);
-		
+		doNullMove(depth, p);
 		short nullScore = -pvs<false>(p, depth - 1 - R_Null, -beta, -beta + 1, pv);
-		p.restoreState(depth);
+		p.restoreState(depth); // undo Null Move
 
 		if (nullScore >= beta)
 			return nullScore;
@@ -202,6 +190,15 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 				return quiescence(p, alpha, beta);
 	
+	
+	/* ********************************************************* */
+	/*  				 EXTENDED FUTILITY PRUNING               */
+	/* ********************************************************* */
+	if (depth == 2)
+		if (lazyEval(p) + EXTENDED_MARGIN < alpha)
+			if (!underCheck(p.getTurn(), p) && !p.isEnding())
+				return quiescence(p, alpha, beta);
+
 
 
 	Move bestMove{}, subPV[MAX_PLY]{};
@@ -298,13 +295,10 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 }
 
 
-const short quiescence(Position p, short alpha, short beta, ushort qsDepth)
+const short quiescence(Position p, short alpha, short beta)
 {
 	short stand_pat = lazyEval(p);
 	
-	if (qsDepth <= 0)
-		return stand_pat;
-
 	if (stand_pat >= beta)
 		return beta;
 
@@ -320,12 +314,12 @@ const short quiescence(Position p, short alpha, short beta, ushort qsDepth)
 		moveList = mvv_lva(moveList);
 
 	for (const auto& m : moveList) {
-		p.storeState(qsDepth);
+		p.storeState();
 		doMove(m, p);
 		mySearch.nodes++;
-		short score = -quiescence(p, -beta, -alpha, qsDepth -1);
+		short score = -quiescence(p, -beta, -alpha);
 		undoMove(m, p);
-		p.restoreState(qsDepth);
+		p.restoreState();
 
 		if (score >= beta)
 			return beta;

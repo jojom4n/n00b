@@ -166,16 +166,35 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
 		
+	if (nullMove && !underCheck(p.getTurn(), p)) {
+		Position copy = p;
+		copy.storeState(depth);
+		const ushort R_Null = determineR(depth, copy);
+		copy.setEnPassant(SQ_EMPTY);
+
+		if (copy.getTurn() == BLACK)
+			copy.setMoveNumber(copy.getMoveNumber() + 1);
+
+		copy.setHalfMove(copy.getHalfMove() + 1);
+		copy.setTurn(Color(!copy.getTurn()));
+
+		short nullScore = -pvs<false>(copy, depth - 1 - R_Null, -beta, -beta + 1, pv);
+		copy.restoreState(depth);
+
+		if (nullScore >= beta)
+			return nullScore;
+	}
+
 
 	/* ********************************************************* */
 	/*															 */
 	/*  				  FUTILITY PRUNING                       */
 	/*                                                           */
 	/* ********************************************************* */
-	/* if (depth == 1)
+	if (depth == 1)
 		if (lazyEval(p) + MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
-				return quiescence(p, alpha, beta); */
+				return quiescence(p, alpha, beta);
 	/* ********************************************************* */
 	/*  				END FUTILITY PRUNING                     */
 	/* ********************************************************* */
@@ -207,25 +226,6 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 	}
 
 	mySearch.nodes++;
-
-	if (nullMove && !underCheck(p.getTurn(), p)) {
-		Position copy = p;
-		copy.storeState(depth);
-		const ushort R_Null = determineR(depth, copy);
-		copy.setEnPassant(SQ_EMPTY);
-		
-		if (copy.getTurn() == BLACK)
-			copy.setMoveNumber(copy.getMoveNumber() + 1);
-		
-		copy.setHalfMove(copy.getHalfMove() + 1);
-		copy.setTurn(Color(!copy.getTurn()));
-
-		short nullScore = -pvs<false>(copy, depth - 1 - R_Null, -beta, -beta + 1, pv);
-		copy.restoreState(depth);
-		
-		if (nullScore >= beta)
-			return nullScore;
-	} 
 
 	short bestScore = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
 	undoMove(moveList[idx], p);

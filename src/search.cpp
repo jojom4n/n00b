@@ -161,7 +161,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 
 template <bool nullMove>
-const short pvs(Position& p, short const& depth, short alpha, short beta, Move* pv)
+const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 {
 	pv[0] = 0;
 		
@@ -169,16 +169,22 @@ const short pvs(Position& p, short const& depth, short alpha, short beta, Move* 
 		return quiescence(p, alpha, beta);
 		
 	/* ********************************************************* */
-	/*  				  ADAPTIVE NULL MOVE PRUNING             */
+	/*  				  EXTENDED NULL MOVE PRUNING             */
 	/* ********************************************************* */
 	if (nullMove && !underCheck(p.getTurn(), p)) {
-		const ushort R_Null = determineR(depth, p);
+		// const ushort R_Null = determineR(depth, p);
+		const ushort R_Null = depth > 6 ? MAX_R : MIN_R;
 		doNullMove(depth, p);
 		short nullScore = -pvs<false>(p, depth - 1 - R_Null, -beta, -beta + 1, pv);
 		p.restoreState(depth); // undo Null Move
 
-		if (nullScore >= beta)
-			return nullScore;
+		if (nullScore >= beta) {
+			// return nullScore;
+			depth -= DR;
+
+			if (depth <= 0)
+				return quiescence(p, alpha, beta);
+		} 
 	}
 
 
@@ -332,15 +338,15 @@ const short quiescence(Position p, short alpha, short beta)
 }
 
 
-const ushort determineR(short const &depth, Position const &p)
+/* const ushort determineR(short const& depth, Position const& p)
 {
 	ushort deltaDepth = mySearch.depth - depth;
 	ushort piecesNo = p.count(WHITE) + p.count(BLACK);
 
 	if ((deltaDepth <= 6) || ((deltaDepth <= 8) && (piecesNo < 3)))
-		return 2;
+		return MIN_R;
 	else if ((deltaDepth > 8) || ((deltaDepth >= 6) && (piecesNo >= 3)))
-		return 3;
+		return MAX_R;
 	else
-		return 2;
-}
+		return MIN_R;
+} */

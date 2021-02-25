@@ -160,14 +160,13 @@ const bool Position::isEnding() const
 {
 	ushort count{};
 
-	for (Color c = BLACK; c <= WHITE; c++)
-		for (Piece piece = QUEEN; piece <= BISHOP; piece++)
-			count += countPieceType(c, piece);
+	for (Color c = BLACK; c <= WHITE; c++) {
+		count += countPieceType(c, QUEEN);
+		count += countPieceType(c, BISHOP);
+		count += countPieceType(c, ROOK);
+	}
 
-	if (count > 0)
-		return false;
-	else
-		return true;
+	return count > 0 ? false : true;
 }
 
 

@@ -15,6 +15,12 @@ const Move iterativeSearch(Position& p, short const& depth)
 {
 	mySearch.pos = p;
 	mySearch.depth = depth;
+	
+	// let's reset history table	
+	std::fill(&mySearch.historyTbl[0][0][0],
+			  &mySearch.historyTbl[0][0][0] + sizeof(mySearch.historyTbl), 
+			  0);
+	
 	unsigned int totalTime{};
 
 	std::vector<Move> moveList;
@@ -212,7 +218,6 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	moveList.reserve(MAX_PLY);
 	moveList = moveGeneration(p);
 	moveList = ordering(moveList, p, depth);
-
 	p.storeState(depth);
 	ushort idx, legalMoves = ushort(moveList.size());
 
@@ -233,19 +238,35 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	}
 
 	mySearch.nodes++;
-
 	short bestScore = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
 	undoMove(moveList[idx], p);
 	p.restoreState(depth);
 	
 
+
+	ushort moveType = ((C64(1) << 3) - 1) & (moveList[idx] >> 6);
+	Piece piece = Piece(((C64(1) << 3) - 1) & (moveList[idx] >> 9));
+	Square squareTo = Square(((C64(1) << 6) - 1) & (moveList[idx] >> 13));
+	
+	if (depth <= 8 && !(moveType == CAPTURE)) {	
+		if (bestScore >= beta) 
+			mySearch.historyTbl[p.getTurn()][piece][squareTo] += depth * depth;
+		else
+			mySearch.historyTbl[p.getTurn()][piece][squareTo] -= depth;
+		
+		if (abs(mySearch.historyTbl[p.getTurn()][piece][squareTo] >= 2000))
+			mySearch.historyTbl[p.getTurn()][piece][squareTo] /= 2;
+	}
+
+	
+	
 	if (bestScore > alpha) {
 		bestMove = moveList[idx];
 		pv[0] = bestMove;
 		memcpy(pv + 1, subPV, 63 * sizeof(Move));
 		pv[63] = 0;
 		
-		if (bestScore >= beta)			
+		if (bestScore >= beta)
 			return bestScore;
 		
 		alpha = bestScore;
@@ -275,6 +296,19 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 
 		undoMove(moveList[i], p);
 		p.restoreState(depth);
+
+		moveType = ((C64(1) << 3) - 1) & (moveList[i] >> 6);
+		piece = Piece(((C64(1) << 3) - 1) & (moveList[i] >> 9));
+		squareTo = Square(((C64(1) << 6) - 1) & (moveList[i] >> 13));
+		if (depth <= 8 && !(moveType == CAPTURE)) {
+			if (score >= beta)
+				mySearch.historyTbl[p.getTurn()][piece][squareTo] += depth * depth;
+			else
+				mySearch.historyTbl[p.getTurn()][piece][squareTo] -= depth;
+
+			if (abs(mySearch.historyTbl[p.getTurn()][piece][squareTo] >= 2000))
+				mySearch.historyTbl[p.getTurn()][piece][squareTo] /= 2;
+		}
 
 		if (score > bestScore) {
 

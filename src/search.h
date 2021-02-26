@@ -25,6 +25,7 @@ struct Search {
 	unsigned long long nodes, ttHits, ttUseful;
 	Move bestMove{}, pv[MAX_PLY];
 	std::array<std::array<Move, 3>, MAX_PLY> killerMoves;
+	std::array<std::array<std::array<ushort, SQ_NUMBER>, NO_PIECE>, ALL_COLOR> historyTbl;
 };
 
 const Move iterativeSearch(Position& p, short const& depth);

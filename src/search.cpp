@@ -238,28 +238,11 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	}
 
 	mySearch.nodes++;
-	short bestScore = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
+	short bestScore = -pvs<false>(p, depth - 1, -beta, -alpha, subPV);
 	undoMove(moveList[idx], p);
 	p.restoreState(depth);
-	
-
-
-	ushort moveType = ((C64(1) << 3) - 1) & (moveList[idx] >> 6);
-	Piece piece = Piece(((C64(1) << 3) - 1) & (moveList[idx] >> 9));
-	Square squareTo = Square(((C64(1) << 6) - 1) & (moveList[idx] >> 13));
-	
-	if (depth <= 8 && !(moveType == CAPTURE)) {	
-		if (bestScore >= beta) 
-			mySearch.historyTbl[p.getTurn()][piece][squareTo] += depth * depth;
-		else
-			mySearch.historyTbl[p.getTurn()][piece][squareTo] -= depth;
+	updateHistoryTBL(depth, moveList[idx], beta, bestScore);
 		
-		if (abs(mySearch.historyTbl[p.getTurn()][piece][squareTo] >= 2000))
-			mySearch.historyTbl[p.getTurn()][piece][squareTo] /= 2;
-	}
-
-	
-	
 	if (bestScore > alpha) {
 		bestMove = moveList[idx];
 		pv[0] = bestMove;
@@ -296,20 +279,8 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 
 		undoMove(moveList[i], p);
 		p.restoreState(depth);
-
-		moveType = ((C64(1) << 3) - 1) & (moveList[i] >> 6);
-		piece = Piece(((C64(1) << 3) - 1) & (moveList[i] >> 9));
-		squareTo = Square(((C64(1) << 6) - 1) & (moveList[i] >> 13));
-		if (depth <= 8 && !(moveType == CAPTURE)) {
-			if (score >= beta)
-				mySearch.historyTbl[p.getTurn()][piece][squareTo] += depth * depth;
-			else
-				mySearch.historyTbl[p.getTurn()][piece][squareTo] -= depth;
-
-			if (abs(mySearch.historyTbl[p.getTurn()][piece][squareTo] >= 2000))
-				mySearch.historyTbl[p.getTurn()][piece][squareTo] /= 2;
-		}
-
+		updateHistoryTBL(depth, moveList[i], beta, score);
+		
 		if (score > bestScore) {
 
 			if (score >= beta) {
@@ -369,6 +340,25 @@ const short quiescence(Position p, short alpha, short beta)
 	}
 
 	return alpha;
+}
+
+
+void updateHistoryTBL(short const& depth, Move const& m, short const& beta, short const& score)
+{
+	ushort const moveType = ((C64(1) << 3) - 1) & (m >> 6);
+	ushort const piece = Piece(((C64(1) << 3) - 1) & (m >> 9));
+	ushort const squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
+	ushort color = Color(((C64(1) << 1) - 1) & (m >> 12));
+	
+	if (depth <= 8 && !(moveType == CAPTURE)) {
+		if (score >= beta)
+			mySearch.historyTbl[color][piece][squareTo] += depth * depth;
+		else
+			mySearch.historyTbl[color][piece][squareTo] -= depth;
+
+		if (abs(mySearch.historyTbl[color][piece][squareTo] >= 2000))
+			mySearch.historyTbl[color][piece][squareTo] /= 2;
+	}
 }
 
 

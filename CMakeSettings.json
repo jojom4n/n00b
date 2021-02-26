@@ -62,7 +62,7 @@
         },
         {
           "name": "CMAKE_CXX_FLAGS_RELEASE",
-          "value": "-O3 -DNDEBUG -march=native -std=c++17 -mtune=native -flto -pipe -fomit-frame-pointer",
+          "value": "-O3 -DNDEBUG -static -static-libgcc -static-libstdc++ -march=native -std=c++17 -mtune=native -flto -pipe -fomit-frame-pointer",
           "type": "STRING"
         }
       ],

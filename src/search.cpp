@@ -302,8 +302,8 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		
 		mySearch.nodes++;
 
-		short const LMR = determineLMR(depth, moveCount, moveList[i], p);
-		score = -pvs<true>(p, depth - LMR, -alpha - 1, -alpha, subPV); // no PV, so let's enable null-move pruning
+		// short const LMR = determineLMR(depth, moveCount, moveList[i], p);
+		score = -pvs<true>(p, depth - 1, -alpha - 1, -alpha, subPV); // no PV, so let's enable null-move pruning
 
 		if (score > alpha && score < beta) {
 			score = -pvs<false>(p, depth - 1, -beta, -alpha, subPV); // probably new PV, no null-move

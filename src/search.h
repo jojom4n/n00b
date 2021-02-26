@@ -35,6 +35,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv);
 
 const short quiescence(Position p, short alpha, short beta);
 void updateHistoryTBL(short const& depth, Move const& m, short const& beta, short const& score);
+void updateKillerMoves(short const& depth, Move const& m);
 /* const ushort determineR(short const& depth, Position const& p); */
 
 #endif

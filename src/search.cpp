@@ -174,6 +174,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
 		
+
 	/* ********************************************************* */
 	/*  				  EXTENDED NULL MOVE PRUNING             */
 	/* ********************************************************* */
@@ -193,7 +194,6 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		} 
 	}
 
-
 	/* ********************************************************* */
 	/*  				  FUTILITY PRUNING                       */
 	/* ********************************************************* */
@@ -202,7 +202,6 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 				return quiescence(p, alpha, beta);
 	
-	
 	/* ********************************************************* */
 	/*  				 EXTENDED FUTILITY PRUNING               */
 	/* ********************************************************* */
@@ -210,7 +209,6 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		if (lazyEval(p) + EXTENDED_MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 				return quiescence(p, alpha, beta);
-
 
 
 	Move bestMove{}, subPV[MAX_PLY]{};
@@ -258,7 +256,6 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	for (ushort i = idx + 1; i < moveList.size(); i++)
 	{
 		short score{};
-		ushort killerIndex{};
 		p.storeState(depth);
 		
 		if (doMove(moveList[i], p) == false) { // move is not legal
@@ -268,10 +265,10 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		}
 		
 		mySearch.nodes++;
-		score = -pvs<true>(p, depth - 1, -alpha - 1, -alpha, subPV);
+		score = -pvs<true>(p, depth - 1, -alpha - 1, -alpha, subPV); // no PV, so let's enable null-move pruning
 
 		if (score > alpha && score < beta) {
-			score = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
+			score = -pvs<false>(p, depth - 1, -beta, -alpha, subPV); // probably new PV, no null-move for safety reason
 
 			if (score > alpha)
 				alpha = score;
@@ -284,12 +281,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		if (score > bestScore) {
 
 			if (score >= beta) {
-			
-				if (mySearch.killerMoves[depth].size() < 2) {
-					mySearch.killerMoves[depth][killerIndex] = moveList[i];
-					killerIndex++;
-				}
-				
+				updateKillerMoves(depth, moveList[i]);
 				return score;
 			}
 			
@@ -359,6 +351,16 @@ void updateHistoryTBL(short const& depth, Move const& m, short const& beta, shor
 		if (abs(mySearch.historyTbl[color][piece][squareTo] >= 2000))
 			mySearch.historyTbl[color][piece][squareTo] /= 2;
 	}
+}
+
+
+void updateKillerMoves(short const& depth, Move const& m)
+{
+	for (ushort i = 0; i < 2; i++)
+		if (mySearch.killerMoves[depth][i] == 0) {
+			mySearch.killerMoves[depth][i] = m;
+			break;
+		}
 }
 
 

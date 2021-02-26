@@ -5,6 +5,7 @@
 #include "makemove.h"
 #include "movegen.h"
 #include "moveorder.h"
+#include "tt.h"
 #include <cmath>
 #include <iomanip>
 #include <iostream>
@@ -170,6 +171,37 @@ template <bool nullMove>
 const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 {
 	pv[0] = 0;
+	uint32_t key = static_cast<uint32_t>(p.getZobrist());
+	auto alphaOrig = alpha;
+	TTEntry TTEntry{};
+
+
+	/* ********************************************************* */
+	/*                  TRANSPOSITION TABLE                      */
+	/* ********************************************************* */
+	if (TT::table[key % TT_SIZE].key == key) {
+		TTEntry = TT::table[key % TT_SIZE];
+		mySearch.ttHits++;
+
+		if (TT::isLegalEntry(TTEntry, p) && TTEntry.depth >= depth) {
+
+			mySearch.ttUseful++;
+
+			switch (TTEntry.nodeType) {
+			case EXACT:
+				return TTEntry.score;
+				break;
+			case LOWER_BOUND:
+				if (alpha < TTEntry.score)
+					alpha = TTEntry.score;
+				break;
+			case UPPER_BOUND:
+				if (beta > TTEntry.score)
+					beta = TTEntry.score;
+				break;
+			}
+		}
+	}
 		
 	if (depth <= 0)
 		return quiescence(p, alpha, beta);
@@ -178,7 +210,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	/* ********************************************************* */
 	/*  				  EXTENDED NULL MOVE PRUNING             */
 	/* ********************************************************* */
-	if (nullMove && !underCheck(p.getTurn(), p)) {
+	if (nullMove && !isPV(alpha, beta) && !underCheck(p.getTurn(), p)) {
 		// const ushort R_Null = determineR(depth, p);
 		const ushort R_Null = depth > 6 ? MAX_R : MIN_R;
 		doNullMove(depth, p);
@@ -197,7 +229,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	/* ********************************************************* */
 	/*  				  FUTILITY PRUNING                       */
 	/* ********************************************************* */
-	if (depth == 1)
+	if (depth == 1 && !isPV(alpha, beta))
 		if (lazyEval(p) + MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 				return quiescence(p, alpha, beta);
@@ -205,7 +237,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	/* ********************************************************* */
 	/*  				 EXTENDED FUTILITY PRUNING               */
 	/* ********************************************************* */
-	if (depth == 2)
+	if (depth == 2 && !isPV(alpha, beta))
 		if (lazyEval(p) + EXTENDED_MARGIN < alpha)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 				return quiescence(p, alpha, beta);
@@ -220,10 +252,8 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	ushort idx, legalMoves = ushort(moveList.size());
 
 	for (idx = 0; idx < moveList.size(); idx++, legalMoves--) {
-		
 		if (doMove(moveList[idx], p)) // we have a legal PV node
 			break;
-		
 		undoMove(moveList[idx], p);  // move is illegal, let's restore position and try next one
 		p.restoreState(depth);
 	}
@@ -236,7 +266,11 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 	}
 
 	mySearch.nodes++;
-	short bestScore = -pvs<false>(p, depth - 1, -beta, -alpha, subPV);
+	short bestScore;
+	
+	isPV(alpha, beta) ? bestScore = -pvs<false>(p, depth - 1, -beta, -alpha, subPV) 
+		: bestScore = -pvs<true>(p, depth - 1, -beta, -alpha, subPV);
+	
 	undoMove(moveList[idx], p);
 	p.restoreState(depth);
 	updateHistoryTBL(depth, moveList[idx], beta, bestScore);
@@ -253,6 +287,8 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		alpha = bestScore;
 	}
 
+	ushort moveCount{};
+
 	for (ushort i = idx + 1; i < moveList.size(); i++)
 	{
 		short score{};
@@ -265,11 +301,13 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		}
 		
 		mySearch.nodes++;
-		score = -pvs<true>(p, depth - 1, -alpha - 1, -alpha, subPV); // no PV, so let's enable null-move pruning
+
+		short const LMR = determineLMR(depth, moveCount, moveList[i], p);
+		score = -pvs<true>(p, depth - LMR, -alpha - 1, -alpha, subPV); // no PV, so let's enable null-move pruning
 
 		if (score > alpha && score < beta) {
-			score = -pvs<false>(p, depth - 1, -beta, -alpha, subPV); // probably new PV, no null-move for safety reason
-
+			score = -pvs<false>(p, depth - 1, -beta, -alpha, subPV); // probably new PV, no null-move
+			
 			if (score > alpha)
 				alpha = score;
 		}
@@ -281,7 +319,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 		if (score > bestScore) {
 
 			if (score >= beta) {
-				updateKillerMoves(depth, moveList[i]);
+				// updateKillerMoves(depth, moveList[i]);
 				return score;
 			}
 			
@@ -291,6 +329,32 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 			memcpy(pv + 1, subPV, 63 * sizeof(Move));
 			pv[63] = 0;
 		}
+
+		moveCount++;
+	}
+
+	/* ********************************************************* */
+	/*                 UPDATE TRANSPOSITION TABLE                */
+	/* we only update TT if there is a best move.In other words, */
+	/* if it's mate and therefore there is not any best move (or */
+	/* hence any move at all), we do not want to update TT,      */
+	/* because otherwise we would have a dummy entry with score  */
+	/* about MATE or -MATE and move = 0, polluting TT!           */
+	/* ********************************************************* */
+	if (bestMove) {
+		TTEntry.score = bestScore;
+		if (bestScore <= alphaOrig)
+			TTEntry.nodeType = UPPER_BOUND;
+		else if (bestScore >= beta)
+			TTEntry.nodeType = LOWER_BOUND;
+		else
+			TTEntry.nodeType = EXACT;
+
+		TTEntry.age = static_cast<uint8_t>(p.getMoveNumber());
+		TTEntry.depth = static_cast<uint8_t>(depth);
+		TTEntry.key = static_cast<uint32_t>(p.getZobrist());
+		TTEntry.move = bestMove;
+		TT::Store(TTEntry);
 	}
 
 	mySearch.bestMove = bestMove;
@@ -304,6 +368,9 @@ const short quiescence(Position p, short alpha, short beta)
 	
 	if (stand_pat >= beta)
 		return beta;
+
+	if (stand_pat < alpha - g_pieceValue.at(QUEEN)) // Delta pruning
+		return alpha;
 
 	if (alpha < stand_pat)
 		alpha = stand_pat;
@@ -332,6 +399,12 @@ const short quiescence(Position p, short alpha, short beta)
 	}
 
 	return alpha;
+}
+
+
+bool const isPV(short const& alpha, short const& beta)
+{
+	return !(alpha == beta - 1);
 }
 
 
@@ -364,15 +437,22 @@ void updateKillerMoves(short const& depth, Move const& m)
 }
 
 
-/* const ushort determineR(short const& depth, Position const& p)
+short const determineLMR(short const& depth, ushort const& moveCount, Move const& m, Position const& p)
 {
-	ushort deltaDepth = mySearch.depth - depth;
-	ushort piecesNo = p.count(WHITE) + p.count(BLACK);
+	ushort moveType = ((C64(1) << 3) - 1) & (m >> 6);
+	Square squareTo = Square(((C64(1) << 6) - 1) & (m >> 13));
+	Color color = Color(((C64(1) << 1) - 1) & (m >> 12));
+	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 9));
+	ushort promotedTo = ((C64(1) << 3) - 1) & (m);
 
-	if ((deltaDepth <= 6) || ((deltaDepth <= 8) && (piecesNo < 3)))
-		return MIN_R;
-	else if ((deltaDepth > 8) || ((deltaDepth >= 6) && (piecesNo >= 3)))
-		return MAX_R;
+	if (depth < 3
+		|| moveCount < 4
+		|| moveType == CAPTURE
+		|| moveType == PROMOTION && promotedTo == QUEEN
+		|| underCheck(Color(!p.getTurn()), p)
+		|| color == WHITE && piece == PAWN && squareTo >= A7
+		|| color == BLACK && piece == PAWN && squareTo <= H2)
+		return 1;
 	else
-		return MIN_R;
-} */
+		return 2;
+}

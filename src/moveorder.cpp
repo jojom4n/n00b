@@ -25,8 +25,8 @@ std::vector<Move> ordering(std::vector<Move> const &moves, Position const &p, sh
 	captures = mvv_lva(moves);
 	moveList.insert(moveList.end(), captures.begin(), captures.end());
 
-	for (const auto &m : mySearch.killerMoves[depth])
-		if (m) { moveList.push_back(m); }
+	/* for (const auto &m : mySearch.killerMoves[depth])
+		if (m) { moveList.push_back(m); } */
 
 	for (const auto &m : moves) {
 		if (std::find(moveList.begin(), moveList.end(), m) == moveList.end())

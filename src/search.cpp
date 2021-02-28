@@ -46,7 +46,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 			mySearch.ttUseful = 0;
 
 			auto depthTimeStart = Clock::now();
-			mySearch.bestScore = newPVS<false>(p, ply, ALPHA, BETA, mySearch.pv);
+			mySearch.bestScore = newPVS<true>(p, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -132,11 +132,10 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 	if (!rootNode) {
 	
 		// MATE DISTANCE PRUNING
-		if (mateScore > alpha) {
+	 	if (mateScore > alpha) {
 			alpha = mateScore;
 			if (beta <= mateScore) return mateScore;
 		}
-
 	}
 
 	short staticEval = lazyEval(p);
@@ -147,7 +146,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		&& !underCheck(p.getTurn(), p)
 		&& depth <= RFP_DEPTH
 		&& staticEval - RFP_MARGIN * depth >= beta)
-		return staticEval;
+		return quiescence(p, alpha, beta);
 
 
 	// ALPHA PRUNING
@@ -155,7 +154,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		&& !underCheck(p.getTurn(), p)
 		&& depth <= ALPHA_PRUNING_DEPTH
 		&& staticEval + ALPHA_PRUNING_MARGIN <= alpha)
-		return staticEval;
+		return quiescence(p, alpha, beta);
 
 
 	// FUTILITY PRUNING

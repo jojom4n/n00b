@@ -12,15 +12,12 @@
 
 struct Search mySearch{};
 
+
 const Move iterativeSearch(Position& p, short const& depth)
 {
 	mySearch.pos = p;
 	mySearch.depth = depth;
-	
-	// let's reset history table	
-	std::fill(&mySearch.historyTbl[0][0][0],
-			  &mySearch.historyTbl[0][0][0] + sizeof(mySearch.historyTbl), 
-			  0);
+	mySearch.height = 0;
 	
 	unsigned int totalTime{};
 
@@ -49,7 +46,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 			mySearch.ttUseful = 0;
 
 			auto depthTimeStart = Clock::now();
-			mySearch.bestScore = pvs<false>(mySearch.pos, ply, ALPHA, BETA, mySearch.pv);
+			mySearch.bestScore = newPVS<false>(p, ply, ALPHA, BETA, mySearch.pv);
 			auto depthTimeEnd = Clock::now();
 
 			std::chrono::duration<float, std::milli> depthTime = depthTimeEnd - depthTimeStart;
@@ -63,7 +60,7 @@ const Move iterativeSearch(Position& p, short const& depth)
 
 				std::cout << "\t move:" << displayMove(mySearch.pos, mySearch.bestMove) << " score:";
 				
-				if (!(mySearch.bestScore == (MATE + (depth - ply))) && !(mySearch.bestScore == -MATE - (depth - ply))) {
+				if (!(mySearch.bestScore == (MATE + mySearch.height) && !(mySearch.bestScore == -MATE - mySearch.height))) {
 					
 					float score = static_cast<float>(mySearch.bestScore / 100.00);
 					
@@ -167,6 +164,141 @@ const Move iterativeSearch(Position& p, short const& depth)
 //}
 
 
+template<bool nullMove>
+const short newPVS(Position& p, short depth, short alpha, short beta, Move* pv)
+{
+	const bool rootNode = (mySearch.height == 0), isPV = (alpha != beta - 1);
+	const short mateScore = -MATE + mySearch.height;
+	short bestScore = -MATE, score = -MATE, moveCount{}, played{};
+	Move bestMove{}, subPV[MAX_PLY]{};
+
+	if (depth <= 0)
+		return quiescence(p, alpha, beta);
+
+	pv[0] = 0;
+
+	if (!rootNode) {
+	
+		// MATE DISTANCE PRUNING
+		if (mateScore > alpha) {
+			alpha = mateScore;
+			if (beta <= mateScore) return mateScore;
+		}
+
+	}
+
+	short staticEval = lazyEval(p);
+	initKillerMoves();
+
+	// REVERSE FUTILITY PRUNING
+	if (!isPV
+		&& !underCheck(p.getTurn(), p)
+		&& depth <= RFP_DEPTH
+		&& staticEval - RFP_MARGIN * depth >= beta)
+		return staticEval;
+
+
+	// ALPHA PRUNING
+	if (!isPV
+		&& !underCheck(p.getTurn(), p)
+		&& depth <= ALPHA_PRUNING_DEPTH
+		&& staticEval + ALPHA_PRUNING_MARGIN <= alpha)
+		return staticEval;
+
+
+	// FUTILITY PRUNING
+	if (!isPV
+		&& !underCheck(p.getTurn(), p)
+		&& depth == 1
+		&& !p.isEnding()
+		&& staticEval + MARGIN < alpha)
+		return quiescence(p, alpha, beta);
+
+
+	// EXTENDED FUTILITY PRUNING
+	if (!isPV
+		&& !underCheck(p.getTurn(), p)
+		&& depth == 2
+		&& !p.isEnding()
+		&& staticEval + EXTENDED_MARGIN < alpha)
+		return quiescence(p, alpha, beta);
+
+
+	// NULL-MOVE PRUNING
+	if (!isPV
+		&& !underCheck(p.getTurn(), p)
+		&& staticEval >= beta
+		&& depth >= NMP_DEPTH
+		&& nullMove
+		&& !p.isEnding()) {
+		
+		const short R = MAX_R + depth / (MIN_R * 2) + std::min(3, (staticEval - beta) / 200); // thanks to Ethereal (https://tinyurl.com/28xyc68j)
+		doNullMove(depth, p);
+		mySearch.height++;
+		short nullScore = -newPVS<false>(p, depth - R, -beta, -beta + 1, subPV);
+		p.restoreState(depth);
+		mySearch.height--;
+
+		if (nullScore >= beta)
+			return beta;
+	}
+
+	std::vector<Move> moveList;
+	moveList.reserve(MAX_PLY);
+	moveList = moveGeneration(p);
+	moveList = ordering(moveList, p, depth);
+
+	for (const auto& m : moveList) {
+		
+		p.storeState(depth);
+		
+		if (doMove(m, p) == false) { // move is not legal
+			undoMove(m, p);
+			p.restoreState(depth);
+			continue; // since move is not legal, let's skip this move and go to next iteration of for() loop
+		}
+
+		mySearch.nodes++, played++, mySearch.height++;
+
+		if (isPV && played == 1)
+			score = -newPVS <false>(p, depth - 1, -beta, -alpha, subPV);
+		else {
+			score = -newPVS<true>(p, depth - 1, -alpha - 1, -alpha, subPV);
+			
+			if (score > alpha && score < beta)
+				score = -newPVS<false>(p, depth - 1, -beta, -alpha, subPV); // probably new PV, no null-move
+		}
+		
+		undoMove(m, p);
+		mySearch.height--;
+		p.restoreState(depth);
+
+		if (score > bestScore) {
+			bestScore = score;
+			bestMove = m;
+
+			if (score > alpha) {
+				alpha = score;
+				pv[0] = bestMove;
+				memcpy(pv + 1, subPV, 63 * sizeof(Move));
+				pv[63] = 0;
+				
+				if (alpha >= beta)
+					break;
+			}
+		}
+	}
+
+	if (played == 0)
+		return underCheck(p.getTurn(), p) ? -MATE + mySearch.height : 0;
+
+	mySearch.bestMove = bestMove;
+	return bestScore;
+}
+
+
+
+
 template <bool nullMove>
 const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 {
@@ -219,12 +351,13 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 
 		if (nullScore >= beta) {
 			// return nullScore;
-			depth -= DR;
+			depth -= NMP_DEPTH;
 
 			if (depth <= 0)
 				return quiescence(p, alpha, beta);
 		} 
 	}
+
 
 	/* ********************************************************* */
 	/*  				  FUTILITY PRUNING                       */
@@ -234,6 +367,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv)
 			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 				return quiescence(p, alpha, beta);
 	
+
 	/* ********************************************************* */
 	/*  				 EXTENDED FUTILITY PRUNING               */
 	/* ********************************************************* */
@@ -404,11 +538,11 @@ const short quiescence(Position p, short alpha, short beta)
 
 bool const isPV(short const& alpha, short const& beta)
 {
-	return !(alpha == beta - 1);
+	return (alpha != beta - 1);
 }
 
 
-void updateHistoryTBL(short const& depth, Move const& m, short const& beta, short const& score)
+/* void updateHistoryTBL(short const& depth, Move const& m, short const& beta, short const& score)
 {
 	ushort const moveType = ((C64(1) << 3) - 1) & (m >> 6);
 	ushort const piece = Piece(((C64(1) << 3) - 1) & (m >> 9));
@@ -424,17 +558,24 @@ void updateHistoryTBL(short const& depth, Move const& m, short const& beta, shor
 		if (abs(mySearch.historyTbl[color][piece][squareTo] >= 2000))
 			mySearch.historyTbl[color][piece][squareTo] /= 2;
 	}
+} */
+
+
+void initKillerMoves()
+{
+	mySearch.killerMoves[mySearch.height + 1][0] = 0;
+	mySearch.killerMoves[mySearch.height + 1][1] = 0;
+	mySearch.killerMoves[mySearch.height + 1][2] = 0;
 }
 
-
-void updateKillerMoves(short const& depth, Move const& m)
+/* void updateKillerMoves(Move const& m)
 {
 	for (ushort i = 0; i < 2; i++)
 		if (mySearch.killerMoves[depth][i] == 0) {
 			mySearch.killerMoves[depth][i] = m;
 			break;
 		}
-}
+} */
 
 
 short const determineLMR(short const& depth, ushort const& moveCount, Move const& m, Position const& p)
@@ -445,8 +586,8 @@ short const determineLMR(short const& depth, ushort const& moveCount, Move const
 	Piece piece = Piece(((C64(1) << 3) - 1) & (m >> 9));
 	ushort promotedTo = ((C64(1) << 3) - 1) & (m);
 
-	if (depth < 3
-		|| moveCount < 4
+	if (depth < 4
+		|| moveCount < 10
 		|| moveType == CAPTURE
 		|| moveType == PROMOTION && promotedTo == QUEEN
 		|| underCheck(Color(!p.getTurn()), p)
@@ -454,5 +595,5 @@ short const determineLMR(short const& depth, ushort const& moveCount, Move const
 		|| color == BLACK && piece == PAWN && squareTo <= H2)
 		return 1;
 	else
-		return 2;
+		return 3;
 }

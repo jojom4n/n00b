@@ -36,17 +36,13 @@ struct Search {
 
 const Move iterativeSearch(Position& p, short const& depth);
 
-template<bool nullMove>
-const short pvs(Position& p, short depth, short alpha, short beta, Move* pv);
+/* template<bool nullMove>
+const short pvs(Position& p, short depth, short alpha, short beta, Move* pv); */
 
 template<bool nullMove>
-const short newPVS(Position& p, short depth, short alpha, short beta, Move* pv);
+const short newPVS(Position& p, short const& depth, short alpha, short const& beta, Move* pv);
 
 const short quiescence(Position p, short alpha, short beta);
-bool const isPV(short const& alpha, short const& beta);
-void updateHistoryTBL(short const& depth, Move const& m, short const& beta, short const& score);
 void initKillerMoves();
-void updateKillerMoves(short const& depth, Move const& m);
-short const determineLMR(short const& depth, ushort const& moveCount, Move const& m, Position const& p);
 
 #endif

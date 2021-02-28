@@ -17,12 +17,12 @@ struct Mask {
 };
 
 struct LookupTable {
-	std::array<Bitboard, SQ_NUMBER> king;
-	std::array<Bitboard, SQ_NUMBER> knight;
-	std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
-	std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishopMagic;
-	std::array<Bitboard, SQ_NUMBER> whitePawn;
-	std::array<Bitboard, SQ_NUMBER> blackPawn;
+	alignas(64) std::array<Bitboard, SQ_NUMBER> king;
+	alignas(64) std::array<Bitboard, SQ_NUMBER> knight;
+	alignas(64) std::array<std::array<Bitboard, 1 << ROOK_INDEX_BITS>, SQ_NUMBER> rookMagic;
+	alignas(64) std::array<std::array<Bitboard, 1 << BISHOP_INDEX_BITS>, SQ_NUMBER> bishopMagic;
+	alignas(64) std::array<Bitboard, SQ_NUMBER> whitePawn;
+	alignas(64) std::array<Bitboard, SQ_NUMBER> blackPawn;
 	/* const Bitboard whitePawn(Bitboard const& pawn, Bitboard const& occupancy) const;
 	const Bitboard blackPawn(Bitboard const& pawn, Bitboard const& occupancy) const; */
 	const Bitboard rook(Square const& square, Bitboard const& blockers) const;

@@ -146,7 +146,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		&& !underCheck(p.getTurn(), p)
 		&& depth <= RFP_DEPTH
 		&& staticEval - RFP_MARGIN * depth >= beta)
-		return quiescence(p, alpha, beta);
+		return quiescence(p, alpha, beta); // should return staticEval, if only eval() was better
 
 
 	// ALPHA PRUNING
@@ -154,7 +154,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		&& !underCheck(p.getTurn(), p)
 		&& depth <= ALPHA_PRUNING_DEPTH
 		&& staticEval + ALPHA_PRUNING_MARGIN <= alpha)
-		return quiescence(p, alpha, beta);
+		return quiescence(p, alpha, beta); // should return staticEval, if only eval() was better
 
 
 	// FUTILITY PRUNING

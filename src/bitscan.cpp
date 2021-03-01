@@ -81,7 +81,7 @@ const ushort bitscan_rvs(Bitboard const &b)
 #endif
 
 
-const ushort bitscan_reset(Bitboard &b, const bool reverse)
+const ushort bitscan_reset(Bitboard &b, const bool& reverse)
 {
 	ushort index{};
 
@@ -97,7 +97,7 @@ const ushort bitscan_reset(Bitboard &b, const bool reverse)
 	return index;
 }
 
-const ushort popcount(const Bitboard* bb)
+const unsigned long long popcount(const Bitboard* bb)
 { 
 #if defined (_MSC_VER)
 	return __popcnt64(*bb);

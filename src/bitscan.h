@@ -18,8 +18,8 @@ const ushort bitscan_rvs(Bitboard const& b);
 #error "Compiler not supported."
 #endif
 
-const ushort bitscan_reset(Bitboard& b, const bool reverse = 0);
-const ushort popcount(const Bitboard* bb);
+const ushort bitscan_reset(Bitboard& b, const bool& reverse = 0);
+const unsigned long long popcount(const Bitboard* bb);
 
 #endif
 

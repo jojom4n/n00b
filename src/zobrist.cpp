@@ -6,10 +6,9 @@
 #include "params.h"
 #include <random>
 
-constexpr uint64_t maxU64 = 0xFFFFFFFFFFFFFFFF;
-uint64_t zobristKeys[2][6][64];
-uint64_t zobristCastle[2][4];
-uint64_t zobristEnPassant[8];
+uint64_t zobristKeys[2][NO_PIECE][SQ_NUMBER];
+uint64_t zobristCastle[2][ALL];
+uint64_t zobristEnPassant[RANK_NUMBER];
 uint64_t zobristSideToMove[2];
 uint64_t zobristDepth[MAX_PLY];
 
@@ -18,8 +17,8 @@ namespace Zobrist {
 	void init()
 	{
 		std::random_device rd;
-		std::mt19937 gen(rd());
-		std::uniform_int_distribution<uint64_t> randomNumbers(0, maxU64);
+		std::mt19937_64 gen(rd());
+		std::uniform_int_distribution<uint64_t> randomNumbers(0, UINT64_MAX);
 
 		for (Piece i : { KING, QUEEN, ROOK, KNIGHT, BISHOP, PAWN })
 			for (ushort j = 0; j < SQ_NUMBER; j++) {
@@ -35,15 +34,15 @@ namespace Zobrist {
 		for (ushort i = 0; i < RANK_NUMBER; i++)
 			zobristEnPassant[i] = randomNumbers(gen);
 
-		for (Color i : {BLACK, WHITE})
-			zobristSideToMove[i] = randomNumbers(gen);
+		zobristSideToMove[BLACK] = randomNumbers(gen);
+		zobristSideToMove[WHITE] = randomNumbers(gen);
 
 		for (ushort i = 0; i < MAX_PLY; i++)
 			zobristDepth[i] = randomNumbers(gen);
 	}
 
 
-	uint64_t fill(Position const &p) {
+	uint64_t computeKey(Position const& p) {
 		uint64_t result{};
 
 		for (Color c : {BLACK, WHITE}) {
@@ -58,13 +57,13 @@ namespace Zobrist {
 
 			} 
 
-			result ^= zobristCastle[WHITE][static_cast<ushort>(p.getCastle(WHITE))];
-			result ^= zobristCastle[BLACK][static_cast<ushort>(p.getCastle(BLACK))];
+			result ^= zobristCastle[BLACK][p.getCastle(BLACK)];
+			result ^= zobristCastle[WHITE][p.getCastle(WHITE)];
 
 			if (p.getEnPassant() != SQ_EMPTY) 
 				result ^= zobristEnPassant[p.getEnPassant() % 8];
 
-			result ^= zobristSideToMove[p.getTurn()];
+			result ^= zobristSideToMove[c];
 
 		}  // end main for
 
@@ -92,10 +91,10 @@ namespace Zobrist {
 
 	uint64_t getKey(Color const& c, Castle const& castle) // for castle
 	{
-		return zobristCastle[c][static_cast<ushort>(castle)];
+		return zobristCastle[c][castle];
 	}
 
-	uint64_t getKey(ushort depth)
+	uint64_t getKey(ushort const& depth)
 	{
 		return zobristDepth[depth];
 	}

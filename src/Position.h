@@ -86,7 +86,7 @@ public:
 	bool isSquareAttacked(Square const &square) const;
 
 	constexpr uint64_t getZobrist() const { return zobristHash_; }
-	void setZobrist() { zobristHash_ = Zobrist::fill(*this); }
+	void setZobrist() { zobristHash_ = Zobrist::computeKey(*this); }
 	
 	void updateZobrist(Color const& c, Piece const& p, Square const& sq)
 		{ zobristHash_ ^= Zobrist::getKey(c, p, sq); }

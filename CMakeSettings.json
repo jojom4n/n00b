@@ -62,7 +62,7 @@
         },
         {
           "name": "CMAKE_CXX_FLAGS_RELEASE",
-          "value": "-O3 -DNDEBUG -DNO_PERFT_CACHE -DUSE_BMI2 -DUSE_POPCNT -flto -static -std=c++17 -msse -msse3 -mpopcnt -mavx2 -msse4.1 -mssse3 -msse2 -mbmi2 -fomit-frame-pointer",
+          "value": "-O3 -DNDEBUG -DUSE_BMI2 -DUSE_POPCNT -flto -static -std=c++17 -msse -msse2 -msse3 -mssse3 -msse4.1 -mbmi2 -mavx2 -mpopcnt  -fomit-frame-pointer",
           "type": "STRING"
         }
       ],
@@ -91,6 +91,46 @@
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x64_x64" ],
       "variables": []
+    },
+    {
+      "name": "Mingw64-Release NO BMI2",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "-v",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "mingw_64" ],
+      "environments": [
+        {
+          "MINGW64_ROOT": "C:/msys64/mingw64",
+          "BIN_ROOT": "${env.MINGW64_ROOT}/bin",
+          "FLAVOR": "x86_64-w64-mingw32",
+          "TOOLSET_VERSION": "9.1.0",
+          "PATH": "${env.MINGW64_ROOT}/bin;${env.MINGW64_ROOT}/../usr/local/bin;${env.MINGW64_ROOT}/../usr/bin;${env.MINGW64_ROOT}/../bin;${env.PATH}",
+          "INCLUDE": "${env.INCLUDE};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/tr1;${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/${env.FLAVOR}",
+          "environment": "mingw_64"
+        }
+      ],
+      "variables": [
+        {
+          "name": "CMAKE_C_COMPILER",
+          "value": "${env.BIN_ROOT}/gcc.exe",
+          "type": "STRING"
+        },
+        {
+          "name": "CMAKE_CXX_COMPILER",
+          "value": "${env.BIN_ROOT}/g++.exe",
+          "type": "STRING"
+        },
+        {
+          "name": "CMAKE_CXX_FLAGS_RELEASE",
+          "value": "-O3 -DNDEBUG -DUSE_POPCNT -flto -static -std=c++17 -msse -msse2 -msse3 -mssse3 -mpopcnt -fomit-frame-pointer",
+          "type": "STRING"
+        }
+      ],
+      "intelliSenseMode": "linux-gcc-x64"
     }
   ]
 }

@@ -16,7 +16,7 @@ void rookMagic()
 		std::array<Bitboard, 1 << ROOK_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_rook{};
-		ushort bits = ushort(popcnt(&g_Masks.linesEx[square], sizeof(g_Masks.linesEx[square])));
+		ushort bits = ushort(popcount(&g_Masks.linesEx[square]));
 
 		for (ushort i = 0; i < (1 << bits); i++) {
 			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.linesEx[square]);
@@ -44,7 +44,7 @@ void bishopMagic()
 		std::array<Bitboard, 1 << BISHOP_INDEX_BITS> blockerboard;
 		blockerboard.fill({});
 		Bitboard tmp_bishop{};
-		ushort bits = ushort(popcnt(&g_Masks.diagonalsEx[square], sizeof(g_Masks.diagonalsEx[square])));
+		ushort bits = ushort(popcount(&g_Masks.diagonalsEx[square]));
 
 		for (ushort i = 0; i < (1 << bits); i++) {
 			blockerboard[i] = gen_blockerboard(i, bits, g_Masks.diagonalsEx[square]);

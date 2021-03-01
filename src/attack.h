@@ -4,6 +4,7 @@
 #include "enums.h"
 #include "magic.h"
 #include <array>
+#include <intrin.h>
 
 struct Mask {
 	std::array<Bitboard, FILE_NUMBER> file;

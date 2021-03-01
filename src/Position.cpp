@@ -138,13 +138,13 @@ const ushort Position::count(Color const &color) const
 {
 	switch (color) {
 	case WHITE:
-		return ushort(popcnt(&whitePieces_, sizeof(whitePieces_)));
+		return ushort(popcount(&whitePieces_));
 		break;
 	case BLACK:
-		return ushort(popcnt(&blackPieces_, sizeof(blackPieces_)));
+		return ushort(popcount(&blackPieces_));
 		break;
 	default:
-		return ushort(popcnt(&blackPieces_, sizeof(blackPieces_)));
+		return ushort(popcount(&blackPieces_));
 		break;
 	}
 }
@@ -152,7 +152,7 @@ const ushort Position::count(Color const &color) const
 
 const ushort Position::countPieceType(Color const &color, Piece const &piece) const
 {
-	return ushort(popcnt(&board_[color][piece], sizeof(board_[color][piece])));
+	return ushort(popcount(&board_[color][piece]));
 }
 
 

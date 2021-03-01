@@ -2,7 +2,6 @@
 #define BITSCAN_H
 
 #include "defs.h"
-#include "libpopcnt.h"
 
 #if defined(__GNUC__)  // GCC, Clang, ICC
 const ushort bitscan_fwd(Bitboard const& b);
@@ -20,6 +19,7 @@ const ushort bitscan_rvs(Bitboard const& b);
 #endif
 
 const ushort bitscan_reset(Bitboard& b, const bool reverse = 0);
+const ushort popcount(const Bitboard* bb);
 
 #endif
 

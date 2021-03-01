@@ -96,3 +96,13 @@ const ushort bitscan_reset(Bitboard &b, const bool reverse)
 
 	return index;
 }
+
+const ushort popcount(const Bitboard* bb)
+{ 
+#if defined (_MSC_VER)
+	return __popcnt64(*bb);
+#elif defined(__GNUC__)
+	return __builtin_popcountll(*bb);
+#endif
+
+}

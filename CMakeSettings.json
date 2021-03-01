@@ -62,7 +62,7 @@
         },
         {
           "name": "CMAKE_CXX_FLAGS_RELEASE",
-          "value": "-O3 -DNDEBUG -DUSE_BMI2 -static -std=c++17 -flto -msse -msse3 -mpopcnt -mavx2 -msse4.1 -mssse3 -msse2 -mbmi2",
+          "value": "-O3 -DNDEBUG -DUSE_BMI2 -DUSE_POPCNT -flto -static -std=c++17 -msse -msse3 -mpopcnt -mavx2 -msse4.1 -mssse3 -msse2 -mbmi2 -fomit-frame-pointer",
           "type": "STRING"
         }
       ],

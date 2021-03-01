@@ -14,7 +14,6 @@ set(HEADER_FILES
     "fen.h"
     "game.h"
     "globals.h"
-    "libpopcnt.h"
     "magic.h"
     "makemove.h"
     "movegen.h"

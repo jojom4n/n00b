@@ -71,9 +71,7 @@ static unsigned long long perft(ushort const &depth, Position &p, std::array<per
 		return moveList.size(); */
 
 	p.storeState(depth);
-
 	for (const auto &elem : moveList) {
-		
 		if (doMove(elem, p))
 			nodes += perft(depth - 1, p, cache);
 		

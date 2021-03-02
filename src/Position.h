@@ -11,7 +11,7 @@
 
 class Position
 {
-	std::array<std::array<Bitboard, 6>, 2> board_{};
+	std::array<std::array<Bitboard, NO_PIECE>, ALL_COLOR> board_{};
 	Bitboard whitePieces_{}, blackPieces_{}, allPieces_{};
 	Square enPassantSquare_{};
 	Color turn_{}; // who has the move?
@@ -36,64 +36,63 @@ public:
 
 	void setNew();
 	void resetPosition();
-	void storeState(ushort const &depth = 0);
-	void restoreState(ushort const &depth = 0);
+	void storeState(ushort const& depth = 0);
+	void restoreState(ushort const& depth = 0);
 
 	constexpr Color getTurn() const { return turn_; }
-	void setTurn(Color const &b) { turn_ = b; }
+	void setTurn(Color const& b) { turn_ = b; }
 
 	constexpr Square getEnPassant() const { return enPassantSquare_; }
-	void setEnPassant(const Square &square) { enPassantSquare_ = square; }
+	void setEnPassant(const Square& square) { enPassantSquare_ = square; }
 
 	constexpr ushort getMoveNumber() const { return moveNumber_; }
 	void setMoveNumber(ushort const &move) { moveNumber_ = move; }
 
 	constexpr ushort getHalfMove() const { return halfMove_; }
-	void setHalfMove(ushort const &half_move) { halfMove_ = half_move; }
+	void setHalfMove(ushort const& half_move) { halfMove_ = half_move; }
 
 	constexpr bool getCheckmate() const { return checkmate_; }
-	void setCheckmate(bool const &b) { checkmate_ = b; }
+	void setCheckmate(bool const& b) { checkmate_ = b; }
 
-	constexpr Castle getCastle(Color const &color) const { return castle_[color]; }
+	constexpr Castle getCastle(Color const& color) const { return castle_[color]; }
 	
-	void setCastle(Color const &color, Castle const &castle)
+	void setCastle(Color const& color, Castle const& castle)
 		{ (color == WHITE) ? castle_[WHITE] = castle : castle_[BLACK] = castle;	}
 
-	void putPiece(Color const &color, Piece const &piece, Square const &square);
-	void removePiece(Color const &color, Piece const &piece, Square const &square);
+	void putPiece(Color const& color, Piece const& piece, Square const& square);
+	void removePiece(Color const& color, Piece const& piece, Square const& square);
 		
 	constexpr Bitboard getPosition() const { return allPieces_; }
 	
-	constexpr Bitboard getPosition(Color const &color) const
-	{ return (color == WHITE) ? whitePieces_ : blackPieces_; }
+	constexpr Bitboard getPosition(Color const& color) const
+		{ return (color == WHITE) ? whitePieces_ : blackPieces_; }
 
-	constexpr Bitboard getPieces(Color const &color, Piece const &piece) const
-	{ return board_[color][piece]; }
+	constexpr Bitboard getPieces(Color const& color, Piece const& piece) const
+		{ return board_[color][piece]; }
 
-	constexpr bool occupiedSquare(Square const &square) const
-	{ return (allPieces_ & (C64(1) << square)) ? true : false; }
+	constexpr bool occupiedSquare(Square const& square) const
+		{ return (allPieces_ & (C64(1) << square)) ? true : false; }
 
-	const PieceID idPiece(Square const &square, Color const &color = ALL_COLOR) const;
-	
-	const ushort count(Color const &color = ALL_COLOR) const;
-	const ushort countPieceType(Color const &color, Piece const &piece) const;
-	
+	const PieceID idPiece(Square const& square, Color const& color = ALL_COLOR) const;
+	const ushort count(Color const& color = ALL_COLOR) const;
+	const ushort countPieceType(Color const& color, Piece const& piece) const;
 	const bool isEnding() const;
-
-	const std::vector<Square> getSquareOfPiece(Color const &color, Piece const &piece) const; // PERFORMANCE TROUBLE DUE TO INEFFICIENT VECTOR
+	const std::vector<Square> getSquareOfPiece(Color const& color, Piece const& piece) const; // PERFORMANCE TROUBLE DUE TO INEFFICIENT VECTOR
 	const Square getKingSquare(Color const& color) const; 
-
-	bool isSquareAttacked(Square const &square) const;
+	bool isSquareAttacked(Square const& square) const;
 
 	constexpr uint64_t getZobrist() const { return zobristHash_; }
 	void setZobrist() { zobristHash_ = Zobrist::computeKey(*this); }
 	
 	void updateZobrist(Color const& c, Piece const& p, Square const& sq)
 		{ zobristHash_ ^= Zobrist::getKey(c, p, sq); }
+	
 	void updateZobrist(Square const& sq)
 		{ zobristHash_ ^= Zobrist::getKey(sq); }
+	
 	void updateZobrist(Color const& c)
 		{ zobristHash_ ^= Zobrist::getKey(c); }
+	
 	void updateZobrist(Color const& c, Castle const& castle)
 		{ zobristHash_ ^= Zobrist::getKey(c, castle); }
 };

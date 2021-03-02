@@ -138,7 +138,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		}
 	}
 
-	short staticEval = lazyEval(p);
+	short staticEval = evaluate(p);
 	initKillerMoves();
 
 	// REVERSE FUTILITY PRUNING
@@ -314,7 +314,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 //	/*  				  FUTILITY PRUNING                       */
 //	/* ********************************************************* */
 //	if (depth == 1 && !isPV(alpha, beta))
-//		if (lazyEval(p) + MARGIN < alpha)
+//		if (evaluate(p) + MARGIN < alpha)
 //			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 //				return quiescence(p, alpha, beta);
 //	
@@ -323,7 +323,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 //	/*  				 EXTENDED FUTILITY PRUNING               */
 //	/* ********************************************************* */
 //	if (depth == 2 && !isPV(alpha, beta))
-//		if (lazyEval(p) + EXTENDED_MARGIN < alpha)
+//		if (evaluate(p) + EXTENDED_MARGIN < alpha)
 //			if (!underCheck(p.getTurn(), p) && !p.isEnding())
 //				return quiescence(p, alpha, beta);
 //
@@ -449,7 +449,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 
 const short quiescence(Position p, short alpha, short beta)
 {
-	short stand_pat = lazyEval(p);
+	short stand_pat = evaluate(p);
 	
 	if (stand_pat >= beta)
 		return beta;

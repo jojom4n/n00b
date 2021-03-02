@@ -30,7 +30,8 @@ int eval_NNUE(Position const& p)
 {
 	int nnue_pieces[33]{}, nnue_squares[33]{};
 	fill_NNUE(p, nnue_pieces, nnue_squares);
-	return nnue_evaluate(p.getTurn(), nnue_pieces, nnue_squares);
+	int score = nnue_evaluate(p.getTurn(), nnue_pieces, nnue_squares);
+	return score;
 }
 
 
@@ -43,21 +44,19 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 	nnue_squares[1] = p.getKingSquare(BLACK);
 	nnue_pieces[1] = NNUEmap[ {BLACK, KING} ];
 
-	for (Piece piece = QUEEN; piece <= PAWN; piece++) {
-		
-		Bitboard bb[ALL_COLOR]{ p.getPieces(BLACK, piece), p.getPieces(WHITE, piece) };
-
-		for (Color color = BLACK; color <= WHITE; color++) {
-			while (bb[color]) {
-				Square sq = static_cast<Square>(bitscan_reset(bb[color]));
+	for (short color = WHITE; color >= BLACK; color--) {
+		for (Piece piece = QUEEN; piece <= PAWN; piece++) {
+			Bitboard bb = p.getPieces(Color(color), piece);
+			while (bb) {
+				Square sq = static_cast<Square>(bitscan_reset(bb));
 				nnue_squares[index] = sq;
-				nnue_pieces[index] = NNUEmap[ {color, piece} ];
+				nnue_pieces[index] = NNUEmap[{Color(color), piece}];
 				index++;
 			}
 		}
 	}
-		
+	
+	 	
 	// set zero at the end of pieces and squares arrays
-	nnue_squares[index] = 0;
 	nnue_pieces[index] = 0;
 }

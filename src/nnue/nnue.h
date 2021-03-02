@@ -7,6 +7,10 @@
 #endif
 #endif
 
+#if defined(_MSC_VER)
+#include <cstdint>
+#endif
+
 /**
 * Calling convention
 */
@@ -69,14 +73,14 @@ typedef struct NNUEdata {
 * position data structure passed to core subroutines
 *  See @nnue_evaluate for a description of parameters
 */
-typedef struct Position {
+typedef struct Board {
   int player;
   int* pieces;
   int* squares;
   NNUEdata* nnue[3];
-} Position;
+} Board;
 
-int nnue_evaluate_pos(Position* pos);
+int nnue_evaluate_pos(Board* pos);
 
 /************************************************************************
 *         EXTERNAL INTERFACES

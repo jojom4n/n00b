@@ -33,6 +33,17 @@ enum RaysKnight : const ushort {
 
 enum nodeType : const char { EXACT, LOWER_BOUND, UPPER_BOUND };
 
-struct PieceID { Color color; Piece piece; };
+struct PieceID
+{ 
+	Color color; 
+	Piece piece; 
+
+	// we need the following operator overloading to be able to use PieceID in std::map (see nnuee_eval.cpp)
+	bool operator==(const PieceID& p) const
+		{ return color == p.color && piece == p.piece; }
+
+	bool operator<(const PieceID& p)  const 
+	{ return color < p.color || (color == p.color && piece < p.piece); }
+};
 
 #endif

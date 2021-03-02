@@ -6,8 +6,8 @@
 
 //--------------------
 #ifdef _MSC_VER
-#  define USE_AVX2   1
-#  define USE_SSE41  1
+// #  define USE_AVX2   1
+// #  define USE_SSE41  1
 #  define USE_SSE3   1
 #  define USE_SSE2   1
 #  define USE_SSE    1
@@ -205,7 +205,7 @@ INLINE unsigned make_index(int c, int s, int pc, int ksq)
   return orient(c, s) + PieceToIndex[c][pc] + PS_END * ksq;
 }
 
-static void half_kp_append_active_indices(const Position *pos, const int c,
+static void half_kp_append_active_indices(const Board *pos, const int c,
     IndexList *active)
 {
   int ksq = pos->squares[c];
@@ -217,7 +217,7 @@ static void half_kp_append_active_indices(const Position *pos, const int c,
   }
 }
 
-static void half_kp_append_changed_indices(const Position *pos, const int c,
+static void half_kp_append_changed_indices(const Board *pos, const int c,
     const DirtyPiece *dp, IndexList *removed, IndexList *added)
 {
   int ksq = pos->squares[c];
@@ -232,13 +232,13 @@ static void half_kp_append_changed_indices(const Position *pos, const int c,
   }
 }
 
-static void append_active_indices(const Position *pos, IndexList active[2])
+static void append_active_indices(const Board *pos, IndexList active[2])
 {
   for (unsigned c = 0; c < 2; c++)
     half_kp_append_active_indices(pos, c, &active[c]);
 }
 
-static void append_changed_indices(const Position *pos, IndexList removed[2],
+static void append_changed_indices(const Board *pos, IndexList removed[2],
     IndexList added[2], bool reset[2])
 {
   const DirtyPiece *dp = &(pos->nnue[0]->dirtyPiece);
@@ -892,7 +892,7 @@ static int16_t ft_weights alignas(64) [kHalfDimensions * FtInDims];
 #endif
 
 // Calculate cumulative value without using difference calculation
-INLINE void refresh_accumulator(Position *pos)
+INLINE void refresh_accumulator(Board *pos)
 {
   Accumulator *accumulator = &(pos->nnue[0]->accumulator);
 
@@ -940,7 +940,7 @@ INLINE void refresh_accumulator(Position *pos)
 }
 
 // Calculate cumulative value using difference calculation if possible
-INLINE bool update_accumulator(Position *pos)
+INLINE bool update_accumulator(Board *pos)
 {
   Accumulator *accumulator = &(pos->nnue[0]->accumulator);
   if (accumulator->computedAccumulation)
@@ -1031,7 +1031,7 @@ INLINE bool update_accumulator(Position *pos)
 }
 
 // Convert input features
-INLINE void transform(Position *pos, clipped_t *output, mask_t *outMask)
+INLINE void transform(Board *pos, clipped_t *output, mask_t *outMask)
 {
   if (!update_accumulator(pos))
     refresh_accumulator(pos);
@@ -1075,7 +1075,7 @@ struct NetData {
 };
 
 // Evaluation function
-int nnue_evaluate_pos(Position *pos)
+int nnue_evaluate_pos(Board *pos)
 {
   int32_t out_value;
   alignas(8) mask_t input_mask[FtOutDims / (8 * sizeof(mask_t))];
@@ -1286,7 +1286,7 @@ DLLExport int _CDECL nnue_evaluate(
   NNUEdata nnue;
   nnue.accumulator.computedAccumulation = 0;
 
-  Position pos;
+  Board pos;
   pos.nnue[0] = &nnue;
   pos.nnue[1] = 0;
   pos.nnue[2] = 0;
@@ -1301,7 +1301,7 @@ DLLExport int _CDECL nnue_evaluate_incremental(
 {
   assert(nnue[0] && (uint64_t)(&nnue[0]->accumulator) % 64 == 0);
 
-  Position pos;
+  Board pos;
   pos.nnue[0] = nnue[0];
   pos.nnue[1] = nnue[1];
   pos.nnue[2] = nnue[2];

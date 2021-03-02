@@ -6,6 +6,7 @@
 #include "fen.h"
 #include "makemove.h"
 #include "movegen.h"
+#include "nnue_eval.h"
 #include "perft.h"
 #include "Position.h"
 #include "search.h"
@@ -121,8 +122,9 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	}
 
 	else if ((inputStream.str().substr(0) == "eval")) {
-		std::cout << "Material evaluation is: " << evMaterial(board) << "\n";
-		std::cout << "PSQT evaluation is: " << evPSQT(board);
+		std::cout << "Material evaluation is: " << evMaterial(board);
+		std::cout << "\nPSQT evaluation is: " << evPSQT(board);
+		std::cout << "\nNNUE evaluation is: " << eval_NNUE(board);
 	}
 	
 	else

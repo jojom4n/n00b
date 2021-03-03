@@ -6,6 +6,7 @@
 #include "movegen.h"
 #include "Position.h"
 #include <algorithm>
+#include <map>
 #include <vector>
 
 

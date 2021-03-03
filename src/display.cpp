@@ -4,6 +4,7 @@
 #include "Position.h"
 #include <algorithm>
 #include <iostream>
+#include <map>
 
 
 std::map<std::string, Square> stringToSquareMap = {

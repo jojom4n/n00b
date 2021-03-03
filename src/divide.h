@@ -2,11 +2,12 @@
 #define DIVIDE_H
 
 #include "defs.h"
+#include "display.h"
 #include "makemove.h"
 #include "movegen.h"
 #include "Position.h"
 #include <iostream>
-#include <cstdint>
+#include <map>
 
 template<bool Root>
 uint64_t divide(short const &depth, Position &p)

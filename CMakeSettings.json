@@ -83,9 +83,9 @@
           "type": "STRING"
         },
         {
-        "name": "CMAKE_CXX_FLAGS_RELEASE",
-        "value": "-O3 -DNDEBUG -DUSE_BMI2 -DUSE_POPCNT -flto -static -std=c++17 -msse -msse2 -msse3 -mssse3 -msse4.1 -mbmi2 -mavx2 -mpopcnt  -fomit-frame-pointer",
-        "type": "STRING"
+          "name": "CMAKE_CXX_FLAGS_RELEASE",
+          "value": "-O3 -DNDEBUG -DUSE_BMI2 -DUSE_POPCNT -flto -static -std=c++17 -msse -msse2 -msse3 -mssse3 -msse4.1 -mbmi2 -mavx2 -mpopcnt  -fomit-frame-pointer",
+          "type": "STRING"
         }
       ],
       "intelliSenseMode": "linux-gcc-x64"

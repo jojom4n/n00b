@@ -76,7 +76,7 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 	std::cout << "\n\n";
 	
 	for (ushort i = 0; i <= 32; i++) {
-		std::cout << "Arrays [0] --- \tPiece: "<< nnue_pieces[i] << "\tSquare: " << nnue_squares[i] << "\n";
+		std::cout << "Arrays [" << i << "] --- \tPiece: "<< nnue_pieces[i] << "\tSquare: " << nnue_squares[i] << "\n";
 	}
 
 }

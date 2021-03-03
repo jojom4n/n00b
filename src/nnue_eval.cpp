@@ -37,9 +37,16 @@ int evalFEN_NNUE(const char* fen)
 
 int eval_NNUE(Position const& p)
 {
-	int nnue_pieces[33]{}, nnue_squares[33]{};
+	int nnue_pieces[33], nnue_squares[33];
 	fill_NNUE(p, nnue_pieces, nnue_squares);
-	return nnue_evaluate(p.getTurn(), nnue_pieces, nnue_squares);
+	
+	int side;
+	p.getTurn() == WHITE ? side = 0 : side = 1;
+	
+	/* Stockfish uses wt = 0, bk = 1 for side to move. I use the contrary,
+	so, to make this work, we must use the trick to pass the negation of
+	p.getTurn() */
+	return nnue_evaluate(side, nnue_pieces, nnue_squares);
 }
 
 
@@ -56,13 +63,9 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 		for (Piece piece = QUEEN; piece <= PAWN; piece++) {
 			Bitboard bb = p.getPieces(Color(color), piece);
 			while (bb) {
-				Square sq = Square((bitscan_reset(bb)));
+				Square sq = Square((bitscan_reset(bb, true)));
 				nnue_squares[index] = sq;
 				nnue_pieces[index] = NNUEmap[ {Color(color), piece} ];
-				std::cout << "\nSquare index: " << sq
-					<< "          Square: " << squareToStringMap[sq]
-					<< "\tPiece index:" << NNUEmap[ {color, piece} ]
-					<< "\tPiece: " << Piecemap[ nnue_pieces[index] ];
 				index++;
 			}
 		}
@@ -71,14 +74,4 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 	 	
 	// set zero at the end of pieces and squares arrays
 	nnue_pieces[index] = 0;
-	nnue_squares[index] = 0;
-
-	std::cout << "\n\n";
-	
-	for (ushort i = 0; i <= 32; i++) {
-		std::cout << "Arrays [" << i << "] ----- Piece: "<< nnue_pieces[i] << " ----- Square: " << nnue_squares[i] << "\n";
-	}
-
-	std::cout << "\nNNUE eval of startpos (via FEN): " << evalFEN_NNUE("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-
 }

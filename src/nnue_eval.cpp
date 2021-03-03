@@ -40,12 +40,11 @@ int eval_NNUE(Position const& p)
 	int nnue_pieces[33], nnue_squares[33];
 	fill_NNUE(p, nnue_pieces, nnue_squares);
 	
+	/* Stockfish uses wt = 0, bk = 1 for side to move. I use the opposite,
+	so, to make this work, I must transform p.getTurn() into Stockfish notation */
 	int side;
 	p.getTurn() == WHITE ? side = 0 : side = 1;
 	
-	/* Stockfish uses wt = 0, bk = 1 for side to move. I use the contrary,
-	so, to make this work, we must use the trick to pass the negation of
-	p.getTurn() */
 	return nnue_evaluate(side, nnue_pieces, nnue_squares);
 }
 
@@ -72,6 +71,6 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 	}
 	
 	 	
-	// set zero at the end of pieces and squares arrays
+	// set zero at the end of pieces arrays
 	nnue_pieces[index] = 0;
 }

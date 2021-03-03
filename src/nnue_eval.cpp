@@ -79,4 +79,6 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 		std::cout << "Arrays [" << i << "] ----- Piece: "<< nnue_pieces[i] << " ----- Square: " << nnue_squares[i] << "\n";
 	}
 
+	std::cout << "\nNNUE eval of startpos (via FEN): " << evalFEN_NNUE("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+
 }

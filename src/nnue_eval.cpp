@@ -60,7 +60,7 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 				nnue_squares[index] = sq;
 				nnue_pieces[index] = NNUEmap[ {Color(color), piece} ];
 				std::cout << "\nSquare index: " << sq
-					<< "\tSquare: " << squareToStringMap[sq]
+					<< "          Square: " << squareToStringMap[sq]
 					<< "\tPiece index:" << NNUEmap[{Color(color), piece}]
 					<< "\tPiece: " << Piecemap[nnue_pieces[index]];
 				index++;

@@ -51,7 +51,7 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 	nnue_pieces[0] = NNUEmap[ {WHITE, KING} ];
 	nnue_squares[1] = p.getKingSquare(BLACK);
 	nnue_pieces[1] = NNUEmap[ {BLACK, KING} ];
-
+	
 	for (short color = WHITE; color >= BLACK; color--) {
 		for (Piece piece = QUEEN; piece <= PAWN; piece++) {
 			Bitboard bb = p.getPieces(Color(color), piece);
@@ -61,8 +61,8 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 				nnue_pieces[index] = NNUEmap[ {Color(color), piece} ];
 				std::cout << "\nSquare index: " << sq
 					<< "          Square: " << squareToStringMap[sq]
-					<< "\tPiece index:" << NNUEmap[{Color(color), piece}]
-					<< "\tPiece: " << Piecemap[nnue_pieces[index]];
+					<< "\tPiece index:" << NNUEmap[ {color, piece} ]
+					<< "\tPiece: " << Piecemap[ nnue_pieces[index] ];
 				index++;
 			}
 		}
@@ -71,4 +71,12 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 	 	
 	// set zero at the end of pieces and squares arrays
 	nnue_pieces[index] = 0;
+	nnue_squares[index] = 0;
+
+	std::cout << "\n\n";
+	
+	for (ushort i = 0; i <= 32; i++) {
+		std::cout << "Arrays [0] --- \tPiece: "<< nnue_pieces[i] << "\tSquare: " << nnue_squares[i] << "\n";
+	}
+
 }

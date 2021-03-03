@@ -59,8 +59,10 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 				Square sq = Square((bitscan_reset(bb)));
 				nnue_squares[index] = sq;
 				nnue_pieces[index] = NNUEmap[ {Color(color), piece} ];
-				std::cout << "Square: " << squareToStringMap[sq]
-					<< "\tPiece: " << Piecemap[nnue_pieces[index]] << "\n";
+				std::cout << "\nSquare index: " << sq
+					<< "\tSquare: " << squareToStringMap[sq]
+					<< "\tPiece index:" << NNUEmap[{Color(color), piece}]
+					<< "\tPiece: " << Piecemap[nnue_pieces[index]];
 				index++;
 			}
 		}

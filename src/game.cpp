@@ -124,7 +124,8 @@ void readCommand(std::stringstream &inputStream, Position &board)
 	else if ((inputStream.str().substr(0) == "eval")) {
 		std::cout << "Material evaluation is: " << evMaterial(board);
 		std::cout << "\nPSQT evaluation is: " << evPSQT(board);
-		std::cout << "\nNNUE evaluation is: " << eval_NNUE(board);
+		int score = eval_NNUE(board);
+		std::cout << "\nNNUE evaluation is: " << score;
 	}
 	
 	else

@@ -14,7 +14,7 @@ int main()
 	std::cout << "Welcome to n00b v. 0.1 - An experimental chess engine project\n";
 	std::cout << "Copyright (c) 2021 Binary Pollution\n\n";
 	init_NNUE("nn-62ef826d1a6d.nnue");
-	std::cout << evalFEN_NNUE("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+	std::cout << "NNUE eval of startpos (via FEN): " << evalFEN_NNUE("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 	newGame();
 	return 0;
 }

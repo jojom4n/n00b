@@ -29,6 +29,28 @@
       ]
     },
     {
+      "name": "x64-Debug",
+      "generator": "Ninja",
+      "configurationType": "Debug",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ]
+    },
+    {
+      "name": "x64-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "cmakeCommandArgs": "",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x64_x64" ]
+    },
+    {
       "name": "Mingw64-Release",
       "generator": "Ninja",
       "configurationType": "Release",
@@ -45,7 +67,7 @@
           "FLAVOR": "x86_64-w64-mingw32",
           "TOOLSET_VERSION": "10.2.0",
           "PATH": "${env.MINGW64_ROOT}/bin;${env.MINGW64_ROOT}/../usr/local/bin;${env.MINGW64_ROOT}/../usr/bin;${env.MINGW64_ROOT}/../bin;${env.PATH}",
-          "INCLUDE": "${env.INCLUDE};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/tr1;${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/${env.FLAVOR}",
+           "INCLUDE": "${env.INCLUDE};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/${env.FLAVOR};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/backward;${env.MINGW64_ROOT}/lib/gcc/${env.FLAVOR}/${env.TOOLSET_VERSION}/include;${env.MINGW64_ROOT}/include;${env.MINGW64_ROOT}/lib/gcc/${env.FLAVOR}/${env.TOOLSET_VERSION}/include-fixed;${env.MINGW64_ROOT}/${env.FLAVOR}/include",
           "environment": "mingw_64"
         }
       ],
@@ -59,41 +81,12 @@
           "name": "CMAKE_CXX_COMPILER",
           "value": "${env.BIN_ROOT}/g++.exe",
           "type": "STRING"
-        },
-        {
-          "name": "CMAKE_CXX_FLAGS_RELEASE",
-          "value": "-O3 -DNDEBUG -DUSE_BMI2 -DUSE_POPCNT -flto -static -std=c++17 -msse -msse2 -msse3 -msse4.1 -mbmi2 -mavx2 -mpopcnt  -fomit-frame-pointer",
-          "type": "STRING"
         }
       ],
       "intelliSenseMode": "linux-gcc-x64"
     },
     {
-      "name": "x64-Debug",
-      "generator": "Ninja",
-      "configurationType": "Debug",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
-    },
-    {
-      "name": "x64-Release",
-      "generator": "Ninja",
-      "configurationType": "Release",
-      "buildRoot": "${projectDir}\\out\\build\\${name}",
-      "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
-      "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
-    },
-    {
-      "name": "Mingw64-Release NO BMI2",
+      "name": "Mingw64-Release NO_BMI2",
       "generator": "Ninja",
       "configurationType": "Release",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
@@ -109,7 +102,7 @@
           "FLAVOR": "x86_64-w64-mingw32",
           "TOOLSET_VERSION": "10.2.0",
           "PATH": "${env.MINGW64_ROOT}/bin;${env.MINGW64_ROOT}/../usr/local/bin;${env.MINGW64_ROOT}/../usr/bin;${env.MINGW64_ROOT}/../bin;${env.PATH}",
-          "INCLUDE": "${env.INCLUDE};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/tr1;${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/${env.FLAVOR}",
+          "INCLUDE": "${env.INCLUDE};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/${env.FLAVOR};${env.MINGW64_ROOT}/include/c++/${env.TOOLSET_VERSION}/backward;${env.MINGW64_ROOT}/lib/gcc/${env.FLAVOR}/${env.TOOLSET_VERSION}/include;${env.MINGW64_ROOT}/include;${env.MINGW64_ROOT}/lib/gcc/${env.FLAVOR}/${env.TOOLSET_VERSION}/include-fixed;${env.MINGW64_ROOT}/${env.FLAVOR}/include",
           "environment": "mingw_64"
         }
       ],
@@ -129,8 +122,9 @@
           "value": "-O3 -DNDEBUG -DUSE_POPCNT -flto -static -std=c++17 -msse -msse2 -msse3 -mpopcnt -fomit-frame-pointer",
           "type": "STRING"
         }
+
       ],
       "intelliSenseMode": "linux-gcc-x64"
     }
-  ]
+        ]
 }

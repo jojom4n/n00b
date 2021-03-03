@@ -37,7 +37,7 @@
 *     wking=1, wqueen=2, wrook=3, wbishop= 4, wknight= 5, wpawn= 6,
 *     bking=7, bqueen=8, brook=9, bbishop=10, bknight=11, bpawn=12
 *
-* Make sure the piecesyou pass to the library from your engine
+* Make sure the pieces you pass to the library from your engine
 * use this format.
 */
 enum colors {
@@ -102,7 +102,7 @@ int nnue_evaluate_pos(Board* pos);
 /**
 * Load NNUE file
 */
-DLLExport void _CDECL nnue_init(
+void nnue_init(
   const char * evalFile             /** Path to NNUE file */
 );
 
@@ -111,7 +111,7 @@ DLLExport void _CDECL nnue_init(
 * Returns
 *   Score relative to side to move in approximate centi-pawns
 */
-DLLExport int _CDECL nnue_evaluate_fen(
+int nnue_evaluate_fen(
   const char* fen                   /** FEN string to probe evaluation for */
 );
 
@@ -133,7 +133,7 @@ DLLExport int _CDECL nnue_evaluate_fen(
 * Returns
 *   Score relative to side to move in approximate centi-pawns
 */
-DLLExport int _CDECL nnue_evaluate(
+int nnue_evaluate(
   int player,                       /** Side to move: white=0 black=1 */
   int* pieces,                      /** Array of pieces */
   int* squares                      /** Corresponding array of squares each piece stands on */
@@ -149,7 +149,7 @@ DLLExport int _CDECL nnue_evaluate(
 *    nnue_data[1] is pointer to NNUEdata for ply - 1
 *    nnue_data[2] is pointer to NNUEdata for ply - 2
 */
-DLLExport int _CDECL nnue_evaluate_incremental(
+int nnue_evaluate_incremental(
   int player,                       /** Side to move: white=0 black=1 */
   int* pieces,                      /** Array of pieces */
   int* squares,                     /** Corresponding array of squares each piece stands on */

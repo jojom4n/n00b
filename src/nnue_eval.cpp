@@ -4,13 +4,14 @@
 #include "nnue_eval.h"
 #include "overloading.h"
 #include <map>
+#include <utility>
 
 
 // to use NNUE-probe we must map our piece notation to Stockfish's one via the following map
-std::map<PieceID, int> NNUEmap = {
-	{ {WHITE, KING}, 1 },   { {WHITE, QUEEN}, 2 },   { {WHITE, ROOK}, 3 },    { {WHITE, BISHOP}, 4 },
-	{ {WHITE, KNIGHT}, 5 }, { {WHITE, PAWN}, 6 },    { {BLACK, KING}, 7 },    { {BLACK, QUEEN}, 8 },
-	{ {BLACK, ROOK}, 9 },   { {BLACK, BISHOP}, 10 }, { {BLACK, KNIGHT}, 11 }, { {BLACK, PAWN}, 12 },
+std::map<std::pair<const int, const int> const, int> NNUEmap = {
+	{ std::make_pair(WHITE, KING), 1 },   { std::make_pair(WHITE, QUEEN), 2 },   { std::make_pair(WHITE, ROOK), 3 },    { std::make_pair(WHITE, BISHOP), 4 },
+	{ std::make_pair(WHITE, KNIGHT), 5 }, { std::make_pair(WHITE, PAWN), 6 },    { std::make_pair(BLACK, KING), 7 },    { std::make_pair(BLACK, QUEEN), 8 },
+	{ std::make_pair(BLACK, ROOK), 9 },   { std::make_pair(BLACK, BISHOP), 10 }, { std::make_pair(BLACK, KNIGHT), 11 }, { std::make_pair(BLACK, PAWN), 12 }
 };
 
 

@@ -1,13 +1,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
+#include <string>
 #include <stdlib.h>
 
 //--------------------
 #ifdef _MSC_VER
-// #  define USE_AVX2   1
-// #  define USE_SSE41  1
+#  define USE_AVX2   1
+#  define USE_SSE41  1
 #  define USE_SSE3   1
 #  define USE_SSE2   1
 #  define USE_SSE    1
@@ -1265,7 +1265,7 @@ static bool load_eval_file(const char *evalFile)
 /*
 Interfaces
 */
-DLLExport void _CDECL nnue_init(const char* evalFile)
+void nnue_init(const char* evalFile)
 {
   printf("Loading NNUE : %s\n", evalFile);
   fflush(stdout);
@@ -1280,7 +1280,7 @@ DLLExport void _CDECL nnue_init(const char* evalFile)
   fflush(stdout);
 }
 
-DLLExport int _CDECL nnue_evaluate(
+int nnue_evaluate(
   int player, int* pieces, int* squares)
 {
   NNUEdata nnue;
@@ -1296,7 +1296,7 @@ DLLExport int _CDECL nnue_evaluate(
   return nnue_evaluate_pos(&pos);
 }
 
-DLLExport int _CDECL nnue_evaluate_incremental(
+int nnue_evaluate_incremental(
   int player, int* pieces, int* squares, NNUEdata** nnue)
 {
   assert(nnue[0] && (uint64_t)(&nnue[0]->accumulator) % 64 == 0);
@@ -1311,7 +1311,7 @@ DLLExport int _CDECL nnue_evaluate_incremental(
   return nnue_evaluate_pos(&pos);
 }
 
-DLLExport int _CDECL nnue_evaluate_fen(const char* fen)
+int nnue_evaluate_fen(const char* fen)
 {
   int pieces[33],squares[33],player,castle,fifty,move_number;
   decode_fen((char*)fen,&player,&castle,&fifty,&move_number,pieces,squares);;

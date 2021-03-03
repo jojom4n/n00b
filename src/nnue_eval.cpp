@@ -3,9 +3,9 @@
 #include "nnue/nnue.h"
 #include "nnue_eval.h"
 #include "overloading.h"
+#include <iostream>
 #include <map>
-#include <utility>
-
+#include <string>
 
 // to use NNUE-probe we must map our piece notation to Stockfish's one via the following map
 std::map<std::pair<const int, const int> const, int> NNUEmap = {
@@ -13,6 +13,14 @@ std::map<std::pair<const int, const int> const, int> NNUEmap = {
 	{ std::make_pair(WHITE, KNIGHT), 5 }, { std::make_pair(WHITE, PAWN), 6 },    { std::make_pair(BLACK, KING), 7 },    { std::make_pair(BLACK, QUEEN), 8 },
 	{ std::make_pair(BLACK, ROOK), 9 },   { std::make_pair(BLACK, BISHOP), 10 }, { std::make_pair(BLACK, KNIGHT), 11 }, { std::make_pair(BLACK, PAWN), 12 }
 };
+
+std::map<const int, std::string> Piecemap = {
+	{ 1, "K" },   { 2, "Q" },   { 3, "R" }, { 4, "B" },  { 5, "N" },  { 6, "P" },
+	{ 7, "k" },   { 8, "q" },   { 9, "r" }, { 10, "b" }, { 11, "n" }, { 12, "p" }
+};
+
+
+extern std::map<Square, std::string> squareToStringMap; // see display.cpp
 
 
 void init_NNUE(const char* filename)
@@ -31,8 +39,7 @@ int eval_NNUE(Position const& p)
 {
 	int nnue_pieces[33]{}, nnue_squares[33]{};
 	fill_NNUE(p, nnue_pieces, nnue_squares);
-	int score = nnue_evaluate(p.getTurn(), nnue_pieces, nnue_squares);
-	return score;
+	return nnue_evaluate(p.getTurn(), nnue_pieces, nnue_squares);
 }
 
 
@@ -49,9 +56,11 @@ void fill_NNUE(Position const& p, int* nnue_pieces, int* nnue_squares)
 		for (Piece piece = QUEEN; piece <= PAWN; piece++) {
 			Bitboard bb = p.getPieces(Color(color), piece);
 			while (bb) {
-				Square sq = static_cast<Square>(bitscan_reset(bb));
+				Square sq = Square((bitscan_reset(bb)));
 				nnue_squares[index] = sq;
-				nnue_pieces[index] = NNUEmap[{Color(color), piece}];
+				nnue_pieces[index] = NNUEmap[ {Color(color), piece} ];
+				std::cout << "Square: " << squareToStringMap[sq]
+					<< "\tPiece: " << Piecemap[nnue_pieces[index]] << "\n";
 				index++;
 			}
 		}

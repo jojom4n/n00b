@@ -62,3 +62,10 @@ Color operator++(Color& c, int) {
 	c = static_cast<Color>((static_cast<int>(c) + 1));
 	return temp;
 }
+
+
+Color operator--(Color& c, int) {
+	Color temp = c;
+	c = static_cast<Color>((static_cast<int>(c) - 1));
+	return temp;
+}

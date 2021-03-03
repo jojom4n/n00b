@@ -5,6 +5,7 @@
 #include "makemove.h"
 #include "movegen.h"
 #include "moveorder.h"
+#include "nnue_eval.h"
 #include "tt.h"
 #include <cmath>
 #include <iomanip>
@@ -138,7 +139,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		}
 	}
 
-	short staticEval = evaluate(p);
+	short staticEval = eval_NNUE(p);
 	initKillerMoves();
 
 	// REVERSE FUTILITY PRUNING
@@ -146,7 +147,8 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		&& !underCheck(p.getTurn(), p)
 		&& depth <= RFP_DEPTH
 		&& staticEval - RFP_MARGIN * depth >= beta)
-		return quiescence(p, alpha, beta); // should return staticEval, if only eval() was better
+		// return quiescence(p, alpha, beta); // should return staticEval, if only eval() was better
+		return eval_NNUE(p);
 
 
 	// ALPHA PRUNING
@@ -154,7 +156,8 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		&& !underCheck(p.getTurn(), p)
 		&& depth <= ALPHA_PRUNING_DEPTH
 		&& staticEval + ALPHA_PRUNING_MARGIN <= alpha)
-		return quiescence(p, alpha, beta); // should return staticEval, if only eval() was better
+		// return quiescence(p, alpha, beta); // should return staticEval, if only eval() was better
+		return eval_NNUE(p);
 
 
 	// FUTILITY PRUNING
@@ -183,7 +186,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 		&& nullMove
 		&& !p.isEnding()) {
 		
-		const short R = MAX_R + depth / (MIN_R * 2) + std::min(3, (staticEval - beta) / 200); // thanks to Ethereal (https://tinyurl.com/28xyc68j)
+		const short R = MAX_R + depth / (MIN_R * 2) + std::min(3, (staticEval - beta) / 200); // credtis to Ethereal (https://tinyurl.com/28xyc68j)
 		doNullMove(depth, p);
 		mySearch.height++;
 		short nullScore = -newPVS<false>(p, depth - R, -beta, -beta + 1, subPV);
@@ -449,7 +452,7 @@ const short newPVS(Position& p, short const& depth, short alpha, short const& be
 
 const short quiescence(Position p, short alpha, short beta)
 {
-	short stand_pat = evaluate(p);
+	short stand_pat = eval_NNUE(p);
 	
 	if (stand_pat >= beta)
 		return beta;

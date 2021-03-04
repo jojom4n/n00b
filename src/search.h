@@ -16,7 +16,7 @@
 #define RFP_MARGIN 75 // margin = 3/4 a pawn
 
 #define ALPHA_PRUNING_DEPTH 5 // for alpha pruning
-#define ALPHA_PRUNING_MARGIN 3000 // margin = a piece 
+#define ALPHA_PRUNING_MARGIN 300 // margin = a piece 
 
 #define MARGIN 50 // for futility pruning - MARGIN = half a pawn
 #define EXTENDED_MARGIN 500 // for extended futility pruning - EXTENDED_MARGIN = a rook

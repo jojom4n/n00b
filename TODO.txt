@@ -1,7 +1,11 @@
 TODO:
 
---- Generazione di mosse per template<Pezzo>
---- Produrre mosse sulla base della tabella dei pezzi inchiodati; produrre, come uniche possibili mosse illegali, i movimenti del Re e le prese e.p. e controllare solo
-la legalità di queste due tipologie di mosse
+--- Late Move Reduction (LMR)
+--- Lazy SMP (shared hash table)
+--- 50-rule repetition draw
+--- UCI interface
+--- Affinamento dello score
+--- Bugfix dello score MATE
 --- Generazione di CheckEvasions
 --- Risolvere la problematica con i timing di Clock (t1, t2 ... tn)
+ 

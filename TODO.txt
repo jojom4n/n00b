@@ -1,5 +1,7 @@
 TODO:
 
+-- Ridurre Move da 32-bit a 16-bit (in previsione di riuscire ad inserire la Move in una lockless shared hash table)
+-- Al fine di ridurre la Move a 16-bit, valutare di ridurre anche l'enum del MoveType, eliminando Promotion, Evasaione e gli arrocchi
 --- Late Move Reduction (LMR)
 --- Lazy SMP (shared hash table)
 --- 50-rule repetition draw

@@ -245,61 +245,6 @@ const Move composeMove(Square const &from, Square const &to, Color const &c, ush
 ushort underCheck(Color const &c, Position const &p)
 {
 	return p.isSquareAttacked(p.getKingSquare(c)) ? true : false;
-		
-	/* Bitboard kingBB = p.getPieces(c, KING);
-	Bitboard opponent, attackedBy, occ = p.getPosition();
-	ushort attackers{};
-	
-	// ROOK
-	opponent = p.getPieces(Color(!c), ROOK); // get rook's bitboard
-	if (opponent) {
-		attackedBy = g_MoveTables.rook(kingPos, occ); // does rook's attack mask...
-		if (attackedBy &= opponent) // ...intersect King's square?
-			attackers += 1;
-	}
-	
-	// BISHOP
-	opponent = p.getPieces(Color(!c), BISHOP); // get bishop's bitboard
-	if (opponent) {
-		attackedBy = g_MoveTables.bishop(kingPos, occ); // does bishop's attack mask...
-		if (attackedBy &= opponent) // ...intersect King's square?
-			attackers += 1;
-	}
-
-	// QUEEN
-	opponent = p.getPieces(Color(!c), QUEEN); // get queen's bitboard
-	if (opponent) {
-		attackedBy = g_MoveTables.rook(kingPos, occ) | g_MoveTables.bishop(kingPos, occ); // does queen's attack mask...
-		if (attackedBy &= opponent) // ...intersect King's square?
-			attackers += 1;
-	}
-
-
-	// KNIGHT
-	opponent = p.getPieces(Color(!c), KNIGHT); // get knight's bitboard
-	if (opponent) {
-		attackedBy = g_MoveTables.knight[kingPos]; // does knight's attack mask...
-		if (attackedBy &= opponent) // ...intersect King's square?
-			attackers += 1;
-	}
-
-	// KING
-	opponent = p.getPieces(Color(!c), KING); // get enemy king's bitboard
-	attackedBy = g_MoveTables.king[kingPos]; // does enemy king's attack mask...
-	if (attackedBy &= opponent) // ...intersect King's square?
-		attackers += 1;
-
-	//PAWNS
-	opponent = p.getPieces(Color(!c), PAWN); // get pawn's bitboard
-	if (opponent) {
-		// does enemy pawn's attack mask...
-		(c == WHITE) ? attackedBy = g_MoveTables.blackPawn(opponent, occ) : attackedBy = g_MoveTables.whitePawn(opponent, occ);
-		if (attackedBy &= kingBB) // ...intersect King's square?
-			attackers += 1;
-	}
-
-	
-	return attackers; // return number of pieces attacking the King */
 }
 
 

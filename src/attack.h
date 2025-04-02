@@ -4,7 +4,15 @@
 #include "enums.h"
 #include "magic.h"
 #include <array>
-#include <intrin.h>
+
+#if defined(_MSC_VER)
+    #include <intrin.h> // For MSVC
+#elif defined(__GNUC__) || defined(__clang__)
+    // Include platform-specific headers or provide alternatives here
+    #include <x86intrin.h> // GCC/Clang equivalent for x86 intrinsics
+#else
+    #error "Unsupported compiler: intrinsics not available"
+#endif
 
 struct Mask {
 	std::array<Bitboard, FILE_NUMBER> file;

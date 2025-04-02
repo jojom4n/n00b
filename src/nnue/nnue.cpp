@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <stdlib.h>
+#include <cstring>
 
 //--------------------
 #ifdef _MSC_VER
@@ -923,7 +924,7 @@ INLINE void refresh_accumulator(Board *pos)
         accTile[j] = acc[j];
     }
 #else
-    memcpy(accumulator->accumulation[c], ft_biases,
+  memcpy(accumulator->accumulation[c], ft_biases,
         kHalfDimensions * sizeof(int16_t));
 
     for (size_t k = 0; k < activeIndices[c].size; k++) {

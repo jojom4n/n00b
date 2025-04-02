@@ -8,6 +8,7 @@
 #include "nnue_eval.h"
 #include "tt.h"
 #include <cmath>
+#include <cstring>
 #include <iomanip>
 #include <iostream>
 

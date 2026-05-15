@@ -34,15 +34,15 @@ struct Search {
 	std::array<std::array<Move, 3>, MAX_PLY> killerMoves;
 };
 
-const Move iterativeSearch(Position& p, short const& depth);
+const Move iterativeSearch(Position& p, Search& search, short const& depth);
 
 /* template<bool nullMove>
 const short pvs(Position& p, short depth, short alpha, short beta, Move* pv); */
 
 template<bool nullMove>
-const short newPVS(Position& p, short const& depth, short alpha, short const& beta, Move* pv);
+const short newPVS(Position& p, Search& search, short const& depth, short alpha, short beta, Move* pv);
 
-const short quiescence(Position p, short alpha, short beta);
-void initKillerMoves();
+const short quiescence(Position p, Search& search, short alpha, short beta);
+void initKillerMoves(Search& search);
 
 #endif

@@ -31,8 +31,6 @@ enum RaysKnight : const ushort {
 	SOUTH_SOUTH_WEST, SOUTH__WEST_WEST, NORTH_WEST_WEST, RAYS_KNIGHT_NUMBER
 };
 
-enum nodeType : const char { EXACT, LOWER_BOUND, UPPER_BOUND };
-
 struct PieceID
 { 
 	Color color; 

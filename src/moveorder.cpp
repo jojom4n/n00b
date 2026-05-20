@@ -3,23 +3,21 @@
 #include "enums.h"
 #include "evaluation.h"
 #include "makemove.h"
-#include "search.h"
 #include <algorithm>
 #include <map>
 
 extern const std::map<Piece, ushort> g_pieceValue; // see evaluation.cpp (and its header)
-extern struct Search mySearch;
 
-
-std::vector<Move> ordering(std::vector<Move> const &moves, Position const &p, short const &depth)
+std::vector<Move> ordering(std::vector<Move> const &moves, Position const &p, short const &depth, 
+	Search const &search)
 {
 	std::vector<Move> moveList, captures;
 	moveList.reserve(MAX_PLY);
 	captures.reserve(MAX_PLY);
 
 	for (const auto& m : moves) {
-		if (std::find(moves.begin(), moves.end(), mySearch.bestMove) != moves.end())
-			moveList.push_back(mySearch.bestMove);
+		if (std::find(moves.begin(), moves.end(), search.bestMove) != moves.end())
+			moveList.push_back(search.bestMove);
 	}
 
 	captures = mvv_lva(moves);

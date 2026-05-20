@@ -1,28 +1,35 @@
 #ifndef TT_H
 #define TT_H
 
-#include "params.h"
-#include "search.h"
+#include "Position.h"
+#include "defs.h"
+#include <cstdint>
+#include <atomic>
 
-enum TTNodeType : unsigned char {
-	EXACT = 0,
-	LOWER_BOUND = 1,
-	UPPER_BOUND = 2
+enum TTNodeType 
+{
+	EXACT,
+	LOWER,
+	UPPER
 };
 
-struct TTEntry {
-	uint32_t key{}; // zobrist key - reduced to 32-bit
-	uint8_t depth{}; // depth - 8-bit
-	Move move{}; // best move - 32-bit
-	int16_t score{}; // score for move - 16-bit
-	TTNodeType nodeType{}; // type of node (exact, fail-high, fail-low)
-	uint8_t age{}; // age (6-bit)
+struct TTEntry
+{
+	std::atomic<uint32_t> key;
+	uint8_t depth;
+	Move move;
+	int16_t score;
+	uint8_t nodeType;
+	uint8_t age;
 };
 
-namespace TT {
-	extern std::vector<TTEntry> table;
-	void Store(const TTEntry& entry);
+namespace TT
+{
+	void Init();
+	void Store(uint32_t key, uint8_t depth, Move move, int16_t score, TTNodeType nodeType, uint8_t age);
 	const TTEntry* Lookup(uint32_t key, uint8_t depth);
+	void Clear();
+	void Deinit();
 }
 
 #endif

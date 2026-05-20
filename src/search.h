@@ -1,6 +1,7 @@
 #ifndef SEARCH_H
 #define SEARCH_H
 
+#include "tt.h"
 #include "defs.h"
 #include "params.h"
 #include "Position.h"
@@ -42,7 +43,7 @@ const short pvs(Position& p, short depth, short alpha, short beta, Move* pv); */
 template<bool nullMove>
 const short newPVS(Position& p, Search& search, short const& depth, short alpha, short beta, Move* pv);
 
-const short quiescence(Position p, Search& search, short alpha, short beta);
+const short quiescence(Position& p, Search& search, short alpha, short beta);
 void initKillerMoves(Search& search);
 
 #endif

@@ -80,7 +80,8 @@ void readCommand(std::stringstream &inputStream, Position &board)
 		short depth = stoi(inputStream.str().substr(7));
 		
 		if (depth > 0 && !(depth > MAX_PLY)) {
-			Move m = iterativeSearch(board, depth);
+			Search search;
+			Move m = iterativeSearch(board, search, depth);
 			if (m) {
 				doMove(m, board);
 				std::cout << std::endl;

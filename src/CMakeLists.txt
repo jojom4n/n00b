@@ -29,6 +29,7 @@ set(HEADER_FILES
     "psqt.h"
     "search.h"
     "tt.h"
+    "uci.h"
     "zobrist.h"
 )
 source_group("Header files" FILES ${HEADER_FILES})
@@ -54,6 +55,7 @@ set(SRC_FILES
     "Position.cpp"
     "search.cpp"
     "tt.cpp"
+    "uci.cpp"
     "zobrist.cpp"
 )
 source_group("Source files" FILES ${SRC_FILES})

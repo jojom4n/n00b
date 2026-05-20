@@ -266,3 +266,6 @@ __pycache__/
 *.pyc
 .aider*
 CLAUDE.md
+.clang-format
+.gitignore
+.editorconfig

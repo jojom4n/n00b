@@ -269,3 +269,10 @@ CLAUDE.md
 .clang-format
 .gitignore
 .editorconfig
+memory-bank/active-context.md
+memory-bank/progress.md
+memory-bank/project-context.md
+memory-bank/system-patterns.md
+memory-bank/tech-stack.md
+compile_commands.json
+.clinerules

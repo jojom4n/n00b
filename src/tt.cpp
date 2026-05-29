@@ -2,6 +2,7 @@
 #include "tt.h"
 #include "makemove.h"
 #include "movegen.h"
+#include <cstring>
 
 namespace TT
 {
@@ -50,7 +51,7 @@ namespace TT
 		slot.score = score;
 		slot.nodeType = nodeType;
 		slot.age = age;
-		
+
 		// Atomically store the key last - this provides happens-before guarantee
 		slot.key.store(key, std::memory_order_release);
 	}

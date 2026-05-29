@@ -4,8 +4,9 @@
 #include "game.h"
 #include "tt.h"
 #include "zobrist.h"
-#include <iostream>
 #include "uci.h"
+#include <iostream>
+
 
 int main()
 {
@@ -16,5 +17,6 @@ int main()
 	std::cout << "Copyright (c) 2021 Binary Pollution\n\n";
 	init_NNUE("nn-62ef826d1a6d.nnue");
 	UCI::run();
+	//newGame();
 	return 0;
 }

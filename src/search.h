@@ -33,6 +33,11 @@ struct Search {
 	unsigned long long nodes, ttHits, ttUseful;
 	Move bestMove{}, pv[MAX_PLY];
 	std::array<std::array<Move, 3>, MAX_PLY> killerMoves;
+	int whiteTime = 0;
+	int blackTime = 0;
+	int whiteIncrement = 0;
+	int blackIncrement = 0;
+	int movesToGo = 0;
 };
 
 const Move iterativeSearch(Position& p, Search& search, short const& depth);

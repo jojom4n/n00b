@@ -59,7 +59,6 @@ const Move iterativeSearch(Position& p, Search& search, short const& depth)
 
             if (search.bestMove)
             {
-
                 std::cout << "*depth:" << ply << " nodes:" << search.nodes
                           << " ms:" << (unsigned int)(depthTime.count())
                           << " total_ms:" << totalTime
@@ -149,11 +148,16 @@ const short newPVS(Position& p, Search& search, short const& depth, short alpha,
     if (entryPtr)
     {
         search.ttHits++;
-        search.ttUseful++;
         const TTEntry& entry = *entryPtr;
         if (entry.nodeType == TTNodeType::EXACT)
         {
-            return entry.score;
+            search.ttUseful++;
+            if (rootNode && entry.move)
+                search.bestMove = entry.move;
+            // In PV nodes, do NOT return early from TT.
+            // Continue searching to build the full PV via recursive memcpy.
+            if (!isPV)
+                return entry.score;
         }
         else if (entry.nodeType == TTNodeType::LOWER)
         {
@@ -163,9 +167,12 @@ const short newPVS(Position& p, Search& search, short const& depth, short alpha,
         {
             beta = std::min(beta, entry.score);
         }
-        if (alpha >= beta)
+        if (!isPV && alpha >= beta)
         {
-            return alpha;
+            search.ttUseful++;
+            if (rootNode && entry.move)
+                search.bestMove = entry.move;
+            return entry.score;
         }
     }
 
@@ -272,10 +279,12 @@ const short newPVS(Position& p, Search& search, short const& depth, short alpha,
     }
 
     if (played == 0)
+    {
+        search.bestMove = bestMove;
         return underCheck(p.getTurn(), p) ? -MATE + search.height : 0;
+    }
 
     // --- INTEGRAZIONE TT: Salvataggio del nodo ---
-    // Fix the TT::Store call to pass individual parameters instead of TTEntry object
     TT::Store(
         static_cast<uint32_t>(p.getZobrist()), static_cast<uint8_t>(depth), bestMove, bestScore,
         static_cast<TTNodeType>(bestScore <= alphaOrig
@@ -333,3 +342,4 @@ void initKillerMoves(Search& search)
     search.killerMoves[search.height + 1][1] = 0;
     search.killerMoves[search.height + 1][2] = 0;
 }
+

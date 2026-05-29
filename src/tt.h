@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <atomic>
 
-enum TTNodeType 
+enum TTNodeType
 {
 	EXACT,
 	LOWER,

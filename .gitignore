@@ -276,3 +276,8 @@ memory-bank/system-patterns.md
 memory-bank/tech-stack.md
 compile_commands.json
 .clinerules
+memory-bank/activeContext.md
+memory-bank/productContext.md
+memory-bank/projectbrief.md
+memory-bank/systemPatterns.md
+memory-bank/techContext.md

@@ -6,6 +6,7 @@ set(PROJECT_NAME n00b)
 set(HEADER_FILES
     "attack.h"
     "bitscan.h"
+    "book.h"
     "defs.h"
     "display.h"
     "divide.h"
@@ -34,30 +35,31 @@ set(HEADER_FILES
 )
 source_group("Header files" FILES ${HEADER_FILES})
 
-set(SRC_FILES
-    "attack.cpp"
-    "bitscan.cpp"
-    "display.cpp"
-    "evaluation.cpp"
-    "fen.cpp"
-    "game.cpp"
-    "magic.cpp"
-    "main.cpp"
-    "makemove.cpp"
-    "./nnue/misc.cpp"
-    "movegen.cpp"
-    "moveorder.cpp"
-    "./nnue/nnue.cpp"
-    "nnue_eval.cpp"
-    "overloading.cpp"
-    "pch.cpp"
-    "perft.cpp"
-    "Position.cpp"
-    "search.cpp"
-    "tt.cpp"
-    "uci.cpp"
-    "zobrist.cpp"
-)
+ set(SRC_FILES
+     "attack.cpp"
+     "bitscan.cpp"
+     "book.cpp"
+     "display.cpp"
+     "evaluation.cpp"
+     "fen.cpp"
+     "game.cpp"
+     "magic.cpp"
+     "main.cpp"
+     "makemove.cpp"
+     "./nnue/misc.cpp"
+     "movegen.cpp"
+     "moveorder.cpp"
+     "./nnue/nnue.cpp"
+     "nnue_eval.cpp"
+     "overloading.cpp"
+     "pch.cpp"
+     "perft.cpp"
+     "Position.cpp"
+     "search.cpp"
+     "tt.cpp"
+     "uci.cpp"
+     "zobrist.cpp"
+ )
 source_group("Source files" FILES ${SRC_FILES})
 
 set(RSRC_FILES

@@ -296,24 +296,12 @@ std::optional<Move> BookManager::getBookMove(const Position& pos, int depth) con
         cumulative += mw.weight;
         if (selected < cumulative) {
             // Decode the Polyglot move
-            uint16_t pgMove = mw.move;
-            uint8_t fromSquare = (pgMove >> 6) & 0x3F;
-            uint8_t toSquare = pgMove & 0x3F;
-            uint8_t promotion = (pgMove >> 12) & 7;
-
-            // Encode the move back
-            Move move = static_cast<Move>(fromSquare | (toSquare << 6) | (promotion << 12));
-            return move;
+            return decodePolyglotMove(mw.move, pos);
         }
     }
 
     // Fallback to the last move
-    uint16_t pgMove = moves.back().move;
-    uint8_t fromSquare = (pgMove >> 6) & 0x3F;
-    uint8_t toSquare = pgMove & 0x3F;
-    uint8_t promotion = (pgMove >> 12) & 7;
-    Move move = static_cast<Move>(fromSquare | (toSquare << 6) | (promotion << 12));
-    return move;
+    return decodePolyglotMove(moves.back().move, pos);
 }
 
 std::optional<Move> BookManager::getWeightedBookMove(const Position& pos) const
@@ -512,19 +500,70 @@ uint16_t BookManager::encodePolyglotMove(Move move) const
     return pgMove;
 }
 
-Move BookManager::decodePolyglotMove(uint16_t pgMove) const
+Move BookManager::decodePolyglotMove(uint16_t pgMove, const Position& pos) const
 {
     // Decode a Polyglot move to our engine format
-    uint8_t fromFile = pgMove & 0x1F;
-    uint8_t toFile = (pgMove >> 5) & 0x1F;
-    uint8_t fromRank = (pgMove >> 10) & 0x07;
-    uint8_t toRank = (pgMove >> 13) & 0x07;
+    Square toSquare   = Square((pgMove)       & 0x3F); // Prende i primi 6 bit
+    Square fromSquare = Square((pgMove >> 6)  & 0x3F); // Prende i successivi 6 bit
+    ushort promoType  = (pgMove >> 12) & 0x07; // Prende i 3 bit di promo
+    Piece promotedTo{};
 
-    Move move = (fromFile & 0x1F) |
-                ((fromRank & 0x1F) << 5) |
-                ((toFile & 0x1F) << 10) |
-                ((toRank & 0x1F) << 15);
+    switch (promoType) {
+        case 1:
+            promotedTo = KNIGHT;
+        case 2:
+            promotedTo = BISHOP;
+        case 3:
+            promotedTo = ROOK;
+        case 4:
+            promotedTo = QUEEN;
+        default:
+            promotedTo = NO_PIECE;
+    }
 
+    Move move{};
+
+    move = (move << 6) | fromSquare;
+    move = (move << 6) | toSquare;
+
+    // Let's get the colour from position
+    move = (move << 1) | pos.getTurn(); 
+    
+    // The piece
+    Piece piece = pos.idPiece(fromSquare).piece;
+    move = (move << 3) | piece;
+
+    if (promoType)
+        if (pos.occupiedSquare(toSquare)) 
+            move = composeMove (fromSquare, toSquare, pos.getTurn(), PAWN, PROMOTION,
+                    pos.idPiece(toSquare).piece, promotedTo);
+        else
+            move = composeMove (fromSquare, toSquare, pos.getTurn(), PAWN, PROMOTION,
+                    NO_PIECE, promotedTo);
+    else if (toSquare == pos.getEnPassant())
+        {
+            move = composeMove (fromSquare, toSquare, pos.getTurn(), PAWN, EN_PASSANT,
+                    PAWN, 0);
+        }
+    else if (pos.occupiedSquare(toSquare)) 
+    { 
+        if (pos.idPiece(fromSquare).piece == KING && pos.idPiece(toSquare).piece == ROOK) // castle    
+            if (toSquare == A1 || toSquare == A8) 
+                move = composeMove (fromSquare, toSquare, pos.getTurn(), KING, CASTLE_Q,
+                    NO_PIECE, 0);
+            else
+                move = composeMove (fromSquare, toSquare, pos.getTurn(), KING, CASTLE_K,
+                    NO_PIECE, 0);
+        else
+            {
+                move = composeMove (fromSquare, toSquare, pos.getTurn(), pos.idPiece(fromSquare).piece, CAPTURE,
+                    pos.idPiece(toSquare).piece, 0);
+            }
+    }
+    else
+        move = composeMove (fromSquare, toSquare, pos.getTurn(), pos.idPiece(fromSquare).piece, QUIET,
+                    NO_PIECE, 0);
+    
     return move;
 }
 
@@ -591,7 +630,7 @@ std::vector<BookManager::BookMove> BookManager::getAllBookMoves(const Position& 
             break;
         }
 
-        result.push_back({decodePolyglotMove(be16ToNative(entry.move)), be16ToNative(entry.weight)});
+        result.push_back({decodePolyglotMove(be16ToNative(entry.move), pos), be16ToNative(entry.weight)});
     }
 
     return result;

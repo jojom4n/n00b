@@ -340,7 +340,7 @@ private:
     uint16_t encodePolyglotMove(Move move) const;
 
     // Decode move from Polyglot format
-    Move decodePolyglotMove(uint16_t pgMove) const;
+    Move decodePolyglotMove(uint16_t pgMove, const Position& pos) const;
 
     // --- Portable inline helper functions for Big-Endian to Little-Endian conversion ---
 

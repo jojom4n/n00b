@@ -275,7 +275,7 @@ std::optional<Move> BookManager::getBookMove(const Position& pos, int depth) con
         }
 
         moves.push_back({be16ToNative(entry.move), be16ToNative(entry.weight)});
-        totalWeight += entry.weight;
+        totalWeight += be16ToNative(entry.weight);
     }
 
     file.close();
